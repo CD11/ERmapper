@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">ERmapper</string>
+    <string name="title_activity_erdraw">ERDraw</string>
+    <string name="title_activity_create_entity">CreateEntity</string>
+    <string name="title_activity_fxapplication_main">FXApplicationMain</string>
+</resources>
