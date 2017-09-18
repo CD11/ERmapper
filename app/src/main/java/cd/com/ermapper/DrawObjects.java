@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.drawable.shapes.Shape;
+import android.support.v4.view.MotionEventCompat;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -88,9 +89,74 @@ public class DrawObjects extends View {
         }
 
     }
+    //events when touching the screen
+    public boolean onTouchEvent(MotionEvent event) {
+        int eventaction = event.getAction();
+
+
+        Button b = (Button) findViewById(R.id.relationship);
+        boolean bClicked = b.isActivated();
+
+
+        switch (eventaction) {
+            case MotionEvent.ACTION_DOWN: {
+                // Remember where we started (for dragging)
+                startX = event.getX();
+                startY = event.getY();
+                for (ShapeObject i : objects) {
+                    if(i.getCoordinates().contains(startX, startY)) {
+
+                        curr = i;
+                        Log.d("TouchEvent", "shape found" + String.valueOf(i.getClass()));
+                    }
+
+                }
+                break;
+            }
 
 
 
+            case MotionEvent.ACTION_MOVE: {
+                // touch down so check if the finger is on
 
+                endX = event.getX();
+                endY = event.getY();
+                if(curr != null) {
+
+                    curr.setCoordinateX(endX);
+                    curr.setCoordinateY(endY);
+                    curr.getNameEdit().setX(endX + 10);
+                    curr.getNameEdit().setY(endY + 100);
+                    invalidate();
+                }
+                break;
+
+            }
+
+            case MotionEvent.ACTION_UP: {
+                // touch down so check if the finger is on
+                endX = event.getX();
+                endY = event.getY();
+
+
+                if(curr != null) {
+                    Log.d("TouchEvent", "contains");
+                    curr.setCoordinateX(endX);
+                    curr.setCoordinateY(endY);
+
+                    curr.getNameEdit().setX(endX + 10);
+                    curr.getNameEdit().setY(endY + 60);
+                    invalidate();
+                    curr = null;
+
+                }
+                break;
+
+            }
+
+        }
+        return true;
+
+    }
 }
 
