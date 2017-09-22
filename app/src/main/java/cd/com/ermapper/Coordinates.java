@@ -21,4 +21,15 @@ public class Coordinates {
         return this.x < x && this.width > x && this.y < y && this.height > y;
     }
 
+    public float centerX() {
+        float c;
+        c = this.x + ((this.width - this.x)/2);
+        return c;
+    }
+
+    public float centerY() {
+        float c;
+        c = this.y + ((this.height - this.y)/2);
+        return c;
+    }
 }

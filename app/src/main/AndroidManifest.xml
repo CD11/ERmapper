@@ -27,6 +27,10 @@
         <activity
             android:name=".FXApplicationMain"
             android:label="@string/title_activity_fxapplication_main"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".FDNormalization"
+            android:label="@string/title_activity_fdnormalization"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

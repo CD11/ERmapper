@@ -1,162 +1,232 @@
 package cd.com.ermapper;
 
 import android.content.Context;
-
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.drawable.shapes.Shape;
-import android.support.v4.view.MotionEventCompat;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
 
-
-import org.w3c.dom.Attr;
-
-import java.util.ArrayList;
-
-import static android.R.attr.button;
-import static android.R.attr.y;
 
 
 public class DrawObjects extends View {
 
     ERDiagram d;
+    int state;
     float startX, startY, endX, endY;
-    ArrayList<Entity> entity;
-    ArrayList<Attribute> attributes;
-    ArrayList<ShapeObject> objects;
     ShapeObject curr;
+    ShapeObject curr1;
+    Relationship rCurr;
+    Paint paint;
 
-    public DrawObjects(Context context, ERDiagram diagram){
+    public DrawObjects(Context context, ERDiagram diagram, int state){
         super(context);
         d = diagram;
-        entity = diagram.getEntities();
-        attributes = diagram.getAttributes();
-        objects = diagram.getObjects();
+        this.state = state;
 
-        for(ShapeObject o: objects){
+        for(ShapeObject o: d.getObjects()){
             Log.d("DrawingER", "Object: " + String.valueOf(o.getClass()));
         }
+    }
+
+    public void setState(int state) {
+     this.state = state;
+     Log.d("setState", "setting"  + Integer.toString(state));
     }
 
     @Override
     public void onDraw(Canvas canvas){
         super.onDraw(canvas);
+        paint = new Paint();
 
-        Paint paint = new Paint();
-        paint.setColor(Color.BLACK);
-        paint.setStrokeWidth(3);
-        paint.setStyle(Paint.Style.STROKE);
-        d.update(entity);
-        d.updateA(attributes);
+        // If this is a new relationship, draw a line that follows the mouse
+        if(state == 3 && rCurr != null ) {
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setColor(Color.BLACK);
+            canvas.drawLine(rCurr.getCoordinates().x, rCurr.getCoordinates().y, rCurr.getCoordinates().width, rCurr.getCoordinates().height, paint);
 
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(Color.WHITE);
+            canvas.drawPath(rCurr.drawDiamond(), paint);
 
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setColor(Color.BLACK);
+            canvas.drawPath(rCurr.drawDiamond(), paint);
 
-        for(ShapeObject e: objects) {
+        }
+        // check each object in teh diagram
+        for(ShapeObject e: d.getSortedObjects()) {
             Coordinates c = e.getCoordinates();
             Log.d("DrawingER", "Searching " + e.getClass());
 
-            if(e.getClass() == Entity.class) {
-                canvas.drawRect(c.x, c.y, c.width, c.height, paint);
-                Log.d("DrawingER", "Entity");
-            }
-            else if(e.getClass() == Attribute.class){
-                canvas.drawOval(c.x, c.y, c.width, c.height, paint);
-                Log.d("DrawingER", "Attribute");
-            }
-            else if(e.getClass() == Relationship.class){
-                Relationship r  = (Relationship) e;
-                float startX = r.getObj1().getCoordinates().x;
-                float startY = r.getObj1().getCoordinates().y;
-                float endX = r.getObj2().getCoordinates().x;
-                float endY = r.getObj2().getCoordinates().y;
+            // draw  relationships objects
+            if(e.getClass() == Relationship.class){
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setColor(Color.BLACK);
+                canvas.drawLine(c.x, c.y, c.width, c.height, paint);
 
-                canvas.drawLine(startX, startY, endX, endY, paint);
+                paint.setStyle(Paint.Style.FILL);
+                paint.setColor(Color.WHITE);
+                canvas.drawPath(((Relationship)e).drawDiamond(), paint);
+
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setColor(Color.BLACK);
+                canvas.drawPath(((Relationship)e).drawDiamond(), paint);
                 Log.d("DrawingER", "Relationship");
             }
 
+            // draw entities pbjects
+            else if(e.getClass() == Entity.class) {
+                paint.setStyle(Paint.Style.FILL);
+                paint.setColor(Color.WHITE);
+                canvas.drawRect(c.x, c.y, c.width, c.height, paint);
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setColor(Color.BLACK);
+                canvas.drawRect(c.x, c.y, c.width, c.height, paint);
 
+
+                Log.d("DrawingER", "Entity");
+            }
+
+            // draw attribute objects
+            else if(e.getClass() == Attribute.class){
+                paint.setStyle(Paint.Style.FILL);
+                paint.setColor(Color.WHITE);
+                canvas.drawOval(c.x, c.y, c.width, c.height, paint);
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setColor(Color.BLACK);
+                canvas.drawOval(c.x, c.y, c.width, c.height, paint);
+                Log.d("DrawingER", "Attribute");
+            }
 
         }
-
-        for(ShapeObject e: objects) {
+        // make sure name are visible
+        for(ShapeObject e: d.getObjects()) {
             e.getNameEdit().bringToFront();
         }
-
     }
-    //events when touching the screen
+
+
+    @Override
     public boolean onTouchEvent(MotionEvent event) {
-        int eventaction = event.getAction();
+            int eventaction = event.getAction();
+            Log.d("checkState", Integer.toString(state));
 
 
-        Button b = (Button) findViewById(R.id.relationship);
-        boolean bClicked = b.isActivated();
+            switch (eventaction) {
 
+                case MotionEvent.ACTION_DOWN: {
+                    // Remember where we started (for dragging)
+                    startX = event.getX();
+                    startY = event.getY();
 
-        switch (eventaction) {
-            case MotionEvent.ACTION_DOWN: {
-                // Remember where we started (for dragging)
-                startX = event.getX();
-                startY = event.getY();
-                for (ShapeObject i : objects) {
-                    if(i.getCoordinates().contains(startX, startY)) {
-
-                        curr = i;
-                        Log.d("TouchEvent", "shape found" + String.valueOf(i.getClass()));
+                    // check of an object was clicked
+                    for (ShapeObject i : d.getObjects()) {
+                        if (i.getCoordinates().contains(startX, startY)) {
+                            curr = i;
+                            // set x,y for a new relationship
+                            if (state == 3 && rCurr != null) {
+                                rCurr.setCoordinateX(startX);
+                                rCurr.setCoordinateY(startY);
+                            }
+                        }
                     }
 
+                    break;
                 }
-                break;
-            }
 
+                case MotionEvent.ACTION_MOVE: {
+                    // touch down so check if the finger is on
+                    endX = event.getX();
+                    endY = event.getY();
+                    // update coordinates of the objects
+                    if (curr != null && (state != 3) && curr.getClass() != Relationship.class) {
+                        curr.setCoordinateX(endX);
+                        curr.setCoordinateY(endY);
+                        float w =  curr.getNameEdit().getWidth()/2;
+                        float h = curr.getNameEdit().getHeight()/2;
+                        curr.getNameEdit().setX(curr.getCoordinates().centerX()-w);
+                        curr.getNameEdit().setY(curr.getCoordinates().centerY()-h);
+                        // make sure relationship lines follow its obhects
+                        if(curr.hasRelationships()){
+                            for(Relationship r : curr.relationships){
+                                r.update();
+                            }
+                        }
+                        // update the relationship line coordinates to follow the mouse
+                    }else if (rCurr!= null && (state == 3)){
+                      rCurr.setCoordinateW(endX);
+                      rCurr.setCoordinateH(endY);
 
-
-            case MotionEvent.ACTION_MOVE: {
-                // touch down so check if the finger is on
-
-                endX = event.getX();
-                endY = event.getY();
-                if(curr != null) {
-
-                    curr.setCoordinateX(endX);
-                    curr.setCoordinateY(endY);
-                    curr.getNameEdit().setX(endX + 10);
-                    curr.getNameEdit().setY(endY + 100);
+                    }
                     invalidate();
+                    break;
                 }
-                break;
 
-            }
+                case MotionEvent.ACTION_UP: {
+                    // touch down so check if the finger is on
+                    endX = event.getX();
+                    endY = event.getY();
 
-            case MotionEvent.ACTION_UP: {
-                // touch down so check if the finger is on
-                endX = event.getX();
-                endY = event.getY();
+                    //  Find connecting relationship
+                    if(rCurr != null && curr.getClass() != Relationship.class) {
+                        for (ShapeObject i : d.getObjects()) {
+                            if (i.getCoordinates().contains(endX + 10, endY + 10) && !(i == curr)) {
+                                curr1 = i;
+                                Log.d("TouchEvent", "Connecting" + String.valueOf(i.getClass()));
+                                if (curr.getClass() == Entity.class && curr1.getClass() == Attribute.class) {
+                                    boolean success = ((Entity) curr).addAttribute(curr1, rCurr);
+                                    if(!success){
+                                        d.deleteR(rCurr);
+                                    }
+                                }
 
 
-                if(curr != null) {
-                    Log.d("TouchEvent", "contains");
-                    curr.setCoordinateX(endX);
-                    curr.setCoordinateY(endY);
+                                 else if (curr1.getClass() == Entity.class && curr.getClass() == Attribute.class)
+                                    ((Entity) curr1).addAttribute(curr, rCurr);
 
-                    curr.getNameEdit().setX(endX + 10);
-                    curr.getNameEdit().setY(endY + 60);
+                                rCurr.setObj1(curr);
+                                rCurr.setObj2(curr1);
+                                float w =  rCurr.getNameEdit().getWidth()/2;
+                                float h = rCurr.getNameEdit().getHeight()/2;
+                                rCurr.getNameEdit().setX(rCurr.getCoordinates().centerX()-w);
+                                rCurr.getNameEdit().setY(rCurr.getCoordinates().centerY()-h);
+                                rCurr.getNameEdit().setVisibility(View.VISIBLE);
+                                break;
+                            }
+                        }
+                    }
+                    // set final position of objects (except relationships)
+                    if (curr != null && state != 3 && curr.getClass() != Relationship.class) {
+                        Log.d("TouchEvent", "contains");
+                        curr.setCoordinateX(endX);
+                        curr.setCoordinateY(endY);
+                        float w =  curr.getNameEdit().getWidth()/2;
+                        float h = curr.getNameEdit().getHeight()/2;
+                        curr.getNameEdit().setX(curr.getCoordinates().centerX()-w);
+                        curr.getNameEdit().setY(curr.getCoordinates().centerY()-h);
+
+                        if(curr.hasRelationships()){
+                            for(Relationship r : curr.relationships){
+                                r.update();
+                            }
+                        }
+                    }
+
+
                     invalidate();
                     curr = null;
+                    curr1 = null;
+                    rCurr = null;
+                    break;
 
                 }
-                break;
-
             }
-
+            return true;
         }
-        return true;
 
+    public void setRelationship(ShapeObject relationship) {
+        this.rCurr = (Relationship) relationship;
     }
 }
-
