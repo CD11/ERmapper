@@ -1,26 +1,20 @@
 package cd.com.ermapper;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.*;
 
-import android.view.KeyEvent;
+
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import java.io.Serializable;
 
-import static android.os.Build.VERSION_CODES.N;
-import static cd.com.ermapper.R.id.New;
-import static cd.com.ermapper.R.id.start;
 
 
 public class ERDraw extends AppCompatActivity {
@@ -143,7 +137,7 @@ public class ERDraw extends AppCompatActivity {
             Log.d("DiagramErrors ", " diagram is Null");
             attribute = null;
         }else{
-             attribute= new Attribute(et, 50, 50, 150, 180);
+            attribute= new Attribute(et, 50, 50, 150, 180);
 
             if(attribute != null){
                 diagram.addObject(attribute);
@@ -205,7 +199,7 @@ public class ERDraw extends AppCompatActivity {
             relationship= new Relationship(et);
 
             if(relationship != null){
-               diagram.addObject(relationship);
+                diagram.addObject(relationship);
             }else{
                 Log.d("DiagramErrors ", "entity is Null");
 

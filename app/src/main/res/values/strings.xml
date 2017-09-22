@@ -4,4 +4,11 @@
     <string name="title_activity_create_entity">CreateEntity</string>
     <string name="title_activity_fxapplication_main">FXApplicationMain</string>
     <string name="title_activity_fdnormalization">FDNormalization</string>
+    <string name="title_activity_er_draw">erDraw</string>
+    <string name="entity">Entity</string>
+    <string name="select">Select</string>
+    <string name="relationships">Relationships</string>
+    <string name="attribute">Attribute</string>
+    <string name="normalize">Normalize</string>
+    <string name="title_activity_fd">fd</string>
 </resources>
