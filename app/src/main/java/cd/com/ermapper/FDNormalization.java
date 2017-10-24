@@ -31,30 +31,31 @@ public class FDNormalization extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fdnormalization);
 
-            //list of functional dependencies
-            functionalDependencies = new DependencySet();
-            relations = new ArrayList<>();
-            attributes = new AttributeSet();
+        //list of functional dependencies
+        functionalDependencies = new DependencySet();
+        relations = new ArrayList<>();
+        attributes = new AttributeSet();
+        functionalDependenciesView= (ListView) findViewById(R.id.FDList);
+        attributesView= (ListView) findViewById(R.id.AttributeList);
 
-           functionalDependenciesView= (ListView) findViewById(R.id.FDList);
-           attributesView= (ListView) findViewById(R.id.AttributeList);
+        // get the ER diagram
+        ERDiagram diagram  = this.getIntent().getParcelableExtra("diagram");
+        relations.addAll(diagram.getRelations());  // get all relations
+        functionalDependencies.addAll(diagram.getDependencies()); // get all functional dependencies
 
-            ERDiagram diagram  = this.getIntent().getParcelableExtra("diagram");
-            relations.addAll(diagram.getRelations());
-            functionalDependencies.addAll(diagram.getDependencies());
-            attributes = functionalDependencies.getAllAttributes();
-           // diagram.printER();
+        //TODO: check these methods and decide how they work
+        //TODO: how do weak relations get normalized
+        performNormalization();  // Perform normalization
+        performAttributeClosure(diagram.getRelations().get(0).getPrimaryKey()); // perform Attribute Closure
 
+        attributes = functionalDependencies.getAllAttributes();
 
-
-        //performAttributeClosure(diagram.getRelations().get(0).getPrimaryKey());
-        //performNormalization();
         fdListAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, functionalDependencies.getStringElements());
         attributesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, attributes.getElements());
         functionalDependenciesView.setAdapter(fdListAdapter);
         attributesView.setAdapter(attributesAdapter);
-
     }
+
     private void addFD(FunctionalDependency anFD){
         functionalDependencies.add(anFD);
         rebuiltAttributesList();
@@ -138,12 +139,12 @@ public class FDNormalization extends AppCompatActivity {
     private void performNormalization(){
 
       //  consoleTextArea.clear(); //clear the console of previous results
-       // DependencySet FDs = new DependencySet();
+       DependencySet FDs = new DependencySet();
         //Gather all the functional dependencies
 
-        //for(FunctionalDependency fd : functionalDependencies.getElements()){FDs.add(fd);}
+        for(FunctionalDependency fd : functionalDependencies.getElements()){FDs.add(fd);}
         //print all the attributes
-        DependencySet FDs = functionalDependencies;
+
         AttributeSet allAttributes = FDs.getAllAttributes();
         //Collections.sort(allAttributes.getElements());
         //allAttributes.printToSystemOut();

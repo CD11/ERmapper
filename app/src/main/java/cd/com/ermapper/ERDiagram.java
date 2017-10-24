@@ -200,7 +200,6 @@ public class ERDiagram implements Parcelable {
         for( Relation r: relations){
             FunctionalDependency fd = new FunctionalDependency(r.getPrimaryKey(), r.getAttributes());
             if(fd != null || fd.isTrivial()) dependencies.add(fd);
-            Log.d("FD", fd.getLHS().toString()  + " " + fd.getRHS().toString());
         }
         return dependencies;
     }
@@ -226,7 +225,6 @@ public class ERDiagram implements Parcelable {
         parcel.writeString(name);
         parcel.writeTypedList(relations);
         parcel.writeTypedObject(dependencies, i);
-//        printER();
 
     }
 

@@ -92,6 +92,5 @@ public class FunctionalDependency implements Parcelable{
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeTypedObject(this.lhs, i);
         parcel.writeTypedObject(this.rhs, i);
-        Log.d("Parcel FD", this.getLHS().toString() + " " + this.getRHS().toString());
     }
 }

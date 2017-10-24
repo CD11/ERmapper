@@ -202,7 +202,8 @@ public class DrawObjects extends View {
                     // get even position
                     endX = event.getX();
                     endY = event.getY();
-                    if(clickCount == 2)
+                    //TODO: double click attribute to set primary key
+                    if(clickCount == 2 && state != 3)
                     {
                         if(duration<= MAX_DURATION && curr != null)
                         {
