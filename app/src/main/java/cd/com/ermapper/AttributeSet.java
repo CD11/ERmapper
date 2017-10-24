@@ -4,9 +4,15 @@ package cd.com.ermapper;
 /**
  * Created by ldnel_000 on 2015-11-04.
  */
+        import android.os.Parcel;
+        import android.os.Parcelable;
+        import android.util.Log;
+
         import java.util.ArrayList;
 
-public class AttributeSet {
+        import static android.R.attr.name;
+
+public class AttributeSet implements Parcelable {
 	/*
 	 * This class represents a set of relation or functional dependency attributes
 	 * or table columns.
@@ -21,6 +27,7 @@ public class AttributeSet {
     public AttributeSet() {
         elements = new ArrayList<Attribute>();
     }
+
     public AttributeSet(Attribute a) {
         elements = new ArrayList<Attribute>();
         this.add(a);
@@ -30,6 +37,23 @@ public class AttributeSet {
         elements = new ArrayList<Attribute>();
         this.addAll(anAttributeSet);
     }
+
+    protected AttributeSet(Parcel in) {
+        elements = new ArrayList<>();
+        elements = in.createTypedArrayList(Attribute.CREATOR);
+    }
+
+    public static final Creator<AttributeSet> CREATOR = new Creator<AttributeSet>() {
+        @Override
+        public AttributeSet createFromParcel(Parcel in) {
+            return new AttributeSet(in);
+        }
+
+        @Override
+        public AttributeSet[] newArray(int size) {
+            return new AttributeSet[size];
+        }
+    };
 
     public ArrayList<Attribute> getElements() {return elements;}
 
@@ -78,9 +102,9 @@ public class AttributeSet {
 
     public boolean equals(AttributeSet anAttributeSet){
         //two attribute sets are equal if the are mutually subsets of each others
+        if(anAttributeSet == null) return false;
         if(!anAttributeSet.containsAll(this)) return false;
-        if(!this.containsAll(anAttributeSet)) return false;
-        return true;
+        return this.containsAll(anAttributeSet);
 
     }
 
@@ -245,12 +269,21 @@ public class AttributeSet {
     }
 
     public void printToSystemOut(){
-        //System.out.println("Attribute Set:");
-        //System.out.println("--------------");
+        System.out.println("Attribute Set:");
+        System.out.println("--------------");
         for(int i=0; i<elements.size(); i++){
             System.out.println(elements.get(i));
         }
 
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeTypedList(elements);
+    }
 }

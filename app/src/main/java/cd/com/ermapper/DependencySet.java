@@ -6,9 +6,13 @@ package cd.com.ermapper;
  * Created by ldnel_000 on 2015-11-04.
  */
 
+        import android.os.Parcel;
+        import android.os.Parcelable;
+        import android.util.Log;
+
         import java.util.ArrayList;
 
-public class DependencySet {
+public class DependencySet implements Parcelable {
 	/*
 	 * This class represents a set of functional dependencies
 	 * The set prevents duplicates via checks in the add() method.
@@ -20,7 +24,26 @@ public class DependencySet {
 
     private ArrayList<FunctionalDependency> elements;
 
-    public DependencySet() { elements = new ArrayList<FunctionalDependency>(); }
+    public DependencySet() {
+        elements = new ArrayList<FunctionalDependency>();
+    }
+
+    protected DependencySet(Parcel in) {
+        elements =  new ArrayList<>();
+        elements = in.createTypedArrayList(FunctionalDependency.CREATOR);
+    }
+
+    public static final Creator<DependencySet> CREATOR = new Creator<DependencySet>() {
+        @Override
+        public DependencySet createFromParcel(Parcel in) {
+            return new DependencySet(in);
+        }
+
+        @Override
+        public DependencySet[] newArray(int size) {
+            return new DependencySet[size];
+        }
+    };
 
     public void add(FunctionalDependency anFD) {
         //add anFD without duplications
@@ -238,4 +261,21 @@ public class DependencySet {
     }
 
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeTypedList(elements);
+    }
+
+    public ArrayList<String> getStringElements() {
+        ArrayList<String> strings = new ArrayList<>();
+        for(FunctionalDependency f : getElements()){
+            strings.add(f.toString());
+        }
+        return strings;
+    }
 }

@@ -11,4 +11,7 @@
     <string name="attribute">Attribute</string>
     <string name="normalize">Normalize</string>
     <string name="title_activity_fd">fd</string>
+    <string name="attributes">Attributes</string>
+    <string name="functional_dependencies">Functional Dependencies</string>
+    <string name="results">Results</string>
 </resources>

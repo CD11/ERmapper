@@ -1,0 +1,10 @@
+{
+    "School":[
+
+        "Student": "id", "name",
+        "Class": "name", "teacher", "Student"
+
+    ]
+
+
+}

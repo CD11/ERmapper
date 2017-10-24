@@ -1,10 +1,11 @@
 package cd.com.ermapper;
 
 import android.content.Intent;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import java.io.Serializable;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -18,9 +19,7 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = new Intent (MainActivity.this, ERDraw.class);
         ERDiagram diagram = new ERDiagram("erDiagram");
-        intent.putExtra("diagram", (Serializable) diagram);
-        intent.putExtra("Name", diagram.getName());
-        intent.putExtra("Entity", diagram.getEntities());
+        intent.putExtra("diagram", diagram);
         startActivity(intent);
     }
 }

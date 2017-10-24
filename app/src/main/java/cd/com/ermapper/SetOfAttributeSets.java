@@ -4,9 +4,12 @@ package cd.com.ermapper;
 /**
  * Created by ldnel_000 on 2015-11-04.
  */
+        import android.os.Parcel;
+        import android.os.Parcelable;
         import java.util.ArrayList;
 
-public class SetOfAttributeSets {
+public class SetOfAttributeSets implements Parcelable
+{
 	/*
 	 * This class represents a set of attribute sets
 	 * It can be used to represent a set of keys, or a set of relations
@@ -23,6 +26,23 @@ public class SetOfAttributeSets {
     private ArrayList<AttributeSet> elements;
 
     public SetOfAttributeSets() { elements = new ArrayList<AttributeSet>(); }
+
+    protected SetOfAttributeSets(Parcel in) {
+        elements = in.createTypedArrayList(AttributeSet.CREATOR);
+    }
+
+    public static final Creator<SetOfAttributeSets> CREATOR = new Creator<SetOfAttributeSets>() {
+        @Override
+        public SetOfAttributeSets createFromParcel(Parcel in) {
+            return new SetOfAttributeSets(in);
+        }
+
+        @Override
+        public SetOfAttributeSets[] newArray(int size) {
+            return new SetOfAttributeSets[size];
+        }
+    };
+
     public AttributeSet get(int i) {return elements.get(i); }
 
     public void add(AttributeSet anAttriubteSet) {
@@ -83,8 +103,7 @@ public class SetOfAttributeSets {
     public boolean equals(SetOfAttributeSets aSet){
         //two attribute sets are equal if the are mutually subsets of each others
         if(!aSet.containsAll(this)) return false;
-        if(!this.containsAll(aSet)) return false;
-        return true;
+        return this.containsAll(aSet);
 
     }
 
@@ -108,4 +127,13 @@ public class SetOfAttributeSets {
     }
 
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeTypedList(elements);
+    }
 }

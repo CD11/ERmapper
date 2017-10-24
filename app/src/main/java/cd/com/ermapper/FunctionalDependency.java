@@ -1,30 +1,56 @@
 package cd.com.ermapper;
 
 
+
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.util.Log;
+
+
 /**
  * Created by ldnel_000 on 2015-11-04.
  */
-public class FunctionalDependency {
+public class FunctionalDependency implements Parcelable{
 
     //This class represents a functional dependency lhs -> rhs
 
     private AttributeSet lhs; //left hand side
     private AttributeSet rhs; //right hand side
 
-    public FunctionalDependency(AttributeSet aLHS, AttributeSet aRHS){
+    public FunctionalDependency(AttributeSet aLHS, AttributeSet aRHS) {
 
-        if(aLHS == null || aRHS == null)
+        if (aLHS == null || aRHS == null) {
             System.out.println("ERROR: NULL ATTRITBUTE SET");
-        if(aLHS.isEmpty() || aRHS.isEmpty())
+        } else if (aLHS.isEmpty() || aRHS.isEmpty()){
             System.out.println("ERROR: EMPTY ATTRITBUTE SET");
-
-        lhs = new AttributeSet();
-        rhs = new AttributeSet();
-        lhs.addAll(aLHS);
-        rhs.addAll(aRHS);
-
+        }else {
+            lhs = new AttributeSet();
+            rhs = new AttributeSet();
+            lhs.addAll(aLHS);
+            rhs.addAll(aRHS);
+        }
     }
 
+
+    protected FunctionalDependency(Parcel in) {
+        lhs = new AttributeSet();
+        rhs = new AttributeSet();
+        lhs = in.readTypedObject(AttributeSet.CREATOR);
+        rhs = in.readTypedObject(AttributeSet.CREATOR);
+    }
+
+
+    public static final Creator<FunctionalDependency> CREATOR = new Creator<FunctionalDependency>() {
+        @Override
+        public FunctionalDependency createFromParcel(Parcel in) {
+            return new FunctionalDependency(in);
+        }
+
+        @Override
+        public FunctionalDependency[] newArray(int size) {
+            return new FunctionalDependency[size];
+        }
+    };
 
     public AttributeSet getLHS(){return lhs;}
     public AttributeSet getRHS(){return rhs;}
@@ -40,8 +66,7 @@ public class FunctionalDependency {
 		 */
 
         if(!lhs.equals(anFD.lhs)) return false;
-        if((!rhs.equals(anFD.rhs))) return false;
-        return true;
+        return rhs.equals(anFD.rhs);
     }
 
     public boolean isTrivial(){
@@ -49,8 +74,24 @@ public class FunctionalDependency {
         //A dependency X->Y is trivial is Y is a subset of X
 
         if(rhs.isEmpty()) return true;
-        return lhs.containsAll(rhs); }
+        return lhs.containsAll(rhs);
+    }
 
-    public String toString(){return lhs.toString() + " -> " + rhs.toString();}
+    public String toString()
+    {
+        return lhs.toString() + " -> " + rhs.toString();
+    }
 
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeTypedObject(this.lhs, i);
+        parcel.writeTypedObject(this.rhs, i);
+        Log.d("Parcel FD", this.getLHS().toString() + " " + this.getRHS().toString());
+    }
 }
