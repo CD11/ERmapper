@@ -187,12 +187,13 @@ public class ERDiagram implements Parcelable {
     }
 
     public ArrayList<Relation> findRelations(){
-       for(Entity e: getEntities()){
-           if(!e.equals(null)){
-               relations.add(new Relation(e.getAttr(), e.getPrimary(), e.getName()));
-           }
-       }
-       return relations;
+
+            for (Entity e : getEntities()) {
+                if (!e.equals(null)) {
+                    relations.add(e.toRelation());
+                }
+            }
+            return relations;
     }
 
     public DependencySet findDependencies(){
@@ -228,5 +229,7 @@ public class ERDiagram implements Parcelable {
 
     }
 
+    public void update() {
 
+    }
 }

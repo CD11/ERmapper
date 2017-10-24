@@ -11,8 +11,10 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import static android.R.attr.max;
 import static android.R.color.white;
 import static android.graphics.Color.WHITE;
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
 
 
 public class DrawObjects extends View {
@@ -21,7 +23,7 @@ public class DrawObjects extends View {
        - > When drawing a conneciton it also lets you see the line and connect two objects
 
      */
-    final int MAX_DURATION = 1000;//constant for defining the time duration between the click that can be considered as double-tap
+    final int MAX_DURATION = 500;//constant for defining the time duration between the click that can be considered as double-tap
     int clickCount = 0;
     long startTime;    //variable for storing the time of first click
     long duration;    //variable for calculating the total time
@@ -143,8 +145,37 @@ public class DrawObjects extends View {
                 case MotionEvent.ACTION_DOWN: {
                     /* check for double click */
                     duration = 0;
-                    startTime = System.currentTimeMillis();
                     clickCount++;
+                    if(clickCount == 1) {
+                        startTime = System.currentTimeMillis(); // only start if  first click
+                    }
+
+                    Log.d("clicks ", String.valueOf(clickCount));
+                    long time = System.currentTimeMillis() - startTime;
+                    duration = duration + time;
+                    Log.d("clicks ", String.valueOf(clickCount) +" " + duration);
+                    if(duration > MAX_DURATION || clickCount >2){
+                        clickCount =0;
+                        duration = 0;
+                    }
+                    boolean doublepress = false;
+                    //TODO: double click attribute to set primary key
+                    if(clickCount == 2 && state != 3 && curr != null && duration <= MAX_DURATION) {
+                        if (curr.getClass() == Entity.class) {
+                            ((Entity) curr).setWeak();
+                        }
+                        if (curr.getClass() == Attribute.class) {
+                            ((Attribute) curr).setPrimary();
+                        }
+                        if (curr.getClass() == Relationship.class) {
+                            d.deleteO(curr);
+                        }
+                        doublepress = true;
+
+                        clickCount = 0;
+                        duration = 0;
+                    }
+
                     Log.d("Click object", String.valueOf(clickCount));
                     /*** check for moving ****/
                     // Remember where we started (for dragging)
@@ -171,23 +202,22 @@ public class DrawObjects extends View {
                     // touch down so check if the finger is on
                     endX = event.getX();
                     endY = event.getY();
+
                     // update coordinates of the objects
-                    if (curr != null && (state != 3) && curr.getClass() != Relationship.class) {
+                    if (curr != null && (state != 3) && curr.getClass() != Relationship.class ) {
                         curr.setCoordinateX(endX);
                         curr.setCoordinateY(endY);
                         curr.moveName();
 
-                        // make sure relationship lines follow its objects
-                        if (curr.hasRelationships()) {
-                            for (Relationship r : curr.relationships) {
-                                r.update();
-                            }
+                       for(Relationship r : d.getRelationships()){
+                            r.update();
                         }
+
                         // update the relationship line coordinates to follow the mouse
                     } else if (rCurr != null && (state == 3)) {
                         rCurr.setCoordinateW(endX);
                         rCurr.setCoordinateH(endY);
-
+                        invalidate();
 
                     }
                     invalidate();
@@ -196,27 +226,11 @@ public class DrawObjects extends View {
 
                 case MotionEvent.ACTION_UP: {
 
-                    long time = System.currentTimeMillis() - startTime;
-                    duration =  duration + time;
-                    boolean doublepress = false;
+
                     // get even position
                     endX = event.getX();
                     endY = event.getY();
-                    //TODO: double click attribute to set primary key
-                    if(clickCount == 2 && state != 3)
-                    {
-                        if(duration<= MAX_DURATION && curr != null)
-                        {
-                            doublepress = true;
-                            if(curr.getClass() == Entity.class){
-                                ((Entity) curr).setWeak();
-                            }
-                        }
-                        clickCount = 0;
-                        duration = 0;
-                    }
 
-                    if(doublepress == false) {
                          /* Get Movement */
 
                         //  Find connecting relationship
@@ -228,16 +242,16 @@ public class DrawObjects extends View {
 
                                         Log.d("TouchEvent", "Connecting" + String.valueOf(i.getClass()));
                                         if (curr.getClass() == Entity.class && curr1.getClass() == Attribute.class) {
-                                            ((Entity) curr).addAttribute(curr1);
+                                            ((Entity) curr).addAttribute((Attribute) curr1);
 
 
                                         } else if (curr1.getClass() == Entity.class && curr.getClass() == Attribute.class) {
-                                            ((Entity) curr1).addAttribute(curr);
+                                            ((Entity) curr1).addAttribute((Attribute) curr);
                                         }
 
                                         rCurr.setObj1(curr);
                                         rCurr.setObj2(curr1);
-                                        rCurr.moveName();
+                                        rCurr.update();
                                         if (rCurr.getObj1() != null && rCurr.getObj2() != null) {
                                             // only add the relationship to the diagram if it is valid
                                             d.addObject(rCurr);
@@ -252,7 +266,7 @@ public class DrawObjects extends View {
                                     }
                                 }
                             }
-                        }
+
 
                         // set final position of objects (except relationships)
                         if (curr != null && state != 3 && curr.getClass() != Relationship.class) {
@@ -260,15 +274,10 @@ public class DrawObjects extends View {
                             curr.setCoordinateY(endY);
                             this.getContext();
                             curr.moveName();
-
-                            if (curr.hasRelationships()) {
-                                for (Relationship r : curr.relationships) {
+                            for (Relationship r : d.getRelationships()) {
                                     r.update();
-                                }
                             }
                         }
-
-
                         invalidate();
                         curr = null;
                         curr1 = null;

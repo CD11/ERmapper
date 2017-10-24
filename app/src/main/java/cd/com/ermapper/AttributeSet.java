@@ -11,6 +11,7 @@ package cd.com.ermapper;
         import java.util.ArrayList;
 
         import static android.R.attr.name;
+        import static android.R.id.empty;
 
 public class AttributeSet implements Parcelable {
 	/*
@@ -40,7 +41,9 @@ public class AttributeSet implements Parcelable {
 
     protected AttributeSet(Parcel in) {
         elements = new ArrayList<>();
+
         elements = in.createTypedArrayList(Attribute.CREATOR);
+
     }
 
     public static final Creator<AttributeSet> CREATOR = new Creator<AttributeSet>() {

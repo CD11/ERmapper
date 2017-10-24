@@ -1,12 +1,15 @@
 package cd.com.ermapper;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.BadParcelableException;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Layout;
 import android.util.*;
 
 
@@ -33,8 +36,6 @@ public class ERDraw extends AppCompatActivity {
         object = new DrawObjects(this, diagram, 0);
         LinearLayout layout = (LinearLayout) findViewById(R.id.diagramLayout);
         layout.addView(object);
-
-
 
     }
 
@@ -83,7 +84,7 @@ public class ERDraw extends AppCompatActivity {
             diagram.addObject(attribute);
         }
         }
-        attribute.moveName();
+
         object.setState(2);
         object.invalidate();
 
@@ -119,7 +120,6 @@ public class ERDraw extends AppCompatActivity {
     // if select button is pressed
     public void SelectObject(View  v){
         Log.d("State", Integer.toString(4));
-
         object.setState(4);
         object.invalidate();
 
@@ -127,12 +127,29 @@ public class ERDraw extends AppCompatActivity {
 
     // when normalize button is clicked
     public void Normalize(View  v){
-        Intent intent = new Intent(this, FDNormalization.class);
-        diagram.printER();
-        diagram.findRelations();
-        diagram.findDependencies();
-        intent.putExtra("diagram", diagram);
-        startActivity(intent);
+        Intent intent;
+        try {
+            diagram.findRelations();
+            diagram.findDependencies();
+            intent= new Intent(this, FDNormalization.class);
+            intent.putExtra("diagram", diagram);
+            startActivity(intent);
+        }catch (NullPointerException e){
+            LinearLayout layout = (LinearLayout) v.findViewById(R.id.diagramLayout);
+            AlertDialog ad = new AlertDialog.Builder(this).create();
+            ad.setTitle("Error");
+            ad.setMessage(e.getMessage());
+            ad.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            ad.show();
+
+
+        }
+
     }
 
     // every object has an editable name set to this

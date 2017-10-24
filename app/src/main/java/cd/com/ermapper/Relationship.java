@@ -30,11 +30,7 @@ public class Relationship extends ShapeObject {
         obj1 = curr;
         obj2 = curr1;
     }
-    public Relationship(String name, ShapeObject curr, ShapeObject curr1) {
-        super(name);
-        obj1 = curr;
-        obj2 = curr1;
-    }
+
     public Relationship(EditText et, String name) {
         super(et,"name", 0, 0, 0, 0);
     }
@@ -132,8 +128,6 @@ public class Relationship extends ShapeObject {
             this.setObj1(obj1);
         if(obj2 != null)
             this.setObj2(obj2);
-
-
         this.getEditId().setX(this.getCoordinates().centerX());
         this.getEditId().setY(this.getCoordinates().centerY());
 

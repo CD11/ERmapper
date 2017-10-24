@@ -24,18 +24,21 @@ public class Relation implements Parcelable{
     public Relation(AttributeSet theAttributes, AttributeSet key, String name) {
         this.name = name;
         if (theAttributes == null)
-            System.out.println("ERROR: Attribute set cannot be null");
+            throw new NullPointerException(name + " Primary key set is null");
         if (theAttributes.isEmpty())
-            System.out.println("ERROR: EMPTY ATTRITBUTE SET");
-
+            throw new NullPointerException(name + " Primary key set is empty");
         if (key != null && !theAttributes.containsAll(key))
-            System.out.println("ERROR: PRIMARY KEY MUST BE A SUBSET OF THE ATTRIBUTES");
+            throw new NullPointerException(name +(" ERROR: PRIMARY KEY MUST BE A SUBSET OF THE ATTRIBUTES"));
 
         attributes = new AttributeSet();
         attributes.addAll(theAttributes);
         if (!key.isEmpty() && !key.equals(null)) {
             primaryKey = new AttributeSet();
             primaryKey.addAll(key);
+        }
+
+        if(key.isEmpty() ||key == null){
+            throw new NullPointerException(name + " attributes  set is empty");
         }
     }
 
@@ -61,10 +64,16 @@ public class Relation implements Parcelable{
         attributes  = new AttributeSet();
         primaryKey = new AttributeSet();
         name  = in.readString();
+
         primaryKey = in.readTypedObject(AttributeSet.CREATOR);
         attributes =  in.readTypedObject(AttributeSet.CREATOR);
+        if(primaryKey.isEmpty() || primaryKey == null ){
+            throw new NullPointerException(name + "Primary key set is empty");
+        }
+        if(attributes.isEmpty() ||attributes == null){
+            throw new NullPointerException(name + "attributes  set is empty");
+        }
 
-    //    Log.d("Parcel Relation",  primaryKey.size() +" " + attributes.size());
     }
 
     public static final Creator<Relation> CREATOR = new Creator<Relation>() {

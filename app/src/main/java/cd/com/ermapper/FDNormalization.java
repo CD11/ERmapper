@@ -45,8 +45,8 @@ public class FDNormalization extends AppCompatActivity {
 
         //TODO: check these methods and decide how they work
         //TODO: how do weak relations get normalized
-        performNormalization();  // Perform normalization
-        performAttributeClosure(diagram.getRelations().get(0).getPrimaryKey()); // perform Attribute Closure
+//         performNormalization();  // Perform normalization
+ //       performAttributeClosure(diagram.getRelations().get(0).getPrimaryKey()); // perform Attribute Closure
 
         attributes = functionalDependencies.getAllAttributes();
 

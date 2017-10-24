@@ -81,11 +81,6 @@ public abstract class ShapeObject implements Parcelable {
     }
 
 
-    public boolean hasRelationships() {
-       return this.relationships.size() >0;
-    }
-
-
     public void moveName() {
         float w =  eName.getWidth()/2;
         float h = eName.getHeight()/2;

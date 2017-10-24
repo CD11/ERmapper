@@ -9,6 +9,8 @@ import android.support.constraint.solver.widgets.Rectangle;
 import android.util.Log;
 import android.widget.EditText;
 
+import static android.R.id.primary;
+
 
 /**
  * Created by me on 9/6/2017.
@@ -21,31 +23,22 @@ public class Entity extends ShapeObject{
        This class represents an Entity in an ER diagram, it is represented by a square
        An Entity contains the name and attributes for a relation / relational table.
      */
-    public static final float offset  =  150;
-    private AttributeSet primary;
+    public static final float offset  =  30;
     private AttributeSet attr;
     private boolean weak;
 
 
     public Entity(EditText eName, String name, float x, float y) {
-        super(eName, name, x, y, x+offset, y+offset);
+        super(eName, name, x, y, 250 , 250);
         attr = new AttributeSet();
-        primary = new AttributeSet();
         weak = false;
-    }
-
-    public Entity(String name) {
-        super(name);
-        attr = new AttributeSet();
-        primary = new AttributeSet();
+        moveName();
     }
 
 
     protected Entity(Parcel in) {
         super(in);
-        primary = new AttributeSet();
         attr = new AttributeSet();
-        primary = in.readTypedObject(AttributeSet.CREATOR);
         attr = in.readTypedObject(AttributeSet.CREATOR);
         Log.d("Parcel Enitity", toString());
 
@@ -65,22 +58,14 @@ public class Entity extends ShapeObject{
 
     public Entity(String name, AttributeSet p, AttributeSet k) {
         super(name);
-        this.primary = p;
         this.attr = k;
     }
 
     // add Attributes to the entity
-    public void addAttribute(ShapeObject curr1) {
-        // set Primary attribute
-        if(this.primary.isEmpty()){
-            this.primary.add((Attribute) curr1);
-            curr1.getEditId().getBackground().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
-        }else {
-            this.attr.add((Attribute) curr1);
-        }
-        Log.d("attr", this.getAttr().toString()+ " " + this.getPrimary().toString());
-
+    public void addAttribute(Attribute a) {
+        this.attr.add(a);
     }
+
 
     public String toString(){
         return this.getName() + " " + this.getAttr().toString();
@@ -90,23 +75,34 @@ public class Entity extends ShapeObject{
     }
 
     public Relation toRelation(){
-        Relation r = new Relation(attr, primary, this.getName());
+        AttributeSet primary = new AttributeSet();
+        AttributeSet attributes = new AttributeSet();
+        /* Search through entity attributes,  if the attribute is part a primary adds it to the
+            primary attribute set, else adds to the atttribute attribute set.
+            - > allows ensures there is no duplication.
+            */
+        for(Attribute a: attr.getElements()){
+            if(a.isPrimary() && !primary.contains(a)){
+                primary.add(a);
+            }
+            if (!attributes.contains(a))
+                attributes.add(a);
+
+        }
+        Relation r = new Relation(attributes, primary, this.getName());
         return r;
     }
 
     public void setCoordinateX(float coordinateX) {
         this.getCoordinates().x = coordinateX;
-        this.getCoordinates().width = coordinateX + offset;
+        this.getCoordinates().width = coordinateX + getEditId().getWidth() +offset;
     }
 
     public void setCoordinateY(float coordinateY) {
         this.getCoordinates().y = coordinateY;
-        this.getCoordinates().height = coordinateY + offset;
+        this.getCoordinates().height = coordinateY +  getEditId().getWidth()+ offset;
     }
 
-    public AttributeSet getPrimary() {
-        return primary;
-    }
     public boolean isWeak() {
         return weak;
     }
@@ -121,7 +117,6 @@ public class Entity extends ShapeObject{
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         super.writeToParcel(parcel, i);
-        parcel.writeTypedObject(primary, i);
         parcel.writeTypedObject(attr, i);
     }
 
