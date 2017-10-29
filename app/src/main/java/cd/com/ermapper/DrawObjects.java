@@ -4,17 +4,11 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.Toast;
 
-import static android.R.attr.max;
-import static android.R.color.white;
 import static android.graphics.Color.WHITE;
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
 
 
 public class DrawObjects extends View {
@@ -67,7 +61,6 @@ public class DrawObjects extends View {
                 paint.setColor(Color.BLACK);
                 canvas.drawPath(rCurr.drawDiamond(), paint);
             }
-
         }
         // check each object in the diagram
         for (ShapeObject e : d.getSortedObjects()) {
@@ -139,36 +132,35 @@ public class DrawObjects extends View {
          */
 
            int eventaction = event.getAction();
-
+        boolean doublepress = false;
             switch (eventaction) {
 
                 case MotionEvent.ACTION_DOWN: {
                     /* check for double click */
                     duration = 0;
                     clickCount++;
+
                     if(clickCount == 1) {
                         startTime = System.currentTimeMillis(); // only start if  first click
                     }
-
-                    Log.d("clicks ", String.valueOf(clickCount));
                     long time = System.currentTimeMillis() - startTime;
                     duration = duration + time;
-                    Log.d("clicks ", String.valueOf(clickCount) +" " + duration);
+                    // check for clicks that cannot be double clicks
                     if(duration > MAX_DURATION || clickCount >2){
                         clickCount =0;
                         duration = 0;
                     }
-                    boolean doublepress = false;
-                    //TODO: double click attribute to set primary key
+                    // check for a double click on an object
                     if(clickCount == 2 && state != 3 && curr != null && duration <= MAX_DURATION) {
+                        Log.d("Click", clickCount + curr.getClass().getSimpleName());
+                        // if the curr object is an entity set it to weak
                         if (curr.getClass() == Entity.class) {
-                            ((Entity) curr).setWeak();
+                            ((Entity) curr).setWeak(d.getRelationships());
+                            invalidate();
                         }
-                        if (curr.getClass() == Attribute.class) {
+                        // if the curr object is an attribute set it to primary
+                       else if (curr.getClass() == Attribute.class) {
                             ((Attribute) curr).setPrimary();
-                        }
-                        if (curr.getClass() == Relationship.class) {
-                            d.deleteO(curr);
                         }
                         doublepress = true;
 
@@ -225,14 +217,11 @@ public class DrawObjects extends View {
                 }
 
                 case MotionEvent.ACTION_UP: {
-
-
                     // get even position
                     endX = event.getX();
                     endY = event.getY();
 
                          /* Get Movement */
-
                         //  Find connecting relationship
                         if (rCurr != null && curr != null) {
                             if (curr.getClass() != Relationship.class) {
@@ -240,13 +229,29 @@ public class DrawObjects extends View {
                                     if (i.getCoordinates().contains(endX + 10, endY + 10) && !(i == curr)) {
                                         curr1 = i;
 
-                                        Log.d("TouchEvent", "Connecting" + String.valueOf(i.getClass()));
-                                        if (curr.getClass() == Entity.class && curr1.getClass() == Attribute.class) {
-                                            ((Entity) curr).addAttribute((Attribute) curr1);
+                                        if (curr.getClass() == Entity.class){
+                                                if (curr1.getClass() == Attribute.class)  // if curr is an entity, add attribute curr1 to entity
+                                                    ((Entity) curr).addAttribute((Attribute) curr1);
+                                                //else if (curr1.getClass() == Entity.class) {  // if curr is an enitty and curr1 is a weak entity, add curr1 to curr
+                                                   // ((Entity) curr).addEntity(curr1);
+                                                    //((Entity) curr1).addEntity(curr);
+                                               // }
 
 
-                                        } else if (curr1.getClass() == Entity.class && curr.getClass() == Attribute.class) {
-                                            ((Entity) curr1).addAttribute((Attribute) curr);
+                                        }else if (curr1.getClass() == Entity.class){
+                                            if(curr.getClass() == Attribute.class)// if curr1 is an entity, add attriubte curr to entity
+                                                ((Entity) curr1).addAttribute((Attribute) curr);
+                                           // else if (curr.getClass() == Entity.class ) {
+                                              //  ((Entity) curr1).addEntity(curr);
+                                               // ((Entity) curr).addEntity(curr1);
+                                            //}
+
+                                        }else if(curr1.getClass() == Attribute.class && curr.getClass () == Attribute.class){ // if attribute is multivalued
+                                            //  check for other values already being stored.
+                                            if(((Attribute) curr).getValues().isEmpty() && !((Attribute)curr1).getValues().isEmpty())
+                                                    ((Attribute) curr1).addAttribute((Attribute)curr);
+                                            else
+                                                ((Attribute) curr).addAttribute((Attribute)curr1);
                                         }
 
                                         rCurr.setObj1(curr);
@@ -288,6 +293,8 @@ public class DrawObjects extends View {
             }
             return true;
         }
+
+
 
 
     public void setRelationship(ShapeObject relationship) {

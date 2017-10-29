@@ -2,7 +2,6 @@ package cd.com.ermapper;
 
 import android.graphics.Path;
 import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -89,8 +88,8 @@ public class Relationship extends ShapeObject {
             Coordinates c =  this.getCoordinates();
             float x =c.centerX();
             float y =c.centerY();
-            float w = 130;
-            float h = 130;
+            float w = 100;
+            float h = 100;
 
             Path p = new Path();
             p.setLastPoint(x-w, y);
@@ -110,14 +109,12 @@ public class Relationship extends ShapeObject {
     }
 
     public void setObj1(ShapeObject obj1) {
-        Log.d("Fds", obj1.getClass().toString());
         this.obj1 = obj1;
         this.setCoordinateX(obj1.getCoordinates().x + 40);
         this.setCoordinateY(obj1.getCoordinates().y + 40);
     }
 
     public void setObj2(ShapeObject obj2) {
-        Log.d("Fds", obj2.getClass().toString());
         this.obj2 = obj2;
         this.setCoordinateW(obj2.getCoordinates().x + 40);
         this.setCoordinateH(obj2.getCoordinates().y + 40);

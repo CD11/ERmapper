@@ -4,11 +4,15 @@ import android.os.Bundle;
 
 import android.support.v7.app.AppCompatActivity;
 
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
+
+import static cd.com.ermapper.R.string.relationships;
 
 
 public class FDNormalization extends AppCompatActivity {
@@ -25,6 +29,8 @@ public class FDNormalization extends AppCompatActivity {
     private ArrayAdapter fdListAdapter;
     private ArrayAdapter attributesAdapter;
 
+    private ERDiagram diagram;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,21 +45,16 @@ public class FDNormalization extends AppCompatActivity {
         attributesView= (ListView) findViewById(R.id.AttributeList);
 
         // get the ER diagram
-        ERDiagram diagram  = this.getIntent().getParcelableExtra("diagram");
-        relations.addAll(diagram.getRelations());  // get all relations
-        functionalDependencies.addAll(diagram.getDependencies()); // get all functional dependencies
+        diagram  = this.getIntent().getParcelableExtra("diagram");
+        //relations.addAll(findRelations(diagram.getEntityObj()));  // get all relations
+        functionalDependencies.addAll(findDependencies()); // get all functional dependencies
 
         //TODO: check these methods and decide how they work
-        //TODO: how do weak relations get normalized
-//         performNormalization();  // Perform normalization
- //       performAttributeClosure(diagram.getRelations().get(0).getPrimaryKey()); // perform Attribute Closure
+         performNormalization();  // Perform normalization
+        // performAttributeClosure(relations.get(0).getPrimaryKey()); // perform Attribute Closure
 
-        attributes = functionalDependencies.getAllAttributes();
+        //attributes = functionalDependencies.getAllAttributes();
 
-        fdListAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, functionalDependencies.getStringElements());
-        attributesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, attributes.getElements());
-        functionalDependenciesView.setAdapter(fdListAdapter);
-        attributesView.setAdapter(attributesAdapter);
     }
 
     private void addFD(FunctionalDependency anFD){
@@ -61,6 +62,73 @@ public class FDNormalization extends AppCompatActivity {
         rebuiltAttributesList();
     }
 
+
+    public DependencySet findDependencies(){
+        FunctionalDependency fd;
+    /* follows the ER->Relational mappint rules in fundamentals of DB systems by Ramex Elmasri & Shamkant B. Navathe
+        1. For all Regular entity types
+            a. assign a Relation, pick a primary key
+                if the primary key is a complex attribute: all attributes will be included
+           b. if  an attributeis complex, create a new relation
+
+     */
+
+        ////////////// Step 1 ///////////////////////////
+        // check for multiple attributes.
+        for(Entity e: diagram.getEntityObj()){
+            for(Attribute a: e.getAttr().getElements()){ // for each attribute a in e
+                if(!a.getValues().isEmpty()){            // check if a is complex and create its own relation.
+                    fd = a.toFD();
+                    if(fd != null || !fd.isTrivial()) functionalDependencies.add(fd);
+
+                }
+            }
+
+        }
+
+
+        ///////////////  Step 2: weak Entities
+        for( Entity e: diagram.getEntityObj()) {
+            AttributeSet primarkey = new AttributeSet();
+            AttributeSet attributes = new AttributeSet();
+            // Check weak Entities
+            if (!e.equals(null) || !e.getWeak().isEmpty()) {
+                /* if entity has weak Entities add the primary key of its strong relation to it */
+                for (Entity eW : e.getWeak()) {
+                    // add Strong entity primary key as key to weak entity
+                    for (Attribute a : e.getAttr().getElements()) {
+                        if (a.isPrimary())
+                            eW.getAttr().add(a);
+                    }
+                    // add attributes of weak entites;   weak -> FD
+                    for (Attribute a : eW.getAttr().getElements()){
+                        if (a.isPrimary()) {
+                            primarkey.add(a);
+                        }
+                        attributes.add(a);
+                    }
+                    fd = new FunctionalDependency(primarkey, attributes, e.getName());
+                    if(fd != null || !fd.isTrivial()) functionalDependencies.add(fd);
+
+                }
+            }
+            primarkey.clear();
+            attributes.clear();
+            // get attributes for Strong Entities;  strong -> FD
+            for (Attribute a : e.getAttr().getElements()){
+                if (a.isPrimary()) {
+                    primarkey.add(a);
+                }
+                attributes.add(a);
+            }
+
+
+
+            fd = new FunctionalDependency(primarkey, attributes,e.getName());
+            if(fd != null || !fd.isTrivial()) functionalDependencies.add(fd);
+        }
+        return functionalDependencies;
+    }
 
     private void rebuiltAttributesList(){
         //Rebuild the attributes list
@@ -81,20 +149,19 @@ public class FDNormalization extends AppCompatActivity {
         //print all the attributes
         AttributeSet allAttributes = FDs.getAllAttributes();
       //  Collections.sort(allAttributes.getElements());
-        //allAttributes.printToSystemOut();
 
         //print all the attributes
-        System.out.print("ATTRIBUTES:");
+        System.out.print("ATTRIBUTES:\n");
         for(Attribute att : allAttributes.getElements())
             System.out.print(att.toString());
-        System.out.print("==================================================");
+        System.out.print("\n==================================================\n");
 
 
         //print all the functional dependencies created from data file
-        System.out.print("FUNCTIONAL DEPENDENCIES:");
-        System.out.print("==================================================");
+        System.out.print("FUNCTIONAL DEPENDENCIES:\n");
+        System.out.print("\n==================================================\n");
 
-        System.out.print("ATTRIBUTE CLOSURE:");
+        System.out.print("ATTRIBUTE CLOSURE:\n");
         System.out.print("CLOSURE {" + leftAttributes + "}+");
         AttributeSet closureSet = leftAttributes.closure(FDs);
         System.out.print(closureSet.toString());
@@ -115,57 +182,39 @@ public class FDNormalization extends AppCompatActivity {
 
     }
 
-    public DependencySet toFunctionalDependency(ArrayList<Relation> relations){
-        /* 1NF - disallows multivalued attributes, composite attributes and their combinations
-         takes multivalued or composite attributes and gives it its own table and primary key
-         */
-
-        /*This method takes every entity, and converts it to a relation, by looking at its attributes
-          It then takes the relation and finds all of its functional dependencies
-         */
-        DependencySet d = new DependencySet();
-        Log.d("Relations", String.valueOf(relations.size()));
-        for(Relation r: relations){
-            if(!r.getPrimaryKey().isEmpty() && !r.getAttributes().isEmpty()) {
-                FunctionalDependency fd = new FunctionalDependency(r.getPrimaryKey(),r.getAttributes());
-                Log.d("printing dependencies", fd.getLHS().toString() +" >" + fd.getRHS().toString());
-                d.add(fd);
-                Log.d("dependencies", d.toString());
-            }
-        }
-        return d;
-
-    }
     private void performNormalization(){
+        String returnstring = " ";
+        DependencySet FDs = new DependencySet();
+        TextView tv  = (TextView) findViewById(R.id.results);
+        tv.setMovementMethod(new ScrollingMovementMethod());
 
-      //  consoleTextArea.clear(); //clear the console of previous results
-       DependencySet FDs = new DependencySet();
+
         //Gather all the functional dependencies
-
         for(FunctionalDependency fd : functionalDependencies.getElements()){FDs.add(fd);}
-        //print all the attributes
 
+        //print all the attributes
         AttributeSet allAttributes = FDs.getAllAttributes();
-        //Collections.sort(allAttributes.getElements());
-        //allAttributes.printToSystemOut();
+        fdListAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, FDs.getStringElements());
+        functionalDependenciesView.setAdapter(fdListAdapter);
+        attributesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, allAttributes.getElements());
+        attributesView.setAdapter(attributesAdapter);
+
 
         //print all the attributes
-        System.out.print("ATTRIBUTES:");
+        returnstring += "ATTRIBUTES:\n";
         for(Attribute att : allAttributes.getElements())
-        System.out.print(att.toString());
-        System.out.print("==================================================\n");
+            returnstring += att.toString();
+        returnstring += "\n==================================================\n";
 
 
-        //print all the functional dependencies created from data file
-        System.out.print("FUNCTIONAL DEPENDENCIES:");
-        System.out.print(FDs.toString());
-        System.out.print("==================================================\n");
+        //print all the functional dependencies created from ER diagram
+        returnstring += "FUNCTIONAL DEPENDENCIES:\n";
+        returnstring += (FDs.toString());
+        returnstring += ("\n==================================================\n");
 
         DependencySet minCover = FDs.minCover();
-
-        System.out.print("==================================================\n");
-        System.out.print("Minimal Cover:");
-        System.out.print( minCover.toString());
+        returnstring += ("Minimal Cover:");
+        returnstring += ( minCover.toString());
 
         DependencySet toMerge = minCover.copy();
         DependencySet newMinCover = new DependencySet();
@@ -187,27 +236,27 @@ public class FDNormalization extends AppCompatActivity {
         minCover = newMinCover;
 
         //Minimal Cover with LHS's merged
-        System.out.print("============================\n");
-        System.out.print("MINIMAL COVER: MERGED LHS");
+        returnstring += ("\n============================\n");
+        returnstring += ("MINIMAL COVER: MERGED LHS");
 
-        System.out.print(minCover.toString());
+        returnstring += (minCover.toString());
         //check that minimal cover and original FD's are in fact equivalent
 
         if(FDs.equals(minCover))
-            System.out.print("FD Sets are Equivalent");
+            returnstring += ("FD Sets are Equivalent");
         else
-            System.out.print("FD Sets are NOT Equivalent");
+            returnstring += ("FD Sets are NOT Equivalent");
 
 
             //find all the candidate keys of a table consisting of all
             //the attributes with respect to the functional dependencies
-        System.out.print("\n-------------------------------------------------------------");
-        System.out.print("CANDIDATE KEY FOR ALL ATTRIBUTES:");
-            AttributeSet candidateKey = allAttributes.findCandidateKey(minCover);
-        System.out.print(candidateKey.toString());
+        returnstring += ("\n-------------------------------------------------------------\n");
+        returnstring += ("CANDIDATE KEY FOR ALL ATTRIBUTES:\n");
+        AttributeSet candidateKey = allAttributes.findCandidateKey(minCover);
+        returnstring += (candidateKey.toString());
 
-        System.out.print("\n-------------------------------------------------------------");
-        System.out.print("ALL CANDIDATE KEYS (FOR SMALL EXAMPLES ONLY):");
+        returnstring += ("\n-------------------------------------------------------------\n");
+        returnstring += ("ALL CANDIDATE KEYS (FOR SMALL EXAMPLES ONLY):\n");
 
             SetOfAttributeSets candidateKeys = allAttributes.allCandidateKeys(minCover);
             if(candidateKeys != null)
@@ -233,8 +282,8 @@ public class FDNormalization extends AppCompatActivity {
 		 */
 
 
-             System.out.print("\n=======================================================");
-             System.out.print("Dependency Preserving, 3NF tables");
+            returnstring +=("\n=======================================================\n");
+            returnstring += ("Dependency Preserving, 3NF tables\n");
 
             //Step 1: already done above
             //Step 2:
@@ -254,10 +303,10 @@ public class FDNormalization extends AppCompatActivity {
             }
 
             for(Relation r : database_3nf_dep_preserving)
-                 System.out.print(r.toString());
+                returnstring += (r.toString());
 
-             System.out.print("\n=======================================================");
-             System.out.print("Lossless-Join, Dependency Preserving, 3NF tables");
+                returnstring += ("\n=======================================================\n");
+                returnstring += ("Lossless-Join, Dependency Preserving, 3NF tables\n");
 
         //Create Lossless-Join, Dependency Preserving 3NF tables
 		/*
@@ -308,14 +357,17 @@ public class FDNormalization extends AppCompatActivity {
             Relation redunantTable = null;
             while((redunantTable = Normalizer.findRedunantTable(database_3nf_lossless_join_dep_preserving)) != null){
                 database_3nf_lossless_join_dep_preserving.remove(redunantTable);
-                System.out.print("\nRemoving Redundant table: " + redunantTable);
+                returnstring += ("\nRemoving Redundant table: " + redunantTable);
 
             }
 
             for(Relation r : database_3nf_lossless_join_dep_preserving)
-                System.out.print(r.toString());
+                returnstring += (r.toString());
 
+            tv.setText(returnstring);
         }
+
+
 /*
         private void openFile(File dataFile){
             //System.out.println("openFile()");

@@ -24,21 +24,17 @@ public class Relation implements Parcelable{
     public Relation(AttributeSet theAttributes, AttributeSet key, String name) {
         this.name = name;
         if (theAttributes == null)
-            throw new NullPointerException(name + " Primary key set is null");
+            throw new NullPointerException(name + " attribute set is null");
         if (theAttributes.isEmpty())
-            throw new NullPointerException(name + " Primary key set is empty");
+            throw new NullPointerException(name + " attribute set is empty");
         if (key != null && !theAttributes.containsAll(key))
             throw new NullPointerException(name +(" ERROR: PRIMARY KEY MUST BE A SUBSET OF THE ATTRIBUTES"));
 
         attributes = new AttributeSet();
         attributes.addAll(theAttributes);
-        if (!key.isEmpty() && !key.equals(null)) {
+        if(key != null){
             primaryKey = new AttributeSet();
             primaryKey.addAll(key);
-        }
-
-        if(key.isEmpty() ||key == null){
-            throw new NullPointerException(name + " attributes  set is empty");
         }
     }
 
@@ -48,16 +44,22 @@ public class Relation implements Parcelable{
 			 * The left hand side becomes the primary key
 			 */
 
-        if (FD == null)
+        if (FD == null) {
             System.out.println("ERROR: Cannot create table out of null dependency");
-        if (FD.getLHS().isEmpty() || FD.getRHS().isEmpty())
+            throw new NullPointerException("FD ERROR: Cannot create table out of null dependency");
+        }
+        if (FD.getLHS().isEmpty() || FD.getRHS().isEmpty()) {
             System.out.println("ERROR: Cannot create table out of empty dependency");
-        attributes = new AttributeSet();
-       // attributes.addAll(FD.getLHS());
-        attributes.addAll(FD.getRHS());
+            throw new NullPointerException("FD ERROR: Cannot create table out of empty dependency");
+        }
 
         primaryKey = new AttributeSet();
         primaryKey.addAll(FD.getLHS());
+
+        attributes = new AttributeSet();
+        attributes.addAll(FD.getLHS());
+        attributes.addAll(FD.getRHS());
+        this.name =  FD.getName();
     }
 
     protected Relation(Parcel in) {
@@ -66,7 +68,9 @@ public class Relation implements Parcelable{
         name  = in.readString();
 
         primaryKey = in.readTypedObject(AttributeSet.CREATOR);
-        attributes =  in.readTypedObject(AttributeSet.CREATOR);
+        attributes = in.readTypedObject(AttributeSet.CREATOR);
+
+
         if(primaryKey.isEmpty() || primaryKey == null ){
             throw new NullPointerException(name + "Primary key set is empty");
         }
@@ -102,7 +106,7 @@ public class Relation implements Parcelable{
 
     public String toString() {
 
-        String returnString = this.name+": [";
+        String returnString = this.name + ": [";
         for (Attribute a : primaryKey.getElements()) {
             if (primaryKey.contains(a)) returnString = returnString + a + ",";
         }
@@ -113,7 +117,7 @@ public class Relation implements Parcelable{
             if (!primaryKey.contains(a)) returnString = returnString + a + ",";
         }
         returnString = returnString.substring(0, returnString.length() - 1);  //strip off last ","
-        returnString = returnString + "]";
+        returnString = returnString + "]  ";
 
         return returnString;
     }

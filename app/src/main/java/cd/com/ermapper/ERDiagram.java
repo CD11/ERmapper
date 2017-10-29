@@ -6,8 +6,6 @@ import android.os.Parcelable;
 import android.util.Log;
 import java.util.ArrayList;
 
-import static cd.com.ermapper.ShapeObject.*;
-
 
 /**
  * Created by CD on 9/7/2017.
@@ -20,36 +18,28 @@ public class ERDiagram implements Parcelable {
 
      */
     private String name;
-    private ArrayList<ShapeObject> objects;
-    private ArrayList<Relation> relations;
-    private DependencySet dependencies;
+    private ArrayList<ShapeObject> objects;   // We hold a list of all objects because we do not know what objects are connect right away
+    private ArrayList<Entity> entityObjs;     // upon time to normalize we can pass all entity objs with their attributes to the FDNormalization.
 
 
 
     public ERDiagram(){
         this.name = "erDiagram";
         this.objects = new ArrayList<>();
-        this.relations = new ArrayList<>();
-        this.dependencies = new DependencySet();
     }
 
     public ERDiagram(String name){
         this.name = name;
         this.objects = new ArrayList<>();
-        this.relations = new ArrayList<>();
-        this.dependencies = new DependencySet();
         Log.d("CreatedER", this.name);
     }
 
 
     protected ERDiagram(Parcel in) {
-        objects  = new ArrayList<>();
-        relations = new ArrayList<>();
-        dependencies = new DependencySet();
+        objects = new ArrayList<>();
+        entityObjs= new ArrayList<>();
         name = in.readString();
-        relations = in.createTypedArrayList(Relation.CREATOR);
-        dependencies = in.readTypedObject(DependencySet.CREATOR);
-
+        entityObjs = in.createTypedArrayList(Entity.CREATOR);
     }
 
     public static final Creator<ERDiagram> CREATOR = new Creator<ERDiagram>() {
@@ -121,11 +111,6 @@ public class ERDiagram implements Parcelable {
 
         }
 
-        for(ShapeObject o: objects){
-            if(o.relationships.contains(i)){
-                o.relationships.remove(i);
-            }
-        }
         objects.remove(i);
     }
 
@@ -167,6 +152,15 @@ public class ERDiagram implements Parcelable {
 
         return r;
     }
+    public ArrayList<Entity> getEntityObj() {
+        ArrayList<Entity> es = new ArrayList<>();
+        for(Entity e: entityObjs) {
+            if(!e.isWeak()){
+                es.add(e);
+            }
+        }
+        return es;
+    }
 
     /* Sorts objects so that all relationship objects are first,
         this allows for them to be drawn first onto the canvas,
@@ -182,40 +176,6 @@ public class ERDiagram implements Parcelable {
         return sortedObjects;
     }
 
-    public DependencySet getDependencies() {
-        return dependencies;
-    }
-
-    public ArrayList<Relation> findRelations(){
-
-            for (Entity e : getEntities()) {
-                if (!e.equals(null)) {
-                    relations.add(e.toRelation());
-                }
-            }
-            return relations;
-    }
-
-    public DependencySet findDependencies(){
-
-        for( Relation r: relations){
-            FunctionalDependency fd = new FunctionalDependency(r.getPrimaryKey(), r.getAttributes());
-            if(fd != null || fd.isTrivial()) dependencies.add(fd);
-        }
-        return dependencies;
-    }
-
-    public ArrayList<Relation> getRelations(){
-        return relations;
-    }
-
-    // Prints the ER diagram Relations, with their dependencies
-    public void printER(){
-        for(Relation r: relations){
-           Log.d("printing diagram", r.toString());
-        }
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -224,12 +184,11 @@ public class ERDiagram implements Parcelable {
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(name);
-        parcel.writeTypedList(relations);
-        parcel.writeTypedObject(dependencies, i);
-
+        parcel.writeTypedList(getEntities());
     }
 
-    public void update() {
 
+    public void removeO(ShapeObject curr) {
+        objects.remove(curr);
     }
 }

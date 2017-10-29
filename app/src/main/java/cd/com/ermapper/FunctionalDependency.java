@@ -6,6 +6,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import static cd.com.ermapper.R.string.attributes;
+
 
 /**
  * Created by ldnel_000 on 2015-11-04.
@@ -16,9 +18,23 @@ public class FunctionalDependency implements Parcelable{
 
     private AttributeSet lhs; //left hand side
     private AttributeSet rhs; //right hand side
+    private String name;
 
     public FunctionalDependency(AttributeSet aLHS, AttributeSet aRHS) {
 
+        if (aLHS == null || aRHS == null) {
+            System.out.println("ERROR: NULL ATTRITBUTE SET");
+        } else if (aLHS.isEmpty() || aRHS.isEmpty()){
+            System.out.println("ERROR: EMPTY ATTRITBUTE SET");
+        }else {
+            lhs = new AttributeSet();
+            rhs = new AttributeSet();
+            lhs.addAll(aLHS);
+            rhs.addAll(aRHS);
+        }
+    }
+    public FunctionalDependency(AttributeSet aLHS, AttributeSet aRHS, String name) {
+        this.name = name;
         if (aLHS == null || aRHS == null) {
             System.out.println("ERROR: NULL ATTRITBUTE SET");
         } else if (aLHS.isEmpty() || aRHS.isEmpty()){
@@ -40,6 +56,7 @@ public class FunctionalDependency implements Parcelable{
     }
 
 
+
     public static final Creator<FunctionalDependency> CREATOR = new Creator<FunctionalDependency>() {
         @Override
         public FunctionalDependency createFromParcel(Parcel in) {
@@ -52,8 +69,11 @@ public class FunctionalDependency implements Parcelable{
         }
     };
 
+
+
     public AttributeSet getLHS(){return lhs;}
     public AttributeSet getRHS(){return rhs;}
+    public String getName(){return name; }
 
     public boolean equals(FunctionalDependency anFD){
 		/*]
@@ -79,7 +99,20 @@ public class FunctionalDependency implements Parcelable{
 
     public String toString()
     {
-        return lhs.toString() + " -> " + rhs.toString();
+        String returnString = " ";
+        for (Attribute a : lhs.getElements()) {
+            if (lhs.contains(a)) returnString = returnString + a + ",";
+        }
+        returnString = returnString.substring(0, returnString.length() - 1);  //strip off last ","
+        returnString = returnString + " -> ";
+
+        for (Attribute a : rhs.getElements()) {
+            if (!lhs.contains(a)) returnString = returnString + a + ",";
+        }
+        returnString = returnString.substring(0, returnString.length() - 1);  //strip off last ","
+        returnString = returnString + " ";
+
+        return returnString;
     }
 
 

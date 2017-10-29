@@ -4,23 +4,21 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.os.BadParcelableException;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Layout;
 import android.util.*;
 
 
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
-import static android.R.attr.name;
 import static android.graphics.Color.BLACK;
-import static android.graphics.Color.WHITE;
 
 
 public class ERDraw extends AppCompatActivity {
@@ -44,7 +42,7 @@ public class ERDraw extends AppCompatActivity {
 
         LinearLayout layout = (LinearLayout) findViewById(R.id.diagramLayout);
         layout.requestFocus();
-        LinearLayout textLayer = (LinearLayout) findViewById(R.id.textLayout);
+        RelativeLayout textLayer = (RelativeLayout) findViewById(R.id.textLayout);
         final EditText et = new EditText(this.getApplicationContext());
         setET(et);
         ShapeObject entity;
@@ -70,7 +68,7 @@ public class ERDraw extends AppCompatActivity {
 
     // if add attribute is pressed
     public void addAttribute(View view){
-        LinearLayout textLayer = (LinearLayout) findViewById(R.id.textLayout);
+        RelativeLayout textLayer = (RelativeLayout) findViewById(R.id.textLayout);
         final EditText et = new EditText(this.getApplicationContext());
         setET(et);
         ShapeObject attribute;
@@ -85,17 +83,16 @@ public class ERDraw extends AppCompatActivity {
         }
         }
 
+        textLayer.addView(et);
         object.setState(2);
         object.invalidate();
 
-        textLayer.addView(et);
-        textLayer.bringToFront();
     }
 
     // if add relationship is pressed
     public void addRelationship(View view){
         LinearLayout layout = (LinearLayout) findViewById(R.id.diagramLayout);
-        LinearLayout textLayer = (LinearLayout) findViewById(R.id.textLayout);
+        RelativeLayout textLayer = (RelativeLayout) findViewById(R.id.textLayout);
         final EditText et = new EditText(this.getApplicationContext());
         setET(et);
         et.setVisibility(View.INVISIBLE);
@@ -108,12 +105,10 @@ public class ERDraw extends AppCompatActivity {
             relationship = new Relationship(et, String.valueOf(et.getText()));
         }
 
+        textLayer.addView(et);
         object.setState(3);
         object.setRelationship(relationship);
-        relationship.moveName();
         object.invalidate();
-        textLayer.addView(et);
-        textLayer.bringToFront();
 
     }
 
@@ -129,8 +124,6 @@ public class ERDraw extends AppCompatActivity {
     public void Normalize(View  v){
         Intent intent;
         try {
-            diagram.findRelations();
-            diagram.findDependencies();
             intent= new Intent(this, FDNormalization.class);
             intent.putExtra("diagram", diagram);
             startActivity(intent);
@@ -155,7 +148,7 @@ public class ERDraw extends AppCompatActivity {
     // every object has an editable name set to this
     public void setET(final EditText et){
         // set Edit text
-        et.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        et.setLayoutParams(new RelativeLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         et.setHint("Name");
         et.bringToFront();
         et.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -172,7 +165,6 @@ public class ERDraw extends AppCompatActivity {
                     for(ShapeObject e: diagram.getObjects()){
                         if(e.getEditId() == view){
                             e.setName(String.valueOf(et.getText()));
-
                             break;
 
                         }

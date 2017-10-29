@@ -41,7 +41,6 @@ public class AttributeSet implements Parcelable {
 
     protected AttributeSet(Parcel in) {
         elements = new ArrayList<>();
-
         elements = in.createTypedArrayList(Attribute.CREATOR);
 
     }
@@ -63,26 +62,26 @@ public class AttributeSet implements Parcelable {
     public void add(Attribute anAttribute) {
         //Add anAttribute without duplication
         if(anAttribute == null) return;
-
         for(Attribute a : elements) if(a.equals(anAttribute)) return; //don't add duplicates
         elements.add(anAttribute);
     }
     public void addAll(AttributeSet anAttributeSet) {
         for(Attribute a : anAttributeSet.elements)
-                this.add(a);
+                 this.add(a);
     }
     public void remove(Attribute anAttribute) {
         //remove all equal to anAttribute
         AttributeSet itemsToRemove = new AttributeSet();
         for(Attribute a : elements) if(a.equals(anAttribute)) itemsToRemove.add(a);
         elements.removeAll(itemsToRemove.elements);
-
     }
+
     public AttributeSet copy(){
         AttributeSet theCopy = new AttributeSet();
         theCopy.addAll(this);
         return theCopy;
     }
+
     public boolean isEmpty() {return elements.isEmpty(); }
     public int size() {return elements.size();} //answer number of attributes in this set
     public void clear(){ elements.clear(); }
@@ -90,9 +89,9 @@ public class AttributeSet implements Parcelable {
         //answer whether this contains an Attribute equal to anAttribute
         for(Attribute a : elements)
             if(a.equals(anAttribute)) return true;
-
         return false;
     }
+
     public boolean containsAll(AttributeSet anAttributeSet){
         //answer whether this contains all attributes in anAttributeSet
         if(anAttributeSet.isEmpty()) return true;
@@ -108,7 +107,6 @@ public class AttributeSet implements Parcelable {
         if(anAttributeSet == null) return false;
         if(!anAttributeSet.containsAll(this)) return false;
         return this.containsAll(anAttributeSet);
-
     }
 
     public AttributeSet closure(DependencySet F){
@@ -118,7 +116,6 @@ public class AttributeSet implements Parcelable {
 		 * The closure are all those attributes that are implied by this wrt. F using
 		 * Armstrong's axioms
 		 */
-
         AttributeSet previous = new AttributeSet();
 
         AttributeSet current = new AttributeSet(this);	//reflexive rule
@@ -129,7 +126,6 @@ public class AttributeSet implements Parcelable {
                 if(current.containsAll(fd.getLHS())) current.addAll(fd.getRHS());
             }
         }
-
         return current;
 
     }
@@ -162,7 +158,6 @@ public class AttributeSet implements Parcelable {
 
             return null;
         }
-
     }
 
     AttributeSet findCandidateKey(DependencySet theFDs){
@@ -252,8 +247,6 @@ public class AttributeSet implements Parcelable {
             }
             candidateKeys.addAll(candidateKeys(superkeys, theFDs));
             return candidateKeys;
-
-
         }
 
     }
@@ -268,7 +261,6 @@ public class AttributeSet implements Parcelable {
             returnString = returnString.substring(0, returnString.length()-1);
 
         return returnString;
-
     }
 
     public void printToSystemOut(){

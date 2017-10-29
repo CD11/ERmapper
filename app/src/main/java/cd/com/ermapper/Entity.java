@@ -1,13 +1,13 @@
 package cd.com.ermapper;
 
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Parcel;
-import android.os.Parcelable;
-import android.support.constraint.solver.widgets.Rectangle;
 import android.util.Log;
 import android.widget.EditText;
+
+
+import java.util.ArrayList;
 
 import static android.R.id.primary;
 
@@ -18,20 +18,24 @@ import static android.R.id.primary;
 
 
 
-public class Entity extends ShapeObject{
+public class Entity extends ShapeObject {
     /*
        This class represents an Entity in an ER diagram, it is represented by a square
        An Entity contains the name and attributes for a relation / relational table.
      */
-    public static final float offset  =  30;
+    public static final float offset  =  80;
     private AttributeSet attr;
-    private boolean weak;
+    private ArrayList<Entity> weak;
+    private boolean isWeak;
 
 
     public Entity(EditText eName, String name, float x, float y) {
-        super(eName, name, x, y, 250 , 250);
+        super(eName, name, x, y);
         attr = new AttributeSet();
-        weak = false;
+        weak = new ArrayList<>();
+        isWeak =false;
+        setCoordinateX(x);
+        setCoordinateY(y);
         moveName();
     }
 
@@ -39,7 +43,10 @@ public class Entity extends ShapeObject{
     protected Entity(Parcel in) {
         super(in);
         attr = new AttributeSet();
+        weak = new ArrayList<>();
         attr = in.readTypedObject(AttributeSet.CREATOR);
+        isWeak = in.readByte() != 0;
+        weak = in.createTypedArrayList(Entity.CREATOR);
         Log.d("Parcel Enitity", toString());
 
     }
@@ -56,10 +63,6 @@ public class Entity extends ShapeObject{
         }
     };
 
-    public Entity(String name, AttributeSet p, AttributeSet k) {
-        super(name);
-        this.attr = k;
-    }
 
     // add Attributes to the entity
     public void addAttribute(Attribute a) {
@@ -80,44 +83,87 @@ public class Entity extends ShapeObject{
         /* Search through entity attributes,  if the attribute is part a primary adds it to the
             primary attribute set, else adds to the atttribute attribute set.
             - > allows ensures there is no duplication.
-            */
-        for(Attribute a: attr.getElements()){
-            if(a.isPrimary() && !primary.contains(a)){
+        */
+        for(Attribute a: attr.getElements()) {
+            if (a.isPrimary()) {
                 primary.add(a);
             }
-            if (!attributes.contains(a))
-                attributes.add(a);
-
+            attributes.add(a);
         }
+
         Relation r = new Relation(attributes, primary, this.getName());
         return r;
     }
 
     public void setCoordinateX(float coordinateX) {
         this.getCoordinates().x = coordinateX;
-        this.getCoordinates().width = coordinateX + getEditId().getWidth() +offset;
+        this.getCoordinates().width = coordinateX + getEditId().getWidth() + offset;
+        if(getEditId().getWidth() ==0 )
+            this.getCoordinates().width = coordinateX + 100+ offset;
+
     }
 
     public void setCoordinateY(float coordinateY) {
         this.getCoordinates().y = coordinateY;
-        this.getCoordinates().height = coordinateY +  getEditId().getWidth()+ offset;
+        this.getCoordinates().height = coordinateY + getEditId().getWidth()+offset;
+        if(getEditId().getWidth() ==0 )
+            this.getCoordinates().height = coordinateY + 100+ offset;
+
     }
 
     public boolean isWeak() {
-        return weak;
+        return isWeak; // if weak is empty then it is not weak
     }
-    public void setWeak() {
-        if(weak == false){
-            weak = true;
+    public void setWeak(ArrayList<Relationship> relationships) {
+        if(isWeak == false){
+            isWeak = true;
+            for(Attribute a:getAttr().getElements()) {
+                if (a.isPrimary()) {
+                    getEditId().getBackground().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
+                    getEditId().setBackgroundResource(R.drawable.dotted_line);
+                }
+            }
         }else{
-            weak = false;
+            isWeak = false;
+            for(Attribute a:getAttr().getElements()) {
+                if (a.isPrimary()) {
+                    getEditId().getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
+                    getEditId().setBackgroundResource(R.drawable.dotted_line);
+                }
+            }
         }
+
+        for(Relationship r: relationships) {
+            if (r.getObj2().getClass() == Entity.class && r.getObj1().getClass() == Entity.class) {
+                if (r.getObj1() == this) {
+                    if(!((Entity) (r.getObj2())).getWeak().contains(this))
+                        ((Entity) (r.getObj2())).addEntity(this);
+                    break;
+                } else if (r.getObj2() == this) {
+                    if(!((Entity)(r.getObj1())).getWeak().contains(this))
+                        ((Entity) (r.getObj1())).addEntity(this);
+                    break;
+                }
+            }
+        }
+
     }
 
+    public ArrayList<Entity> getWeak() {
+        return  weak;
+    }
+
+    public void addEntity(ShapeObject curr1) {
+        if(!weak.contains(curr1))
+            this.weak.add((Entity) curr1);
+    }
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         super.writeToParcel(parcel, i);
         parcel.writeTypedObject(attr, i);
+        parcel.writeByte((byte) (isWeak() ? 1 : 0));
+        parcel.writeTypedList(weak);
     }
+
 
 }
