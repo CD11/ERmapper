@@ -53,8 +53,6 @@ public class FDNormalization extends AppCompatActivity {
          performNormalization();  // Perform normalization
         // performAttributeClosure(relations.get(0).getPrimaryKey()); // perform Attribute Closure
 
-        //attributes = functionalDependencies.getAllAttributes();
-
     }
 
     private void addFD(FunctionalDependency anFD){
@@ -73,14 +71,13 @@ public class FDNormalization extends AppCompatActivity {
 
      */
 
-        ////////////// Step 1 ///////////////////////////
+        ////////////// Step 1/6 ///////////////////////////
         // check for multiple attributes.
         for(Entity e: diagram.getEntityObj()){
             for(Attribute a: e.getAttr().getElements()){ // for each attribute a in e
                 if(!a.getValues().isEmpty()){            // check if a is complex and create its own relation.
                     fd = a.toFD();
                     if(fd != null || !fd.isTrivial()) functionalDependencies.add(fd);
-
                 }
             }
 

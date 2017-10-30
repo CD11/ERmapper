@@ -125,6 +125,10 @@ public class ERDiagram implements Parcelable {
             }
         }
 
+        for(Relationship r: getRelationships()){
+
+        }
+
         return e;
     }
     // get all attribute shapeobjects
@@ -154,10 +158,12 @@ public class ERDiagram implements Parcelable {
     }
     public ArrayList<Entity> getEntityObj() {
         ArrayList<Entity> es = new ArrayList<>();
+
         for(Entity e: entityObjs) {
             if(!e.isWeak()){
                 es.add(e);
             }
+
         }
         return es;
     }

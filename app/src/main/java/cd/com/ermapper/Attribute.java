@@ -33,7 +33,7 @@ public class Attribute extends ShapeObject {
     {
      super(anAttributeName);
         primary = false;
-        values = new ArrayList();
+        values = new ArrayList<>();
     }
 
     public Attribute(Parcel in) {
@@ -104,6 +104,7 @@ public class Attribute extends ShapeObject {
         FunctionalDependency fd = new FunctionalDependency(key, v, this.getName());
         return fd;
     }
+
     public AttributeSet getValuesSet() {
         AttributeSet as = new AttributeSet();
         for(Attribute a: values){
@@ -117,6 +118,7 @@ public class Attribute extends ShapeObject {
         parcel.writeByte((byte) (primary ? 1 : 0));
         parcel.writeTypedList(values);
     }
+
 
 
 }

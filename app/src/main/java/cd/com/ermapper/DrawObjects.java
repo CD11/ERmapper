@@ -131,11 +131,10 @@ public class DrawObjects extends View {
             object selected by following the mouse.
          */
 
-           int eventaction = event.getAction();
+        int eventaction = event.getAction();
         boolean doublepress = false;
-            switch (eventaction) {
-
-                case MotionEvent.ACTION_DOWN: {
+        switch (eventaction) {
+            case MotionEvent.ACTION_DOWN: {
                     /* check for double click */
                     duration = 0;
                     clickCount++;
@@ -168,7 +167,6 @@ public class DrawObjects extends View {
                         duration = 0;
                     }
 
-                    Log.d("Click object", String.valueOf(clickCount));
                     /*** check for moving ****/
                     // Remember where we started (for dragging)
                     startX = event.getX();
@@ -232,19 +230,13 @@ public class DrawObjects extends View {
                                         if (curr.getClass() == Entity.class){
                                                 if (curr1.getClass() == Attribute.class)  // if curr is an entity, add attribute curr1 to entity
                                                     ((Entity) curr).addAttribute((Attribute) curr1);
-                                                //else if (curr1.getClass() == Entity.class) {  // if curr is an enitty and curr1 is a weak entity, add curr1 to curr
-                                                   // ((Entity) curr).addEntity(curr1);
-                                                    //((Entity) curr1).addEntity(curr);
-                                               // }
+
 
 
                                         }else if (curr1.getClass() == Entity.class){
                                             if(curr.getClass() == Attribute.class)// if curr1 is an entity, add attriubte curr to entity
                                                 ((Entity) curr1).addAttribute((Attribute) curr);
-                                           // else if (curr.getClass() == Entity.class ) {
-                                              //  ((Entity) curr1).addEntity(curr);
-                                               // ((Entity) curr).addEntity(curr1);
-                                            //}
+
 
                                         }else if(curr1.getClass() == Attribute.class && curr.getClass () == Attribute.class){ // if attribute is multivalued
                                             //  check for other values already being stored.

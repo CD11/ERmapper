@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Parcel;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 
 
@@ -119,18 +120,13 @@ public class Entity extends ShapeObject {
             isWeak = true;
             for(Attribute a:getAttr().getElements()) {
                 if (a.isPrimary()) {
-                    getEditId().getBackground().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
-                    getEditId().setBackgroundResource(R.drawable.dotted_line);
+                    a.getEditId().getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
+
                 }
             }
         }else{
             isWeak = false;
-            for(Attribute a:getAttr().getElements()) {
-                if (a.isPrimary()) {
-                    getEditId().getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
-                    getEditId().setBackgroundResource(R.drawable.dotted_line);
-                }
-            }
+
         }
 
         for(Relationship r: relationships) {
@@ -138,6 +134,7 @@ public class Entity extends ShapeObject {
                 if (r.getObj1() == this) {
                     if(!((Entity) (r.getObj2())).getWeak().contains(this))
                         ((Entity) (r.getObj2())).addEntity(this);
+
                     break;
                 } else if (r.getObj2() == this) {
                     if(!((Entity)(r.getObj1())).getWeak().contains(this))

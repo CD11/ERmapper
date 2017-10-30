@@ -110,14 +110,14 @@ public class Relationship extends ShapeObject {
 
     public void setObj1(ShapeObject obj1) {
         this.obj1 = obj1;
-        this.setCoordinateX(obj1.getCoordinates().x + 40);
-        this.setCoordinateY(obj1.getCoordinates().y + 40);
+        this.setCoordinateX(obj1.getCoordinates().centerX());
+        this.setCoordinateY(obj1.getCoordinates().centerY());
     }
 
     public void setObj2(ShapeObject obj2) {
         this.obj2 = obj2;
-        this.setCoordinateW(obj2.getCoordinates().x + 40);
-        this.setCoordinateH(obj2.getCoordinates().y + 40);
+        this.setCoordinateW(obj2.getCoordinates().centerX());
+        this.setCoordinateH(obj2.getCoordinates().centerY());
     }
 
     public void update(){
