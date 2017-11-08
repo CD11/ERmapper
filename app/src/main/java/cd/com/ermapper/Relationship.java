@@ -22,16 +22,19 @@ public class Relationship extends ShapeObject {
 
     ShapeObject obj1;
     ShapeObject obj2;
+    AttributeSet attrs;
     Coordinates c;
 
     public Relationship(EditText nameEdit, String name, ShapeObject curr, ShapeObject curr1) {
         super(nameEdit,"relationship", curr.getCoordinates().x, curr.getCoordinates().y, curr1.getCoordinates().x, curr1.getCoordinates().y);
         obj1 = curr;
         obj2 = curr1;
+        attrs = new AttributeSet();
     }
 
     public Relationship(EditText et, String name) {
         super(et,"name", 0, 0, 0, 0);
+        attrs = new AttributeSet();
     }
 
     public Relationship(Parcel in) {
@@ -39,16 +42,11 @@ public class Relationship extends ShapeObject {
         obj1 = in.readParcelable(ShapeObject.class.getClassLoader());
         obj2 = in.readParcelable(ShapeObject.class.getClassLoader());
         c = in.readParcelable(Coordinates.class.getClassLoader());
+        attrs = in.readTypedObject(AttributeSet.CREATOR);
     }
 
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        dest.writeParcelable(obj1, flags);
-        dest.writeParcelable(obj2, flags);
-        dest.writeParcelable(c, flags);
-    }
+
 
     @Override
     public int describeContents() {
@@ -100,6 +98,16 @@ public class Relationship extends ShapeObject {
             return p;
     }
 
+    public boolean contains(float v, float v1) {
+        float x =this.getCoordinates().centerX();
+        float y =this.getCoordinates().centerY();
+        float w = 50;
+        float h = 50;
+        Coordinates c = new Coordinates(x-w, y-h, x+w, y+h);
+
+
+        return c.contains(v,v1);
+    }
 
     public ShapeObject getObj1() {
         return obj1;
@@ -152,5 +160,16 @@ public class Relationship extends ShapeObject {
         }
         return  result;
     }
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeParcelable(obj1, flags);
+        dest.writeParcelable(obj2, flags);
+        dest.writeParcelable(c, flags);
+        dest.writeTypedObject(attrs,flags);
+    }
 
+    public void addAttribute(Attribute curr1) {
+        attrs.add(curr1);
+    }
 }

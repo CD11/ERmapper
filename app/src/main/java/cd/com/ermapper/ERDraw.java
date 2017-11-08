@@ -153,7 +153,6 @@ public class ERDraw extends AppCompatActivity {
         et.bringToFront();
         et.setImeOptions(EditorInfo.IME_ACTION_DONE);
         et.setSingleLine();
-        et.setShowSoftInputOnFocus(false);
         et.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
         et.setTextColor(BLACK);
         et.setOnFocusChangeListener(new View.OnFocusChangeListener() {

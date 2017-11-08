@@ -222,58 +222,53 @@ public class DrawObjects extends View {
                          /* Get Movement */
                         //  Find connecting relationship
                         if (rCurr != null && curr != null) {
-                            if (curr.getClass() != Relationship.class) {
-                                for (ShapeObject i : d.getObjects()) {
-                                    if (i.getCoordinates().contains(endX + 10, endY + 10) && !(i == curr)) {
-                                        curr1 = i;
-
-                                        if (curr.getClass() == Entity.class){
-                                                if (curr1.getClass() == Attribute.class)  // if curr is an entity, add attribute curr1 to entity
-                                                    ((Entity) curr).addAttribute((Attribute) curr1);
-
-
-
-                                        }else if (curr1.getClass() == Entity.class){
-                                            if(curr.getClass() == Attribute.class)// if curr1 is an entity, add attriubte curr to entity
+                            for (ShapeObject i : d.getObjects()) {
+                                // Object clicked
+                                if (i.contains(endX + 10, endY + 10) && !(i == curr)) {
+                                    curr1 = i;
+                                    // Check Entity
+                                    if (curr.getClass() == Entity.class) {
+                                        if (curr1.getClass() == Attribute.class)  // if curr is an entity, add attribute curr1 to entity
+                                            ((Entity) curr).addAttribute((Attribute) curr1);
+                                        } else if (curr1.getClass() == Entity.class) {
+                                            if (curr.getClass() == Attribute.class)// if curr1 is an entity, add attriubte curr to entity
                                                 ((Entity) curr1).addAttribute((Attribute) curr);
 
-
-                                        }else if(curr1.getClass() == Attribute.class && curr.getClass () == Attribute.class){ // if attribute is multivalued
+                                            // Check Attribute
+                                        } else if (curr1.getClass() == Attribute.class && curr.getClass() == Attribute.class) { // if attribute is multivalued
                                             //  check for other values already being stored.
-                                            if(((Attribute) curr).getValues().isEmpty() && !((Attribute)curr1).getValues().isEmpty())
-                                                    ((Attribute) curr1).addAttribute((Attribute)curr);
+                                            if (((Attribute) curr).getValues().isEmpty() && !((Attribute) curr1).getValues().isEmpty())
+                                                ((Attribute) curr1).addAttribute((Attribute) curr);
                                             else
-                                                ((Attribute) curr).addAttribute((Attribute)curr1);
+                                                ((Attribute) curr).addAttribute((Attribute) curr1);
+
+                                            //Check Relationship
+                                        }else if(curr1.getClass() == Attribute.class && curr.getClass () == Relationship.class){ // Add Attributes to a relationship
+                                            ((Relationship) curr).addAttribute((Attribute)curr1);
+                                        }else if(curr1.getClass() == Relationship.class && curr.getClass () == Attribute.class) { // Add Attributes to a relationship
+                                            ((Relationship) curr1).addAttribute((Attribute) curr);
                                         }
 
                                         rCurr.setObj1(curr);
                                         rCurr.setObj2(curr1);
                                         rCurr.update();
-                                        if (rCurr.getObj1() != null && rCurr.getObj2() != null) {
-                                            // only add the relationship to the diagram if it is valid
-                                            d.addObject(rCurr);
-                                        } else {
-                                            // remove the edit text for an invalid relationship
-                                            rCurr.getEditId().setVisibility(INVISIBLE);
-                                            rCurr = null;
-                                        }
-
-
-                                        break;
+                                    if (rCurr.getObj1() != null && rCurr.getObj2() != null) {
+                                        // only add the relationship to the diagram if it is valid
+                                        d.addObject(rCurr);
+                                    } else {
+                                      // remove the edit text for an invalid relationship
+                                        rCurr.getEditId().setVisibility(INVISIBLE);
+                                        rCurr = null;
                                     }
+                                    break;
                                 }
                             }
-
-
                         // set final position of objects (except relationships)
-                        if (curr != null && state != 3 && curr.getClass() != Relationship.class) {
+                        if (curr != null && state != 3) {
                             curr.setCoordinateX(endX);
                             curr.setCoordinateY(endY);
                             this.getContext();
                             curr.moveName();
-                            for (Relationship r : d.getRelationships()) {
-                                    r.update();
-                            }
                         }
                         invalidate();
                         curr = null;
