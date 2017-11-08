@@ -1,4 +1,4 @@
-package cd.com.ermapper;
+package cd.com.ermapper.relations;
 
 
 /**
@@ -6,12 +6,10 @@ package cd.com.ermapper;
  */
         import android.os.Parcel;
         import android.os.Parcelable;
-        import android.util.Log;
 
         import java.util.ArrayList;
 
-        import static android.R.attr.name;
-        import static android.R.id.empty;
+        import cd.com.ermapper.shapes.Attribute;
 
 public class AttributeSet implements Parcelable {
 	/*
@@ -160,7 +158,7 @@ public class AttributeSet implements Parcelable {
         }
     }
 
-    AttributeSet findCandidateKey(DependencySet theFDs){
+    public AttributeSet findCandidateKey(DependencySet theFDs){
         AttributeSet candidateKey = this.copy();
         for(Attribute a : this.getElements()){
             AttributeSet tryCandidate = candidateKey.copy();

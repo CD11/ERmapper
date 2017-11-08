@@ -5,7 +5,7 @@
     android:id="@+id/baseLayout"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    tools:context=".FDNormalization"
+    tools:context=".Logic.FDNormalization"
     tools:showIn="@layout/activity_fdnormalization">
 
     <TextView

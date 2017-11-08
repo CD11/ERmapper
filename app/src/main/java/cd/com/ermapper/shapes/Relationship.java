@@ -1,10 +1,11 @@
-package cd.com.ermapper;
+package cd.com.ermapper.shapes;
 
 import android.graphics.Path;
 import android.os.Parcel;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+
+import cd.com.ermapper.relations.AttributeSet;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;

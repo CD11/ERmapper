@@ -1,4 +1,4 @@
-package cd.com.ermapper;
+package cd.com.ermapper.Logic;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,11 +12,15 @@ import android.util.*;
 
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+
+import cd.com.ermapper.R;
+import cd.com.ermapper.shapes.Attribute;
+import cd.com.ermapper.shapes.Entity;
+import cd.com.ermapper.shapes.Relationship;
+import cd.com.ermapper.shapes.ShapeObject;
 
 import static android.graphics.Color.BLACK;
 

@@ -1,6 +1,12 @@
-package cd.com.ermapper;
+package cd.com.ermapper.Logic;
 import java.io.*;
 import java.util.ArrayList;
+
+import cd.com.ermapper.relations.AttributeSet;
+import cd.com.ermapper.relations.DependencySet;
+import cd.com.ermapper.relations.FunctionalDependency;
+import cd.com.ermapper.relations.Relation;
+import cd.com.ermapper.shapes.Attribute;
 
 /**
  * Created by ldnel_000 on 2015-11-04.

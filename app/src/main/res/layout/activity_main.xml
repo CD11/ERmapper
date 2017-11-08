@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="cd.com.ermapper.MainActivity">
+    tools:context="cd.com.ermapper.Logic.MainActivity">
     <TextView
         android:id="@+id/welcome"
         android:layout_width="355dp"

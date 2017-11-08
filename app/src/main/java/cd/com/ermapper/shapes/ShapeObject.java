@@ -1,4 +1,4 @@
-package cd.com.ermapper;
+package cd.com.ermapper.shapes;
 
 import android.os.Parcel;
 import android.os.Parcelable;

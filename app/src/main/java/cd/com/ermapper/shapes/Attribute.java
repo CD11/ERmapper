@@ -1,4 +1,4 @@
-package cd.com.ermapper;
+package cd.com.ermapper.shapes;
 
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -6,7 +6,9 @@ import android.os.Parcel;
 import android.widget.EditText;
 
 import java.util.ArrayList;
-import java.util.BitSet;
+
+import cd.com.ermapper.relations.AttributeSet;
+import cd.com.ermapper.relations.FunctionalDependency;
 
 /**
  * Created by cd on 2015-11-04.
@@ -61,16 +63,16 @@ public class Attribute extends ShapeObject {
     public String toString(){ return this.getName()+" ";}
 
     public void setCoordinateX(float coordinateX) {
-        this.getCoordinates().x = coordinateX;
+        this.getCoordinates().setX(coordinateX);
         float w = coordinateX + getEditId().getWidth()+ width;
         if(getEditId().getWidth() == 0)
             w += 100;
-        this.getCoordinates().width = w;
+        this.getCoordinates().setWidth(w);
     }
 
     public void setCoordinateY(float coordinateY) {
-        this.getCoordinates().y = coordinateY;
-        this.getCoordinates().height = coordinateY + height;
+        this.getCoordinates().setY(coordinateY);
+        this.getCoordinates().setHeight(coordinateY + height);
 
     }
 

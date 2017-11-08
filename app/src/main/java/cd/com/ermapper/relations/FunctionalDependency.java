@@ -1,12 +1,11 @@
-package cd.com.ermapper;
+package cd.com.ermapper.relations;
 
 
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
-import static cd.com.ermapper.R.string.attributes;
+import cd.com.ermapper.shapes.Attribute;
 
 
 /**

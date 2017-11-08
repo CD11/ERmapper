@@ -1,4 +1,4 @@
-package cd.com.ermapper;
+package cd.com.ermapper.relations;
 
 
 
@@ -8,9 +8,10 @@ package cd.com.ermapper;
 
         import android.os.Parcel;
         import android.os.Parcelable;
-        import android.util.Log;
 
         import java.util.ArrayList;
+
+        import cd.com.ermapper.shapes.Attribute;
 
 public class DependencySet implements Parcelable {
 	/*

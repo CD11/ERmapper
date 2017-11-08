@@ -1,25 +1,31 @@
-package cd.com.ermapper;
+package cd.com.ermapper.Logic;
 
 import android.os.Bundle;
 
 import android.support.v7.app.AppCompatActivity;
 
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import static cd.com.ermapper.R.string.relationships;
+import cd.com.ermapper.R;
+import cd.com.ermapper.relations.AttributeSet;
+import cd.com.ermapper.relations.DependencySet;
+import cd.com.ermapper.relations.FunctionalDependency;
+import cd.com.ermapper.relations.Relation;
+import cd.com.ermapper.relations.SetOfAttributeSets;
+import cd.com.ermapper.shapes.Attribute;
+import cd.com.ermapper.shapes.Entity;
 
 
 public class FDNormalization extends AppCompatActivity {
 
 
     //list of functional dependencies
-    private  DependencySet functionalDependencies;
+    private DependencySet functionalDependencies;
     private ArrayList<Relation> relations;
     private AttributeSet attributes;
 

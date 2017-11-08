@@ -1,4 +1,4 @@
-package cd.com.ermapper;
+package cd.com.ermapper.shapes;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -69,5 +69,37 @@ public class Coordinates implements Parcelable {
         parcel.writeFloat(y);
         parcel.writeFloat(width);
         parcel.writeFloat(height);
+    }
+
+    public float getX() {
+        return x;
+    }
+
+    public float getY() {
+        return y;
+    }
+
+    public float getWidth() {
+        return width;
+    }
+
+    public float getHeight() {
+        return height;
+    }
+
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    public void setWidth(float width) {
+        this.width = width;
+    }
+
+    public void setY(float y) {
+        this.y = y;
+    }
+
+    public void setHeight(float height) {
+        this.height = height;
     }
 }

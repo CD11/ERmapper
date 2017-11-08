@@ -1,16 +1,16 @@
-package cd.com.ermapper;
+package cd.com.ermapper.shapes;
 
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Parcel;
 import android.util.Log;
-import android.view.View;
 import android.widget.EditText;
 
 
 import java.util.ArrayList;
 
-import static android.R.id.primary;
+import cd.com.ermapper.relations.AttributeSet;
+import cd.com.ermapper.relations.Relation;
 
 
 /**
@@ -97,18 +97,18 @@ public class Entity extends ShapeObject {
     }
 
     public void setCoordinateX(float coordinateX) {
-        this.getCoordinates().x = coordinateX;
-        this.getCoordinates().width = coordinateX + getEditId().getWidth() + offset;
+        this.getCoordinates().setX(coordinateX);
+        this.getCoordinates().setWidth(coordinateX + getEditId().getWidth() + offset);
         if(getEditId().getWidth() ==0 )
-            this.getCoordinates().width = coordinateX + 100+ offset;
+            this.getCoordinates().setWidth(coordinateX + 100+ offset);
 
     }
 
     public void setCoordinateY(float coordinateY) {
-        this.getCoordinates().y = coordinateY;
-        this.getCoordinates().height = coordinateY + getEditId().getWidth()+offset;
+        this.getCoordinates().setY(coordinateY);
+        this.getCoordinates().setHeight(coordinateY + getEditId().getWidth()+offset);
         if(getEditId().getWidth() ==0 )
-            this.getCoordinates().height = coordinateY + 100+ offset;
+            this.getCoordinates().setHeight(coordinateY + 100+ offset);
 
     }
 

@@ -1,4 +1,4 @@
-package cd.com.ermapper;
+package cd.com.ermapper.relations;
 
 
 /**

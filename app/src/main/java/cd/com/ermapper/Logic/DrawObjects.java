@@ -1,4 +1,4 @@
-package cd.com.ermapper;
+package cd.com.ermapper.Logic;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -7,6 +7,12 @@ import android.graphics.Paint;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+
+import cd.com.ermapper.shapes.Attribute;
+import cd.com.ermapper.shapes.Coordinates;
+import cd.com.ermapper.shapes.Entity;
+import cd.com.ermapper.shapes.Relationship;
+import cd.com.ermapper.shapes.ShapeObject;
 
 import static android.graphics.Color.WHITE;
 
@@ -50,7 +56,7 @@ public class DrawObjects extends View {
         if (state == 3 && rCurr != null) {
             paint.setStyle(Paint.Style.STROKE);
             paint.setColor(Color.BLACK);
-            canvas.drawLine(rCurr.getCoordinates().x, rCurr.getCoordinates().y, rCurr.getCoordinates().width, rCurr.getCoordinates().height, paint);
+            canvas.drawLine(rCurr.getCoordinates().getX(), rCurr.getCoordinates().getY(), rCurr.getCoordinates().getWidth(), rCurr.getCoordinates().getHeight(), paint);
 
             if(rCurr.isRelationship()) {
                 paint.setStyle(Paint.Style.FILL);
@@ -71,7 +77,7 @@ public class DrawObjects extends View {
             if (e.getClass() == Relationship.class) {
                 paint.setStyle(Paint.Style.STROKE);
                 paint.setColor(Color.BLACK);
-                canvas.drawLine(c.x, c.y, c.width, c.height, paint);
+                canvas.drawLine(c.getX(), c.getY(), c.getWidth(), c.getHeight(), paint);
                 e.getEditId().setVisibility(INVISIBLE);
                 if(((Relationship)e).isRelationship()) {
                     paint.setStyle(Paint.Style.FILL);
@@ -94,12 +100,12 @@ public class DrawObjects extends View {
             else if (e.getClass() == Entity.class) {
                 paint.setStyle(Paint.Style.FILL);
                 paint.setColor(WHITE);
-                canvas.drawRect(c.x, c.y, c.width, c.height, paint);
+                canvas.drawRect(c.getX(), c.getX(), c.getWidth(), c.getHeight(), paint);
                 paint.setStyle(Paint.Style.STROKE);
                 paint.setColor(Color.BLACK);
-                canvas.drawRect(c.x, c.y, c.width, c.height, paint);
+                canvas.drawRect(c.getX(), c.getX(), c.getWidth(), c.getHeight(), paint);
                 if(((Entity) e).isWeak()){
-                    canvas.drawRect(c.x-15, c.y-15, c.width+15, c.height+15, paint);
+                    canvas.drawRect(c.getX()-15, c.getX()-15, c.getWidth()+15, c.getHeight()+15, paint);
 
                 }
 
@@ -111,10 +117,10 @@ public class DrawObjects extends View {
             else if (e.getClass() == Attribute.class) {
                 paint.setStyle(Paint.Style.FILL);
                 paint.setColor(WHITE);
-                canvas.drawOval(c.x, c.y, c.width, c.height, paint);
+                canvas.drawOval(c.getX(), c.getX(), c.getWidth(), c.getHeight(), paint);
                 paint.setStyle(Paint.Style.STROKE);
                 paint.setColor(Color.BLACK);
-                canvas.drawOval(c.x, c.y, c.width, c.height, paint);
+                canvas.drawOval(c.getX(), c.getX(), c.getWidth(), c.getHeight(), paint);
                 Log.d("DrawingER", "Attribute");
             }
 

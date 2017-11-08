@@ -1,10 +1,15 @@
-package cd.com.ermapper;
+package cd.com.ermapper.Logic;
 
 
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 import java.util.ArrayList;
+
+import cd.com.ermapper.shapes.Attribute;
+import cd.com.ermapper.shapes.Entity;
+import cd.com.ermapper.shapes.Relationship;
+import cd.com.ermapper.shapes.ShapeObject;
 
 
 /**
