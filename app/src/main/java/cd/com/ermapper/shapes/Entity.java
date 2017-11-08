@@ -37,7 +37,6 @@ public class Entity extends ShapeObject {
         isWeak =false;
         setCoordinateX(x);
         setCoordinateY(y);
-        moveName();
     }
 
 
@@ -48,7 +47,6 @@ public class Entity extends ShapeObject {
         attr = in.readTypedObject(AttributeSet.CREATOR);
         isWeak = in.readByte() != 0;
         weak = in.createTypedArrayList(Entity.CREATOR);
-        Log.d("Parcel Enitity", toString());
 
     }
 
@@ -97,18 +95,18 @@ public class Entity extends ShapeObject {
     }
 
     public void setCoordinateX(float coordinateX) {
-        this.getCoordinates().setX(coordinateX);
-        this.getCoordinates().setWidth(coordinateX + getEditId().getWidth() + offset);
+        this.getCoordinates().x = coordinateX;
+        this.getCoordinates().width = coordinateX + getEditId().getWidth() + offset;
         if(getEditId().getWidth() ==0 )
-            this.getCoordinates().setWidth(coordinateX + 100+ offset);
+            this.getCoordinates().width = coordinateX + 100+ offset;
 
     }
 
     public void setCoordinateY(float coordinateY) {
-        this.getCoordinates().setY(coordinateY);
-        this.getCoordinates().setHeight(coordinateY + getEditId().getWidth()+offset);
+        this.getCoordinates().y = coordinateY;
+        this.getCoordinates().height = coordinateY + getEditId().getWidth()+offset;
         if(getEditId().getWidth() ==0 )
-            this.getCoordinates().setHeight(coordinateY + 100+ offset);
+            this.getCoordinates().height = coordinateY + 100+ offset;
 
     }
 

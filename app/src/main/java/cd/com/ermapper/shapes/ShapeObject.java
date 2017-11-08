@@ -5,7 +5,7 @@ import android.os.Parcelable;
 import android.util.Log;
 import android.widget.EditText;
 
-
+import cd.com.ermapper.shapes.Coordinates;
 
 /**
  * Created by CD on 9/15/2017.
@@ -55,7 +55,6 @@ public abstract class ShapeObject implements Parcelable {
     }
 
     public void setName(String name) {
-        Log.d("Changing name", this.name+" - >" + name );
         this.name = name;
 
     }
@@ -85,9 +84,10 @@ public abstract class ShapeObject implements Parcelable {
             w = 100;
             h = 100;
         }
-        eName.setX(this.getCoordinates().centerX() - w/2);
-        eName.setY(this.getCoordinates().centerY() - h/2);
-        Log.d("newPos", eName.getX() +" " + eName.getY());
+
+
+        eName.setX(this.getCoordinates().centerX()- w/2);
+        eName.setY(this.getCoordinates().centerY()-h/2);
     }
 
 

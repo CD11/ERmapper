@@ -28,7 +28,6 @@ public class Attribute extends ShapeObject {
         values = new ArrayList<>();
         setCoordinateX(x);
         setCoordinateY(y);
-        moveName();
     }
 
     public Attribute(String anAttributeName)

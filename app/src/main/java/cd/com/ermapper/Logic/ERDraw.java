@@ -26,9 +26,10 @@ import static android.graphics.Color.BLACK;
 
 
 public class ERDraw extends AppCompatActivity {
-
     public ERDiagram diagram;
     public DrawObjects object;
+    public LinearLayout layout;
+    public RelativeLayout textLayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +37,8 @@ public class ERDraw extends AppCompatActivity {
         setContentView(R.layout.activity_erdraw);
         diagram = this.getIntent().getParcelableExtra("diagram");
         object = new DrawObjects(this, diagram, 0);
-        LinearLayout layout = (LinearLayout) findViewById(R.id.diagramLayout);
+        layout = (LinearLayout) findViewById(R.id.diagramLayout);
+        textLayer = (RelativeLayout) findViewById(R.id.textLayout);
         layout.addView(object);
 
     }
@@ -44,9 +46,6 @@ public class ERDraw extends AppCompatActivity {
     // if add entity is pressed
     public void addEntity(View view){
 
-        LinearLayout layout = (LinearLayout) findViewById(R.id.diagramLayout);
-        layout.requestFocus();
-        RelativeLayout textLayer = (RelativeLayout) findViewById(R.id.textLayout);
         final EditText et = new EditText(this.getApplicationContext());
         setET(et);
         ShapeObject entity;
@@ -72,8 +71,7 @@ public class ERDraw extends AppCompatActivity {
 
     // if add attribute is pressed
     public void addAttribute(View view){
-        RelativeLayout textLayer = (RelativeLayout) findViewById(R.id.textLayout);
-        final EditText et = new EditText(this.getApplicationContext());
+         final EditText et = new EditText(this.getApplicationContext());
         setET(et);
         ShapeObject attribute;
 
@@ -95,8 +93,7 @@ public class ERDraw extends AppCompatActivity {
 
     // if add relationship is pressed
     public void addRelationship(View view){
-        LinearLayout layout = (LinearLayout) findViewById(R.id.diagramLayout);
-        RelativeLayout textLayer = (RelativeLayout) findViewById(R.id.textLayout);
+
         final EditText et = new EditText(this.getApplicationContext());
         setET(et);
         et.setVisibility(View.INVISIBLE);
@@ -152,9 +149,7 @@ public class ERDraw extends AppCompatActivity {
     // every object has an editable name set to this
     public void setET(final EditText et){
         // set Edit text
-        et.setLayoutParams(new RelativeLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         et.setHint("Name");
-        et.bringToFront();
         et.setImeOptions(EditorInfo.IME_ACTION_DONE);
         et.setSingleLine();
         et.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));

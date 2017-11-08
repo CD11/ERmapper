@@ -71,7 +71,6 @@ public class DrawObjects extends View {
         // check each object in the diagram
         for (ShapeObject e : d.getSortedObjects()) {
             Coordinates c = e.getCoordinates();
-            Log.d("DrawingER", "Searching " + e.getClass());
 
             // draw  relationships objects
             if (e.getClass() == Relationship.class) {
@@ -88,7 +87,6 @@ public class DrawObjects extends View {
                     paint.setColor(Color.BLACK);
                     canvas.drawPath(((Relationship) e).drawDiamond(), paint);
                     e.getEditId().setVisibility(VISIBLE);
-                    Log.d("DrawingER", "Relationship");
 
                     if(((Entity)((Relationship)e).getObj1()).isWeak() ||((Entity)((Relationship)e).getObj2()).isWeak()){
                         canvas.drawPath(((Relationship) e).drawOuterDiamond(), paint);
@@ -100,30 +98,28 @@ public class DrawObjects extends View {
             else if (e.getClass() == Entity.class) {
                 paint.setStyle(Paint.Style.FILL);
                 paint.setColor(WHITE);
-                canvas.drawRect(c.getX(), c.getX(), c.getWidth(), c.getHeight(), paint);
+                canvas.drawRect(c.getX(), c.getY(), c.getWidth(), c.getHeight(), paint);
                 paint.setStyle(Paint.Style.STROKE);
                 paint.setColor(Color.BLACK);
-                canvas.drawRect(c.getX(), c.getX(), c.getWidth(), c.getHeight(), paint);
+                canvas.drawRect(c.getX(), c.getY(), c.getWidth(), c.getHeight(), paint);
                 if(((Entity) e).isWeak()){
-                    canvas.drawRect(c.getX()-15, c.getX()-15, c.getWidth()+15, c.getHeight()+15, paint);
+                    canvas.drawRect(c.getX()-15, c.getY()-15, c.getWidth()+15, c.getHeight()+15, paint);
 
                 }
-
-
-                Log.d("DrawingER", "Entity");
             }
 
             // draw attribute objects
             else if (e.getClass() == Attribute.class) {
                 paint.setStyle(Paint.Style.FILL);
                 paint.setColor(WHITE);
-                canvas.drawOval(c.getX(), c.getX(), c.getWidth(), c.getHeight(), paint);
+                canvas.drawOval(c.getX(), c.getY(), c.getWidth(), c.getHeight(), paint);
                 paint.setStyle(Paint.Style.STROKE);
                 paint.setColor(Color.BLACK);
-                canvas.drawOval(c.getX(), c.getX(), c.getWidth(), c.getHeight(), paint);
+                canvas.drawOval(c.getX(), c.getY(), c.getWidth(), c.getHeight(), paint);
                 Log.d("DrawingER", "Attribute");
             }
 
+            e.moveName();
         }
     }
 
