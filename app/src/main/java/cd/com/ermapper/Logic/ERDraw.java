@@ -97,20 +97,15 @@ public class ERDraw extends AppCompatActivity {
 
     // if add relationship is pressed
     public void addRelationship(View view){
-
-        final EditText et = new EditText(this.getApplicationContext());
-        setET(et);
-        et.setVisibility(View.INVISIBLE);
         ShapeObject relationship;
 
         if(diagram == null){
             Log.d("DiagramErrors ", " diagram is Null");
             relationship = null;
         }else {
-            relationship = new Relationship(et, String.valueOf(et.getText()));
+            relationship = new Relationship();
         }
 
-        textLayer.addView(et);
         object.setState(3);
         object.setRelationship(relationship);
         object.invalidate();
@@ -178,9 +173,4 @@ public class ERDraw extends AppCompatActivity {
 
     }
 
-
-    public void initTexts(Relationship rCurr) {
-       textLayer.addView(rCurr.getleft());
-       textLayer.addView(rCurr.getRight());
-    }
 }

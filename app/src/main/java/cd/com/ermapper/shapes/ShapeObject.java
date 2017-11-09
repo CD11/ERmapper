@@ -109,4 +109,8 @@ public abstract class ShapeObject implements Parcelable {
     public boolean contains(float v, float v1) {
       return  this.getCoordinates().contains(v,v1);
     }
+
+    public void setEditText(EditText e){
+        eName = e;
+    }
 }

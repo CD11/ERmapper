@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 
 import java.net.CookieHandler;
+import java.util.ArrayList;
 
 import cd.com.ermapper.R;
 import cd.com.ermapper.relations.AttributeSet;
@@ -31,7 +32,7 @@ public class Relationship extends ShapeObject {
         if a connection is between two entites, defined by its name as well as the two objects
         It also represents a connection between two objects with just a line
      */
-
+    ArrayList<ShapeObject> objs;
     ShapeObject obj1;
     ShapeObject obj2;
 
@@ -41,17 +42,13 @@ public class Relationship extends ShapeObject {
     AttributeSet attrs;
     Coordinates c;
 
-    public Relationship(EditText nameEdit, String name, ShapeObject curr, ShapeObject curr1) {
-        super(nameEdit,"relationship", curr.getCoordinates().x, curr.getCoordinates().y, curr1.getCoordinates().x, curr1.getCoordinates().y);
-        obj1 = curr;
-        obj2 = curr1;
+
+    public Relationship() {
+        super(null,"relationship", 0, 0, 0,0);
+        objs = new ArrayList<>();
         attrs = new AttributeSet();
     }
 
-    public Relationship(EditText et, String name) {
-        super(et,"name", 0, 0, 0, 0);
-        attrs = new AttributeSet();
-    }
 
     public Relationship(Parcel in) {
         super(in.readString());
@@ -78,6 +75,24 @@ public class Relationship extends ShapeObject {
         }
     };
 
+    // Draw the lines to each Entity in the relationship
+    public Path drawLines(){
+        Path p = new Path();
+        Coordinates c =  this.getCoordinates();
+        float x = c.centerX();
+        float y = c.centerY();
+        p.setLastPoint(x,y);
+
+        // Draw a line to each entity
+        for(ShapeObject o:objs){
+            p.lineTo(x,y);
+            p.lineTo(o.getCoordinates().centerX(), o.getCoordinates().centerY());
+
+        }
+
+        return p;
+
+    }
     // This gets the path from the coordinates of the objects that will be draw the diamond to the canvas
     public Path drawDiamond(){
        Coordinates c =  this.getCoordinates();
@@ -130,6 +145,12 @@ public class Relationship extends ShapeObject {
         return obj2;
     }
 
+    public void addObj(ShapeObject obj){
+        if(!objs.contains(obj)) // Check for duplicates
+          objs.add(obj);
+
+
+    }
     public void setObj1(ShapeObject obj1) {
         this.obj1 = obj1;
         this.setCoordinateX(obj1.getCoordinates().centerX());
@@ -142,18 +163,27 @@ public class Relationship extends ShapeObject {
         this.setCoordinateH(obj2.getCoordinates().centerY());
     }
 
+    // Checks for valid objts and updates name coordinates
     public void update(){
+
         if(obj1 != null)
             this.setObj1(obj1);
         if(obj2 != null)
             this.setObj2(obj2);
-        this.getEditId().setX(this.getCoordinates().centerX());
-        this.getEditId().setY(this.getCoordinates().centerY());
+        if(this.getEditId() != null) {
+            this.getEditId().setX(this.getCoordinates().centerX());
+            this.getEditId().setY(this.getCoordinates().centerY());
+        }
 
     }
     //  For cardinality purposes
+    // Initiates Edit texts  for name and cardinality and positions them in their proper place
     public void setTexts(Context c){
-
+        // Give name edit
+        EditText e = new EditText(c);
+        e.setBackgroundColor(Color.BLACK);
+        this.setEditText(e);
+        // Give cardinality
         left = new EditText(c);
         right = new EditText(c);
         left.setText("0");
@@ -161,17 +191,20 @@ public class Relationship extends ShapeObject {
         movecardinaity();
     }
     public void movecardinaity() {
+        if (getEditId() == null) {
+            return;
+        }
         float w = getEditId().getWidth();
         float h = getEditId().getHeight();
         if(w == 0 || h == 0){
             w = 100;
             h = 100;
         }
-        left.setX(this.getCoordinates().getX() - 200);
-        left.setY(this.getObj1().getCoordinates().centerY()-50);
+        left.setX(this.getCoordinates().getX() - 150);
+        left.setY(this.getObj1().getCoordinates().centerY()-55);
         left.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
-        right.setX(this.getCoordinates().getWidth()+200);
-        right.setY(this.getObj2().getCoordinates().centerY()-50);
+        right.setX(this.getCoordinates().getWidth()+150);
+        right.setY(this.getObj2().getCoordinates().centerY()-55);
         right.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
     }
     public EditText getleft(){
@@ -187,19 +220,12 @@ public class Relationship extends ShapeObject {
      */
     public boolean isRelationship() {
         boolean result = false;
-        try{
-         if (obj1.getClass() == Entity.class && obj2.getClass() == Entity.class)
-           result =  true;
-            this.getEditId().setTextColor(BLACK);
-            this.getEditId().setVisibility(View.VISIBLE);
-        }catch (NullPointerException exception) {
-            result =  false;
-            this.getEditId().setHint("");
-            this.getEditId().setTextColor(WHITE);
-            this.getEditId().setX(0);
-            this.getEditId().setY(0);
-            this.getEditId().setVisibility(View.INVISIBLE);
-        }
+            try {
+                if (obj1.getClass() == Entity.class && obj2.getClass() == Entity.class)
+                    result = true;
+            }catch (NullPointerException e){
+                result = false;
+            }
         return  result;
     }
     @Override
