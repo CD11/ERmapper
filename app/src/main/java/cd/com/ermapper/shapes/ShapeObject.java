@@ -84,11 +84,11 @@ public abstract class ShapeObject implements Parcelable {
             w = 100;
             h = 100;
         }
-
-
         eName.setX(this.getCoordinates().centerX()- w/2);
         eName.setY(this.getCoordinates().centerY()-h/2);
     }
+
+
 
 
     public String getName() {
@@ -98,9 +98,8 @@ public abstract class ShapeObject implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.name);
-
-
     }
+
     @Override
     public int describeContents() {
         return 0;

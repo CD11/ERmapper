@@ -36,10 +36,12 @@ public class ERDraw extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_erdraw);
         diagram = this.getIntent().getParcelableExtra("diagram");
-        object = new DrawObjects(this, diagram, 0);
+
         layout = (LinearLayout) findViewById(R.id.diagramLayout);
         textLayer = (RelativeLayout) findViewById(R.id.textLayout);
+        object = new DrawObjects(this, diagram, 0, textLayer);
         layout.addView(object);
+        Log.d("er Context", this.toString() +" " + textLayer.getChildCount());
 
     }
 
@@ -67,6 +69,8 @@ public class ERDraw extends AppCompatActivity {
         object.invalidate();
         textLayer.addView(et);
         textLayer.bringToFront();
+        Log.d("er Context", this.toString() +" " + textLayer.getChildCount());
+
     }
 
     // if add attribute is pressed
@@ -110,6 +114,7 @@ public class ERDraw extends AppCompatActivity {
         object.setState(3);
         object.setRelationship(relationship);
         object.invalidate();
+
 
     }
 
@@ -174,6 +179,8 @@ public class ERDraw extends AppCompatActivity {
     }
 
 
-
-
+    public void initTexts(Relationship rCurr) {
+       textLayer.addView(rCurr.getleft());
+       textLayer.addView(rCurr.getRight());
+    }
 }

@@ -1,10 +1,21 @@
 package cd.com.ermapper.shapes;
 
+import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.graphics.Path;
 import android.os.Parcel;
+import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.CoordinatorLayout;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 
+import java.net.CookieHandler;
+
+import cd.com.ermapper.R;
 import cd.com.ermapper.relations.AttributeSet;
 
 import static android.graphics.Color.BLACK;
@@ -23,6 +34,10 @@ public class Relationship extends ShapeObject {
 
     ShapeObject obj1;
     ShapeObject obj2;
+
+    private EditText left = null;
+    private EditText right = null;
+
     AttributeSet attrs;
     Coordinates c;
 
@@ -45,9 +60,6 @@ public class Relationship extends ShapeObject {
         c = in.readParcelable(Coordinates.class.getClassLoader());
         attrs = in.readTypedObject(AttributeSet.CREATOR);
     }
-
-
-
 
     @Override
     public int describeContents() {
@@ -85,6 +97,7 @@ public class Relationship extends ShapeObject {
 
     public Path drawOuterDiamond() {
             Coordinates c =  this.getCoordinates();
+
             float x =c.centerX();
             float y =c.centerY();
             float w = 100;
@@ -138,7 +151,35 @@ public class Relationship extends ShapeObject {
         this.getEditId().setY(this.getCoordinates().centerY());
 
     }
+    //  For cardinality purposes
+    public void setTexts(Context c){
 
+        left = new EditText(c);
+        right = new EditText(c);
+        left.setText("0");
+        right.setText("0");
+        movecardinaity();
+    }
+    public void movecardinaity() {
+        float w = getEditId().getWidth();
+        float h = getEditId().getHeight();
+        if(w == 0 || h == 0){
+            w = 100;
+            h = 100;
+        }
+        left.setX(this.getCoordinates().getX() - 200);
+        left.setY(this.getObj1().getCoordinates().centerY()-50);
+        left.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
+        right.setX(this.getCoordinates().getWidth()+200);
+        right.setY(this.getObj2().getCoordinates().centerY()-50);
+        right.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
+    }
+    public EditText getleft(){
+        return left;
+    }
+    public EditText getRight(){
+        return right;
+    }
 
     /* checks that the connection is between two entities objects.
         returns true if yes

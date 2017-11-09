@@ -4,10 +4,14 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.text.Layout;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.RelativeLayout;
 
+import cd.com.ermapper.R;
 import cd.com.ermapper.shapes.Attribute;
 import cd.com.ermapper.shapes.Coordinates;
 import cd.com.ermapper.shapes.Entity;
@@ -33,12 +37,18 @@ public class DrawObjects extends View {
     ShapeObject curr;
     ShapeObject curr1;
     Relationship rCurr;
+    RelativeLayout textLayer;
     Paint paint;
+    Context c;
 
-    public DrawObjects(Context context, ERDiagram diagram, int state){
+    public DrawObjects(Context context, ERDiagram diagram, int state, RelativeLayout textLayer){
         super(context);
         this.d = diagram;
         this.state = state;
+        this.c = context;
+        this.textLayer =textLayer;
+
+
 
     }
 
@@ -51,7 +61,6 @@ public class DrawObjects extends View {
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         paint = new Paint();
-
         // If this is a new relationship, draw a line that follows the mouse
         if (state == 3 && rCurr != null) {
             paint.setStyle(Paint.Style.STROKE);
@@ -65,7 +74,7 @@ public class DrawObjects extends View {
 
                 paint.setStyle(Paint.Style.STROKE);
                 paint.setColor(Color.BLACK);
-                canvas.drawPath(rCurr.drawDiamond(), paint);
+                rCurr.movecardinaity();
             }
         }
         // check each object in the diagram
@@ -203,6 +212,7 @@ public class DrawObjects extends View {
 
                        for(Relationship r : d.getRelationships()){
                             r.update();
+                            r.movecardinaity();
                         }
 
                         // update the relationship line coordinates to follow the mouse
@@ -256,7 +266,14 @@ public class DrawObjects extends View {
                                         rCurr.update();
                                     if (rCurr.getObj1() != null && rCurr.getObj2() != null) {
                                         // only add the relationship to the diagram if it is valid
+                                        rCurr.setTexts(c);
+                                        textLayer.addView(rCurr.getleft());
+                                        textLayer.addView(rCurr.getRight());
                                         d.addObject(rCurr);
+
+
+
+
                                     } else {
                                       // remove the edit text for an invalid relationship
                                         rCurr.getEditId().setVisibility(INVISIBLE);
