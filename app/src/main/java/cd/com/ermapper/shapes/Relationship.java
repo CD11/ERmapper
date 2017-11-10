@@ -1,26 +1,15 @@
 package cd.com.ermapper.shapes;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Path;
 import android.os.Parcel;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.CoordinatorLayout;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
+
+import android.view.Window;
 import android.widget.EditText;
-import android.widget.RelativeLayout;
-
-import java.net.CookieHandler;
 import java.util.ArrayList;
-
-import cd.com.ermapper.R;
 import cd.com.ermapper.relations.AttributeSet;
 
-import static android.graphics.Color.BLACK;
-import static android.graphics.Color.WHITE;
 
 /**
  * Created by CD on 9/15/2017.
@@ -33,20 +22,16 @@ public class Relationship extends ShapeObject {
         It also represents a connection between two objects with just a line
      */
     ArrayList<ShapeObject> objs;
+    ArrayList<Cardinality> conns;
     ShapeObject obj1;
     ShapeObject obj2;
-
-    private EditText left = null;
-    private EditText right = null;
-
     AttributeSet attrs;
-    Coordinates c;
-
 
     public Relationship() {
         super(null,"relationship", 0, 0, 0,0);
         objs = new ArrayList<>();
         attrs = new AttributeSet();
+        conns = new ArrayList<>();
     }
 
 
@@ -54,7 +39,6 @@ public class Relationship extends ShapeObject {
         super(in.readString());
         obj1 = in.readParcelable(ShapeObject.class.getClassLoader());
         obj2 = in.readParcelable(ShapeObject.class.getClassLoader());
-        c = in.readParcelable(Coordinates.class.getClassLoader());
         attrs = in.readTypedObject(AttributeSet.CREATOR);
     }
 
@@ -81,18 +65,36 @@ public class Relationship extends ShapeObject {
         Coordinates c =  this.getCoordinates();
         float x = c.centerX();
         float y = c.centerY();
-        p.setLastPoint(x,y);
+        p.setLastPoint(x,y); // Center of the diamond
 
         // Draw a line to each entity
-        for(ShapeObject o:objs){
+      /*  for(ShapeObject o:objs){
             p.lineTo(x,y);
             p.lineTo(o.getCoordinates().centerX(), o.getCoordinates().centerY());
+        }*/
+        for(Cardinality co: conns){
+            p.lineTo(x,y);
+            p.lineTo(co.getO().getCoordinates().centerX(), co.getO().getCoordinates().centerY());
+            if(x < co.getO().getCoordinates().getX()) {
+                co.getNum().setX(x - 175);
+            } else if(x > co.getO().getCoordinates().getX()){
+                co.getNum().setX(x + 175);
 
+            }
+            co.getNum().setY(co.getO().getCoordinates().centerY());
         }
 
         return p;
-
     }
+    public void moveCardinality(){
+        for(Cardinality c : conns){
+            if(c.getO() != null) {
+      //          c.getNum().setX(c.getO().getCoordinates().getX());
+      //          c.getNum().setY(c.getO().getCoordinates().centerY() - 55);
+            }
+        }
+    }
+
     // This gets the path from the coordinates of the objects that will be draw the diamond to the canvas
     public Path drawDiamond(){
        Coordinates c =  this.getCoordinates();
@@ -133,8 +135,6 @@ public class Relationship extends ShapeObject {
         float w = 50;
         float h = 50;
         Coordinates c = new Coordinates(x-w, y-h, x+w, y+h);
-
-
         return c.contains(v,v1);
     }
 
@@ -145,19 +145,23 @@ public class Relationship extends ShapeObject {
         return obj2;
     }
 
-    public void addObj(ShapeObject obj){
-        if(!objs.contains(obj)) // Check for duplicates
-          objs.add(obj);
+    public void addObj(ShapeObject obj, Context c){
+        if(!objs.contains(obj)) { // Check for duplicates
+            objs.add(obj);
+            conns.add(new Cardinality(c, obj));
+        }
 
 
     }
-    public void setObj1(ShapeObject obj1) {
+    public void setObj1(ShapeObject obj1, Context c) {
         this.obj1 = obj1;
         this.setCoordinateX(obj1.getCoordinates().centerX());
         this.setCoordinateY(obj1.getCoordinates().centerY());
+
+
     }
 
-    public void setObj2(ShapeObject obj2) {
+    public void setObj2(ShapeObject obj2, Context c) {
         this.obj2 = obj2;
         this.setCoordinateW(obj2.getCoordinates().centerX());
         this.setCoordinateH(obj2.getCoordinates().centerY());
@@ -165,16 +169,17 @@ public class Relationship extends ShapeObject {
 
     // Checks for valid objts and updates name coordinates
     public void update(){
-
         if(obj1 != null)
-            this.setObj1(obj1);
+            this.setCoordinateX(obj1.getCoordinates().centerX());
+          this.setCoordinateY(obj1.getCoordinates().centerY());
         if(obj2 != null)
-            this.setObj2(obj2);
+            this.setCoordinateW(obj2.getCoordinates().centerX());
+          this.setCoordinateH(obj2.getCoordinates().centerY());
         if(this.getEditId() != null) {
             this.getEditId().setX(this.getCoordinates().centerX());
             this.getEditId().setY(this.getCoordinates().centerY());
         }
-
+         moveCardinality();
     }
     //  For cardinality purposes
     // Initiates Edit texts  for name and cardinality and positions them in their proper place
@@ -183,45 +188,19 @@ public class Relationship extends ShapeObject {
         EditText e = new EditText(c);
         e.setBackgroundColor(Color.BLACK);
         this.setEditText(e);
-        // Give cardinality
-        left = new EditText(c);
-        right = new EditText(c);
-        left.setText("0");
-        right.setText("0");
-        movecardinaity();
-    }
-    public void movecardinaity() {
-        if (getEditId() == null) {
-            return;
-        }
-        float w = getEditId().getWidth();
-        float h = getEditId().getHeight();
-        if(w == 0 || h == 0){
-            w = 100;
-            h = 100;
-        }
-        left.setX(this.getCoordinates().getX() - 150);
-        left.setY(this.getObj1().getCoordinates().centerY()-55);
-        left.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
-        right.setX(this.getCoordinates().getWidth()+150);
-        right.setY(this.getObj2().getCoordinates().centerY()-55);
-        right.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
-    }
-    public EditText getleft(){
-        return left;
-    }
-    public EditText getRight(){
-        return right;
     }
 
-    /* checks that the connection is between two entities objects.
-        returns true if yes
-        returns false if no, and hides the name object.
+
+    /* checks that the connection is it is a relationship or a connection
      */
     public boolean isRelationship() {
         boolean result = false;
             try {
-                if (obj1.getClass() == Entity.class && obj2.getClass() == Entity.class)
+                boolean e1 = obj1.getClass() == Entity.class;
+                boolean e2 = obj2.getClass() == Entity.class;
+                boolean r1 = obj1.getClass() == Relationship.class;
+                boolean r2 = obj2.getClass() == Relationship.class;
+                if (e1 && e2 || e1&&r1 || e1&&r2 || e2&&r1 || e2&&r2)
                     result = true;
             }catch (NullPointerException e){
                 result = false;
@@ -233,11 +212,24 @@ public class Relationship extends ShapeObject {
         super.writeToParcel(dest, flags);
         dest.writeParcelable(obj1, flags);
         dest.writeParcelable(obj2, flags);
-        dest.writeParcelable(c, flags);
         dest.writeTypedObject(attrs,flags);
     }
 
     public void addAttribute(Attribute curr1) {
         attrs.add(curr1);
+    }
+
+    public boolean isWeak() {
+        for (ShapeObject o : objs) {
+            if (o.getClass() == Entity.class)
+                if (((Entity) o).isWeak())
+                    return true;
+        }
+
+        return false;
+    }
+
+    public ArrayList<Cardinality> getTextObjs() {
+        return conns;
     }
 }

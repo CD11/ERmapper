@@ -13,6 +13,7 @@ import android.widget.RelativeLayout;
 
 import cd.com.ermapper.R;
 import cd.com.ermapper.shapes.Attribute;
+import cd.com.ermapper.shapes.Cardinality;
 import cd.com.ermapper.shapes.Coordinates;
 import cd.com.ermapper.shapes.Entity;
 import cd.com.ermapper.shapes.Relationship;
@@ -69,7 +70,7 @@ public class DrawObjects extends View {
                 paint.setStyle(Paint.Style.FILL);
                 paint.setColor(WHITE);
                 canvas.drawPath(rCurr.drawDiamond(), paint);
-                rCurr.movecardinaity();
+
             }
         }
         // check each object in the diagram
@@ -79,20 +80,21 @@ public class DrawObjects extends View {
             // draw  relationships objects
             if (e.getClass() == Relationship.class) {
                 paint.setStyle(Paint.Style.STROKE);
-                paint.setColor(Color.BLACK);
+                paint.setColor(Color.RED);
                 canvas.drawPath(((Relationship)e).drawLines(), paint);
+                paint.setColor(Color.BLACK);
+
                 if(((Relationship)e).isRelationship()) {
                     paint.setStyle(Paint.Style.FILL);
                     paint.setColor(WHITE);
                     canvas.drawPath(((Relationship) e).drawDiamond(), paint);
-
                     paint.setStyle(Paint.Style.STROKE);
                     paint.setColor(Color.BLACK);
                     canvas.drawPath(((Relationship) e).drawDiamond(), paint);
-
-                    if(((Entity)((Relationship)e).getObj1()).isWeak() ||((Entity)((Relationship)e).getObj2()).isWeak()){
+                    if(((Relationship )e).isWeak()){
                         canvas.drawPath(((Relationship) e).drawOuterDiamond(), paint);
                     }
+
                 }
             }
 
@@ -205,7 +207,7 @@ public class DrawObjects extends View {
                        for(Relationship r : d.getRelationships()){
                             r.update();
 
-                            r.movecardinaity();
+                            r.moveCardinality();
                         }
 
                         // update the relationship line coordinates to follow the mouse
@@ -250,26 +252,28 @@ public class DrawObjects extends View {
                                     } else if (curr1.getClass() == Relationship.class && curr.getClass() == Attribute.class) { // Add Attributes to a relationship
                                         ((Relationship) curr1).addAttribute((Attribute) curr);
                                     } else if (curr1.getClass() == Entity.class && curr.getClass() == Relationship.class) {
-                                        ((Relationship) curr).addObj(curr1);
+                                        ((Relationship) curr).addObj(curr1,c);
+                                        break;
                                     } else if (curr1.getClass() == Relationship.class && curr.getClass() == Entity.class) {
-                                        ((Relationship) curr1).addObj(curr);
+                                        ((Relationship) curr1).addObj(curr,c);
+                                        break;
 
                                     }
-                                    if(rCurr.getObj1() == null) {
-                                        rCurr.setObj1(curr);
-                                        rCurr.addObj(curr);
-                                    }
-                                    if(rCurr.getObj2() == null) {
-                                        rCurr.setObj2(curr1);
-                                        rCurr.addObj(curr1);
-                                    }
+                                    rCurr.setObj1(curr, c);
+                                    rCurr.addObj(curr,c);
+                                    rCurr.setObj2(curr1, c);
+                                    rCurr.addObj(curr1,c);
+
                                     rCurr.update();
                                     if (rCurr.isRelationship()) {
                                         // only add the relationship to the diagram if it is valid
                                         rCurr.setTexts(c);
+                                        rCurr.moveCardinality();
                                         textLayer.addView(rCurr.getEditId());
-                                        textLayer.addView(rCurr.getleft());
-                                        textLayer.addView(rCurr.getRight());
+                                        for(Cardinality e : rCurr.getTextObjs()){
+                                            textLayer.addView(e.getNum());
+                                        }
+
 
                                     }
                                     d.addObject(rCurr);
