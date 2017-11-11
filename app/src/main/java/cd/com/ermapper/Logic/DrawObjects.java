@@ -79,12 +79,13 @@ public class DrawObjects extends View {
 
             // draw  relationships objects
             if (e.getClass() == Relationship.class) {
-                paint.setStyle(Paint.Style.STROKE);
-                paint.setColor(Color.RED);
-                canvas.drawPath(((Relationship)e).drawLines(), paint);
-                paint.setColor(Color.BLACK);
+
 
                 if(((Relationship)e).isRelationship()) {
+                    paint.setStyle(Paint.Style.STROKE);
+                    canvas.drawPath(((Relationship)e).drawLines(), paint);
+                    paint.setColor(Color.BLACK);
+
                     paint.setStyle(Paint.Style.FILL);
                     paint.setColor(WHITE);
                     canvas.drawPath(((Relationship) e).drawDiamond(), paint);
@@ -95,6 +96,8 @@ public class DrawObjects extends View {
                         canvas.drawPath(((Relationship) e).drawOuterDiamond(), paint);
                     }
 
+                }else{
+                    canvas.drawLine(c.getX(), c.getY(), c.getWidth(),c.getHeight(),paint);
                 }
             }
 
@@ -206,8 +209,6 @@ public class DrawObjects extends View {
 
                        for(Relationship r : d.getRelationships()){
                             r.update();
-
-                            r.moveCardinality();
                         }
 
                         // update the relationship line coordinates to follow the mouse
@@ -234,41 +235,45 @@ public class DrawObjects extends View {
                                 if (i.contains(endX + 10, endY + 10) && !(i == curr)) {
                                     curr1 = i;
                                     // Check Entities
-                                    if (curr.getClass() == Entity.class && curr1.getClass() == Attribute.class)  // if curr is an entity, add attribute curr1 to entity
+                                    if (curr.getClass() == Entity.class && curr1.getClass() == Attribute.class){  // if curr is an entity, add attribute curr1 to entity
                                         ((Entity) curr).addAttribute((Attribute) curr1);
-                                    else if (curr1.getClass() == Entity.class && curr.getClass() == Attribute.class)// if curr1 is an entity, add attriubte curr to entity
+                                    } else if (curr1.getClass() == Entity.class && curr.getClass() == Attribute.class) {// if curr1 is an entity, add attriubte curr to entity
                                         ((Entity) curr1).addAttribute((Attribute) curr);
                                         // Check Attribute
-                                    else if (curr1.getClass() == Attribute.class && curr.getClass() == Attribute.class) { // if attribute is multivalued
+                                    }else if (curr1.getClass() == Attribute.class && curr.getClass() == Attribute.class) { // if attribute is multivalued
                                         //  check for other values already being stored.
-                                        if (((Attribute) curr).getValues().isEmpty() && !((Attribute) curr1).getValues().isEmpty())
+                                        if (((Attribute) curr).getValues().isEmpty() && !((Attribute) curr1).getValues().isEmpty()){
                                             ((Attribute) curr1).addAttribute((Attribute) curr);
-                                        else
+                                    } else {
                                             ((Attribute) curr).addAttribute((Attribute) curr1);
-
+                                        }
                                         //Check Relationship
                                     } else if (curr1.getClass() == Attribute.class && curr.getClass() == Relationship.class) { // Add Attributes to a relationship
                                         ((Relationship) curr).addAttribute((Attribute) curr1);
+
                                     } else if (curr1.getClass() == Relationship.class && curr.getClass() == Attribute.class) { // Add Attributes to a relationship
                                         ((Relationship) curr1).addAttribute((Attribute) curr);
+
                                     } else if (curr1.getClass() == Entity.class && curr.getClass() == Relationship.class) {
-                                        ((Relationship) curr).addObj(curr1,c);
+                                        rCurr.setObj1(curr, c);
+                                        ((Relationship) curr).addObj((Entity)curr1,c);
                                         break;
                                     } else if (curr1.getClass() == Relationship.class && curr.getClass() == Entity.class) {
-                                        ((Relationship) curr1).addObj(curr,c);
+                                        rCurr.setObj2(curr1, c);
+                                        ((Relationship) curr1).addObj((Entity)curr,c);
                                         break;
 
                                     }
-                                    rCurr.setObj1(curr, c);
-                                    rCurr.addObj(curr,c);
                                     rCurr.setObj2(curr1, c);
-                                    rCurr.addObj(curr1,c);
+                                    rCurr.setObj1(curr, c);
+
+                                    //rCurr.addObj((Entity)curr,c);
+                                    //rCurr.addObj((Entity)curr1,c);
 
                                     rCurr.update();
                                     if (rCurr.isRelationship()) {
                                         // only add the relationship to the diagram if it is valid
                                         rCurr.setTexts(c);
-                                        rCurr.moveCardinality();
                                         textLayer.addView(rCurr.getEditId());
                                         for(Cardinality e : rCurr.getTextObjs()){
                                             textLayer.addView(e.getNum());
@@ -287,7 +292,7 @@ public class DrawObjects extends View {
                             this.getContext();
                             curr.moveName();
                         }
-                      //  rCurr.update();
+
                         invalidate();
                         curr = null;
                         curr1 = null;

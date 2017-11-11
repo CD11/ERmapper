@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -52,7 +53,6 @@ public class FDNormalization extends AppCompatActivity {
 
         // get the ER diagram
         diagram  = this.getIntent().getParcelableExtra("diagram");
-        //relations.addAll(findRelations(diagram.getEntityObj()));  // get all relations
         functionalDependencies.addAll(findDependencies()); // get all functional dependencies
 
         //TODO: check these methods and decide how they work
@@ -77,6 +77,7 @@ public class FDNormalization extends AppCompatActivity {
 
      */
 
+       Log.d("Relationships", diagram.getRelationships().toString());
         ////////////// Step 1/6 ///////////////////////////
         // check for multiple attributes.
         for(Entity e: diagram.getEntityObj()){

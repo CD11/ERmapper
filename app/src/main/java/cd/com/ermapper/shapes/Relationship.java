@@ -21,12 +21,20 @@ public class Relationship extends ShapeObject {
         if a connection is between two entites, defined by its name as well as the two objects
         It also represents a connection between two objects with just a line
      */
-    ArrayList<ShapeObject> objs;
+    ArrayList<Entity> objs;
     ArrayList<Cardinality> conns;
     ShapeObject obj1;
     ShapeObject obj2;
     AttributeSet attrs;
 
+    public Relationship(String name, Entity e1, Entity e2) {
+        super(null,name, 0, 0, 0,0);
+        objs = new ArrayList<>();
+        attrs = new AttributeSet();
+        conns = new ArrayList<>();
+        obj1 = e1;
+        obj2 = e2;
+    }
     public Relationship() {
         super(null,"relationship", 0, 0, 0,0);
         objs = new ArrayList<>();
@@ -40,6 +48,7 @@ public class Relationship extends ShapeObject {
         obj1 = in.readParcelable(ShapeObject.class.getClassLoader());
         obj2 = in.readParcelable(ShapeObject.class.getClassLoader());
         attrs = in.readTypedObject(AttributeSet.CREATOR);
+        objs = in.createTypedArrayList(Entity.CREATOR);
     }
 
     @Override
@@ -68,10 +77,10 @@ public class Relationship extends ShapeObject {
         p.setLastPoint(x,y); // Center of the diamond
 
         // Draw a line to each entity
-      /*  for(ShapeObject o:objs){
+        for(Attribute o: attrs.getElements()){
             p.lineTo(x,y);
             p.lineTo(o.getCoordinates().centerX(), o.getCoordinates().centerY());
-        }*/
+        }
         for(Cardinality co: conns){
             p.lineTo(x,y);
             p.lineTo(co.getO().getCoordinates().centerX(), co.getO().getCoordinates().centerY());
@@ -86,14 +95,7 @@ public class Relationship extends ShapeObject {
 
         return p;
     }
-    public void moveCardinality(){
-        for(Cardinality c : conns){
-            if(c.getO() != null) {
-      //          c.getNum().setX(c.getO().getCoordinates().getX());
-      //          c.getNum().setY(c.getO().getCoordinates().centerY() - 55);
-            }
-        }
-    }
+
 
     // This gets the path from the coordinates of the objects that will be draw the diamond to the canvas
     public Path drawDiamond(){
@@ -130,12 +132,12 @@ public class Relationship extends ShapeObject {
     }
 
     public boolean contains(float v, float v1) {
-        float x =this.getCoordinates().centerX();
-        float y =this.getCoordinates().centerY();
+        float x = this.getCoordinates().centerX();
+        float y = this.getCoordinates().centerY();
         float w = 50;
         float h = 50;
-        Coordinates c = new Coordinates(x-w, y-h, x+w, y+h);
-        return c.contains(v,v1);
+        Coordinates c = new Coordinates(x - w, y - h, x + w, y + h);
+        return c.contains(v, v1);
     }
 
     public ShapeObject getObj1() {
@@ -145,7 +147,7 @@ public class Relationship extends ShapeObject {
         return obj2;
     }
 
-    public void addObj(ShapeObject obj, Context c){
+    public void addObj(Entity obj, Context c){
         if(!objs.contains(obj)) { // Check for duplicates
             objs.add(obj);
             conns.add(new Cardinality(c, obj));
@@ -157,7 +159,8 @@ public class Relationship extends ShapeObject {
         this.obj1 = obj1;
         this.setCoordinateX(obj1.getCoordinates().centerX());
         this.setCoordinateY(obj1.getCoordinates().centerY());
-
+        if(obj1.getClass() == Entity.class)
+            addObj((Entity)obj1, c);
 
     }
 
@@ -165,6 +168,8 @@ public class Relationship extends ShapeObject {
         this.obj2 = obj2;
         this.setCoordinateW(obj2.getCoordinates().centerX());
         this.setCoordinateH(obj2.getCoordinates().centerY());
+        if(obj2.getClass() == Entity.class)
+            addObj((Entity)obj2, c);
     }
 
     // Checks for valid objts and updates name coordinates
@@ -179,7 +184,6 @@ public class Relationship extends ShapeObject {
             this.getEditId().setX(this.getCoordinates().centerX());
             this.getEditId().setY(this.getCoordinates().centerY());
         }
-         moveCardinality();
     }
     //  For cardinality purposes
     // Initiates Edit texts  for name and cardinality and positions them in their proper place
@@ -213,12 +217,14 @@ public class Relationship extends ShapeObject {
         dest.writeParcelable(obj1, flags);
         dest.writeParcelable(obj2, flags);
         dest.writeTypedObject(attrs,flags);
+        dest.writeTypedList(objs);
     }
 
     public void addAttribute(Attribute curr1) {
         attrs.add(curr1);
     }
 
+    // Relationship properties
     public boolean isWeak() {
         for (ShapeObject o : objs) {
             if (o.getClass() == Entity.class)
@@ -229,7 +235,25 @@ public class Relationship extends ShapeObject {
         return false;
     }
 
+    public boolean isBinary(){
+        return  objs.size() ==2;
+    }
+
+    public boolean isTernary(){
+        return  objs.size() ==3;
+    }
+    public boolean isNary(){
+        return  objs.size() >3;
+    }
     public ArrayList<Cardinality> getTextObjs() {
         return conns;
+    }
+
+    public ArrayList<Entity> getObjs() {
+        return objs;
+    }
+
+    public AttributeSet getAttrs() {
+        return attrs;
     }
 }

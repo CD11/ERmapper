@@ -19,6 +19,7 @@ public class Attribute extends ShapeObject {
     public static final float width  =  80;
     public static final float height   = 150;
     private boolean primary;
+    private boolean foreign;
     private ArrayList<Attribute> values;   // this is an arraylist and not an attribute set because it becomes circluar if it is an attributeset
 
 
@@ -78,8 +79,10 @@ public class Attribute extends ShapeObject {
     public void setPrimary() {
         if (primary == false){
             primary = true;
-            getEditId().getBackground().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
+            if(getEditId() != null)
+             getEditId().getBackground().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
         }else {
+            if(getEditId() != null)
             getEditId().getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
             primary = false;
         }
@@ -88,6 +91,8 @@ public class Attribute extends ShapeObject {
         return primary;
     }
 
+    public void setForeign(Boolean b)  { foreign = b;}
+    public boolean isForeign() {return foreign;}
 
 
     public void addAttribute(Attribute curr) {
@@ -121,5 +126,7 @@ public class Attribute extends ShapeObject {
     }
 
 
-
+    public void setPrimary(boolean b) {
+        primary = b;
+    }
 }

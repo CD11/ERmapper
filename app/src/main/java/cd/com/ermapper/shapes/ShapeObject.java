@@ -5,6 +5,7 @@ import android.os.Parcelable;
 import android.util.Log;
 import android.widget.EditText;
 
+import cd.com.ermapper.relations.AttributeSet;
 import cd.com.ermapper.shapes.Coordinates;
 
 /**
@@ -113,4 +114,6 @@ public abstract class ShapeObject implements Parcelable {
     public void setEditText(EditText e){
         eName = e;
     }
+
+
 }

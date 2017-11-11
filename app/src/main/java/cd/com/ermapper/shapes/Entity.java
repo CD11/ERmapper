@@ -39,6 +39,14 @@ public class Entity extends ShapeObject {
         setCoordinateY(y);
     }
 
+    public Entity(String name) {
+        super(null, name, 0, 0);
+        attr = new AttributeSet();
+        weak = new ArrayList<>();
+        isWeak =false;
+    //    setCoordinateX(0);
+   //     setCoordinateY(0);
+    }
 
     protected Entity(Parcel in) {
         super(in);
@@ -161,4 +169,15 @@ public class Entity extends ShapeObject {
     }
 
 
+    public AttributeSet partAttrs() {
+        AttributeSet newA = new AttributeSet();
+        for(Attribute a: attr.getElements()){
+            if( a.isPrimary()){
+                a.setPrimary(false);
+                a.setForeign(true);
+            }
+            newA.add(a);
+        }
+        return newA;
+    }
 }

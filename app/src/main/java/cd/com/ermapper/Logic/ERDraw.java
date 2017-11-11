@@ -124,11 +124,11 @@ public class ERDraw extends AppCompatActivity {
     // when normalize button is clicked
     public void Normalize(View  v){
         Intent intent;
-        try {
-            intent= new Intent(this, FDNormalization.class);
-            intent.putExtra("diagram", diagram);
-            startActivity(intent);
-        }catch (NullPointerException e){
+       try {
+           intent = new Intent(this, FDNormalization.class);
+           intent.putExtra("diagram", diagram);
+           startActivity(intent);
+       }catch (NullPointerException e){
             LinearLayout layout = (LinearLayout) v.findViewById(R.id.diagramLayout);
             AlertDialog ad = new AlertDialog.Builder(this).create();
             ad.setTitle("Error");
@@ -142,7 +142,7 @@ public class ERDraw extends AppCompatActivity {
             ad.show();
 
 
-        }
+       }
 
     }
 
