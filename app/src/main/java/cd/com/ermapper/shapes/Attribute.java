@@ -87,11 +87,30 @@ public class Attribute extends ShapeObject {
             primary = false;
         }
     }
+
+    public void setPrimary(boolean b) {
+        primary = b;
+        if(getEditId() != null) {
+            if (b == true)
+                getEditId().getBackground().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
+            else
+                getEditId().getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
+        }
+    }
     public boolean isPrimary(){
         return primary;
     }
 
-    public void setForeign(Boolean b)  { foreign = b;}
+    public void setForeign(Boolean b)
+    {
+        foreign = b;
+        if(getEditId()!= null) {
+            if (b == true)
+                getEditId().getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
+            else
+                getEditId().getBackground().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
+        }
+    }
     public boolean isForeign() {return foreign;}
 
 
@@ -126,7 +145,4 @@ public class Attribute extends ShapeObject {
     }
 
 
-    public void setPrimary(boolean b) {
-        primary = b;
-    }
 }

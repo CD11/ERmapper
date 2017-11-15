@@ -31,6 +31,8 @@ public class ERDraw extends AppCompatActivity {
     public LinearLayout layout;
     public RelativeLayout textLayer;
 
+
+    // This creates the ERDraw activity 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,8 +43,6 @@ public class ERDraw extends AppCompatActivity {
         textLayer = (RelativeLayout) findViewById(R.id.textLayout);
         object = new DrawObjects(this, diagram, 0, textLayer);
         layout.addView(object);
-        Log.d("er Context", this.toString() +" " + textLayer.getChildCount());
-
     }
 
     // if add entity is pressed

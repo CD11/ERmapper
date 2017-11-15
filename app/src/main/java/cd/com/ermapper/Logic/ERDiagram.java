@@ -6,8 +6,8 @@ import android.os.Parcelable;
 import android.util.Log;
 import java.util.ArrayList;
 
-import cd.com.ermapper.shapes.Attribute;
 import cd.com.ermapper.relations.AttributeSet;
+import cd.com.ermapper.shapes.Attribute;
 import cd.com.ermapper.shapes.Entity;
 import cd.com.ermapper.shapes.Relationship;
 import cd.com.ermapper.shapes.ShapeObject;
@@ -26,7 +26,7 @@ public class ERDiagram implements Parcelable {
     private String name;
     private ArrayList<ShapeObject> objects;   // We hold a list of all objects because we do not know what objects are connect right away
     private ArrayList<Entity> entityObjs;     // upon time to normalize we can pass all entity objs with their attributes to the FDNormalization.
-    private ArrayList<Relationship> relationships;
+    private ArrayList<Relationship> relationshipsobjs;
 
 
     public ERDiagram(){
@@ -44,10 +44,10 @@ public class ERDiagram implements Parcelable {
     protected ERDiagram(Parcel in) {
         objects = new ArrayList<>();
         entityObjs= new ArrayList<>();
-        relationships = new ArrayList<>();
+        relationshipsobjs = new ArrayList<>();
         name = in.readString();
         entityObjs = in.createTypedArrayList(Entity.CREATOR);
-        relationships = in.createTypedArrayList(Relationship.CREATOR);
+        relationshipsobjs = in.createTypedArrayList(Relationship.CREATOR);
 
     }
 
@@ -152,41 +152,60 @@ public class ERDiagram implements Parcelable {
         }
         return r;
     }
+    // get all relationship shapeobjects
+    public ArrayList<Relationship> getRelationshipsObjs() {
+        return relationshipsobjs;
+    }
 
 
 
-    public ArrayList<Entity> getEntityObj() {
+    /* Funciton: getBinaryEntities()
+       Purpose:
+            -> Searches all Diagram relationships, if they are not Binary converts them to binary
+            -> Also removes any  redundant entites ( weak entites are stored in 2 places
+                Todo: once entity is set to weak, remove from objects,
+                Todo: update draw function to search Entity for weak entites to draw
+     */
+    public ArrayList<Entity> getBinaryEntities() {
         ArrayList<Entity> es = new ArrayList<>();
-        Log.d("Ternary", String.valueOf(getRelationships().size()));
-        for(Relationship r: relationships){
+        ArrayList<Relationship> tempR = new ArrayList<>();
+        for(Relationship r: relationshipsobjs){
              /* If Relationship is ternary
                 1. replace the relationship between the 3 entities with a new entity E and
                 create relationships E -> E1, E->E2, E->E3
                 2. Give E a temporary primary key
                 3. add any attributes of R to E
             */
-            if(r.isTernary()){
-                Entity newE = new Entity("Temp");
 
-                Relationship EA = new Relationship("Temp", newE, (Entity)r.getObjs().get(0));
-                Relationship EB = new Relationship("Temp", newE, (Entity)r.getObjs().get(1));
-                Relationship EC = new Relationship("Temp", newE, (Entity)r.getObjs().get(2));
-                Attribute temp = new Attribute("temp");
-                Attribute temp2 = new Attribute("temp2");
+             /////////////////////// Converts all N-ary relationships to Binary
+            if(r.isTernary()){
+                Entity newE = new Entity("-1");
+                Relationship EA = new Relationship("-1", newE, (Entity)r.getObjs().get(0));
+                Relationship EB = new Relationship("-1", newE, (Entity)r.getObjs().get(1));
+                Relationship EC = new Relationship("-1", newE, (Entity)r.getObjs().get(2));
+                Attribute temp = new Attribute("-1");
+                Attribute temp2 = new Attribute("-1");
                 temp.setPrimary();
                 newE.addAttribute(temp2);
                 newE.addAttribute(temp);
-                newE.getAttr().addAll(((Entity)r.getObjs().get(0)).partAttrs());
-                newE.getAttr().addAll(((Entity)r.getObjs().get(1)).partAttrs());
-                newE.getAttr().addAll(((Entity)r.getObjs().get(2)).partAttrs());
+                newE.getAttr().addAll(((Entity)r.getObjs().get(0)).foreignAttrs());
+                newE.getAttr().addAll(((Entity)r.getObjs().get(1)).foreignAttrs());
+                newE.getAttr().addAll(((Entity)r.getObjs().get(2)).foreignAttrs());
                 newE.getAttr().addAll(r.getAttrs());
                 es.add(newE);
                 addObject(EA);
                 addObject(EB);
                 addObject(EC);
-                deleteO(r);
+                tempR.add(EA);
+                tempR.add(EB);
+                tempR.add(EC);
+                r = null;  // this relaitonship isn't needed
             }
+
         }
+        relationshipsobjs.addAll(tempR);
+
+
         for(Relationship r: getRelationships()){
             // If Relationship is binary add both entity objects
             if(r.isBinary()){
@@ -196,6 +215,7 @@ public class ERDiagram implements Parcelable {
         }
 
 
+        ////////////////////////// Step 2 in normalization
         for(Entity e: entityObjs) {
             if(!e.isWeak()){
                 es.add(e);
@@ -231,8 +251,4 @@ public class ERDiagram implements Parcelable {
         parcel.writeTypedList(getRelationships());
     }
 
-
-    public void removeO(ShapeObject curr) {
-        objects.remove(curr);
-    }
 }

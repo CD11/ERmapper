@@ -21,7 +21,7 @@ public class Cardinality implements Parcelable {
 
     public Cardinality(Context c, ShapeObject o){
       num = new EditText(c);
-      num.setText("0");
+      num.setText("1");
       this.o = o;
 
     }

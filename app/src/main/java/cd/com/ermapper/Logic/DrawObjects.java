@@ -52,7 +52,6 @@ public class DrawObjects extends View {
 
     public void setState(int state) {
      this.state = state;
-     Log.d("setState", "setting"  + Integer.toString(state));
     }
 
     @Override
@@ -123,7 +122,6 @@ public class DrawObjects extends View {
                 paint.setStyle(Paint.Style.STROKE);
                 paint.setColor(Color.BLACK);
                 canvas.drawOval(c.getX(), c.getY(), c.getWidth(), c.getHeight(), paint);
-                Log.d("DrawingER", "Attribute");
             }
 
         }
@@ -159,7 +157,6 @@ public class DrawObjects extends View {
                     }
                     // check for a double click on an object
                     if(clickCount == 2 && state != 3 && curr != null && duration <= MAX_DURATION) {
-                        Log.d("Click", clickCount + curr.getClass().getSimpleName());
                         // if the curr object is an entity set it to weak
                         if (curr.getClass() == Entity.class) {
                             ((Entity) curr).setWeak(d.getRelationships());
@@ -257,10 +254,14 @@ public class DrawObjects extends View {
                                     } else if (curr1.getClass() == Entity.class && curr.getClass() == Relationship.class) {
                                         rCurr.setObj1(curr, c);
                                         ((Relationship) curr).addObj((Entity)curr1,c);
+                                        // adds the edit text to the layer so you can edit cardinality
+                                            textLayer.addView(((Relationship) curr).addObj((Entity)curr1,c));
+
                                         break;
                                     } else if (curr1.getClass() == Relationship.class && curr.getClass() == Entity.class) {
                                         rCurr.setObj2(curr1, c);
-                                        ((Relationship) curr1).addObj((Entity)curr,c);
+                                        textLayer.addView( ((Relationship) curr1).addObj((Entity)curr,c));
+
                                         break;
 
                                     }

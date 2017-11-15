@@ -30,6 +30,7 @@ public class Entity extends ShapeObject {
     private boolean isWeak;
 
 
+    // Constructors
     public Entity(EditText eName, String name, float x, float y) {
         super(eName, name, x, y);
         attr = new AttributeSet();
@@ -43,9 +44,6 @@ public class Entity extends ShapeObject {
         super(null, name, 0, 0);
         attr = new AttributeSet();
         weak = new ArrayList<>();
-        isWeak =false;
-    //    setCoordinateX(0);
-   //     setCoordinateY(0);
     }
 
     protected Entity(Parcel in) {
@@ -71,37 +69,28 @@ public class Entity extends ShapeObject {
     };
 
 
-    // add Attributes to the entity
-    public void addAttribute(Attribute a) {
-        this.attr.add(a);
+    /////////////////////  Setters and getters
+    public AttributeSet getAttr() {
+            return attr;
+        }
+    public ArrayList<Entity> getWeak() {
+            return  weak;
+        }
+    public boolean isWeak() {
+        return isWeak;
     }
-
-
     public String toString(){
         return this.getName() + " " + this.getAttr().toString();
     }
-    public AttributeSet getAttr() {
-        return attr;
-    }
 
-    public Relation toRelation(){
-        AttributeSet primary = new AttributeSet();
-        AttributeSet attributes = new AttributeSet();
-        /* Search through entity attributes,  if the attribute is part a primary adds it to the
-            primary attribute set, else adds to the atttribute attribute set.
-            - > allows ensures there is no duplication.
-        */
-        for(Attribute a: attr.getElements()) {
-            if (a.isPrimary()) {
-                primary.add(a);
-            }
-            attributes.add(a);
-        }
 
-        Relation r = new Relation(attributes, primary, this.getName());
-        return r;
-    }
-
+    /*
+        Fuctions: SetCoordinateX() and SetCoordinateY()
+        Takes the mouse position and updates the current X and Y postions
+        - the editText view has an inital width of 0 until it gets added to the Diagram view,
+            therefore therefore  to try to maintain a consistent width when the object is created we
+            give it a temporary width of 100
+     */
     public void setCoordinateX(float coordinateX) {
         this.getCoordinates().x = coordinateX;
         this.getCoordinates().width = coordinateX + getEditId().getWidth() + offset;
@@ -109,7 +98,6 @@ public class Entity extends ShapeObject {
             this.getCoordinates().width = coordinateX + 100+ offset;
 
     }
-
     public void setCoordinateY(float coordinateY) {
         this.getCoordinates().y = coordinateY;
         this.getCoordinates().height = coordinateY + getEditId().getWidth()+offset;
@@ -118,16 +106,37 @@ public class Entity extends ShapeObject {
 
     }
 
-    public boolean isWeak() {
-        return isWeak; // if weak is empty then it is not weak
+    //  Add an attribute to the entity
+    public void addAttribute(Attribute a) {
+        this.attr.add(a);
     }
+
+    /*
+        If an entity is Strong, then it has weak entities that rely on it,
+        the Relying entities get added to a list
+    */
+    public void addEntity(ShapeObject curr1) {
+        if(!weak.contains(curr1))
+            this.weak.add((Entity) curr1);
+    }
+
+    /* Function: setWeak()
+       Purpose:  When an Entity is set to weak,  it cannot be identified  by itself, and its primary
+                key is made up of its own primary key along with a foriegn key to its Strong Entity
+                -> set any primary keys to part of the foreign key so that the system can draw them
+                    different than primary keys
+                -> check all relationships to Find all strong Entities,
+                    a. add to each entites weak list
+                    // to avoid duplication we will not store the primary keys of the strong relationships
+                    in the attribute set of the weak entities;
+     */
     public void setWeak(ArrayList<Relationship> relationships) {
         if(isWeak == false){
             isWeak = true;
             for(Attribute a:getAttr().getElements()) {
                 if (a.isPrimary()) {
-                    a.getEditId().getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
-
+                    a.setForeign(true);
+                    a.setPrimary(false);
                 }
             }
         }else{
@@ -135,14 +144,14 @@ public class Entity extends ShapeObject {
 
         }
 
+        // Search for strong entities and weak to strong list
         for(Relationship r: relationships) {
             if (r.getObj2().getClass() == Entity.class && r.getObj1().getClass() == Entity.class) {
-                if (r.getObj1() == this) {
+                if (r.getObj1() == this) { // obj1 is weak, Obj2 is strong
                     if(!((Entity) (r.getObj2())).getWeak().contains(this))
                         ((Entity) (r.getObj2())).addEntity(this);
-
                     break;
-                } else if (r.getObj2() == this) {
+                } else if (r.getObj2() == this) { // obj2 is weak, obj1 is strong
                     if(!((Entity)(r.getObj1())).getWeak().contains(this))
                         ((Entity) (r.getObj1())).addEntity(this);
                     break;
@@ -152,24 +161,13 @@ public class Entity extends ShapeObject {
 
     }
 
-    public ArrayList<Entity> getWeak() {
-        return  weak;
-    }
-
-    public void addEntity(ShapeObject curr1) {
-        if(!weak.contains(curr1))
-            this.weak.add((Entity) curr1);
-    }
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        super.writeToParcel(parcel, i);
-        parcel.writeTypedObject(attr, i);
-        parcel.writeByte((byte) (isWeak() ? 1 : 0));
-        parcel.writeTypedList(weak);
-    }
 
 
-    public AttributeSet partAttrs() {
+
+    // This function takes an the AttributesSet of an Entity
+    // and sets any primary keys to foreign keys
+    // This is used to convert N-ary relationships to Binary relationships
+    public AttributeSet foreignAttrs() {
         AttributeSet newA = new AttributeSet();
         for(Attribute a: attr.getElements()){
             if( a.isPrimary()){
@@ -180,4 +178,14 @@ public class Entity extends ShapeObject {
         }
         return newA;
     }
+
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        super.writeToParcel(parcel, i);
+        parcel.writeTypedObject(attr, i);
+        parcel.writeByte((byte) (isWeak() ? 1 : 0));
+        parcel.writeTypedList(weak);
+    }
+
 }

@@ -72,8 +72,8 @@ public class Relationship extends ShapeObject {
     public Path drawLines(){
         Path p = new Path();
         Coordinates c =  this.getCoordinates();
-        float x = c.centerX();
-        float y = c.centerY();
+        float x = c.centerX(); // center of diamond
+        float y = c.centerY();  // center of diamond
         p.setLastPoint(x,y); // Center of the diamond
 
         // Draw a line to each entity
@@ -81,16 +81,14 @@ public class Relationship extends ShapeObject {
             p.lineTo(x,y);
             p.lineTo(o.getCoordinates().centerX(), o.getCoordinates().centerY());
         }
+
         for(Cardinality co: conns){
             p.lineTo(x,y);
             p.lineTo(co.getO().getCoordinates().centerX(), co.getO().getCoordinates().centerY());
-            if(x < co.getO().getCoordinates().getX()) {
-                co.getNum().setX(x - 175);
-            } else if(x > co.getO().getCoordinates().getX()){
-                co.getNum().setX(x + 175);
+            // set the coordinates in the middle of the line
+                co.getNum().setX(((x + co.getO().getCoordinates().centerX())/2));
+                co.getNum().setY(((y + co.getO().getCoordinates().centerY())/2));
 
-            }
-            co.getNum().setY(co.getO().getCoordinates().centerY());
         }
 
         return p;
@@ -147,12 +145,15 @@ public class Relationship extends ShapeObject {
         return obj2;
     }
 
-    public void addObj(Entity obj, Context c){
+    public EditText addObj(Entity obj, Context c){
+        Cardinality cd = null;
         if(!objs.contains(obj)) { // Check for duplicates
             objs.add(obj);
-            conns.add(new Cardinality(c, obj));
+          cd = new Cardinality(c, obj);
+            conns.add(cd);
         }
 
+        return cd.getNum();
 
     }
     public void setObj1(ShapeObject obj1, Context c) {
@@ -245,6 +246,48 @@ public class Relationship extends ShapeObject {
     public boolean isNary(){
         return  objs.size() >3;
     }
+
+
+    /*  Function: isOneToOne()
+        Purpose:
+          Checks if a relationhips is 1:1
+     */
+    public boolean isOneToOne() {
+                if(obj1.getEditId() == null || obj2.getEditId() ==null )
+                    return false;
+                if(obj1.getEditId().getText().equals("1") && obj2.getEditId().getText().equals("1") )
+                    return true;
+        return false;
+    }
+    /*  Function : isOneToN
+        Purpose:
+        Checks if a relationship is 1:N
+       todo: -- > Need to implement something to define what N is.
+    */
+    public boolean isOneToN() {
+        if(obj1.getEditId() == null || obj2.getEditId() ==null )
+            return false;
+        if(obj1.getEditId().getText().equals("1") && !obj2.getEditId().getText().equals("N"))
+            return true;
+        if(obj2.getEditId().getText().equals("1") && !obj1.getEditId().getText().equals("N"))
+            return true;
+        return false;
+    }
+
+    /*  Funciton : isMtoN()
+        Purpose  :
+        Checks if a relationship is M:N
+        todo:--> need to implement something to define what N:M is
+     */
+    public boolean isMToN() {
+        if(obj1.getEditId() == null || obj2.getEditId() ==null )
+            return false;
+        if(obj1.getEditId().getText().equals("M") && !obj2.getEditId().getText().equals("N"))
+            return true;
+        if(obj2.getEditId().getText().equals("N") && !obj1.getEditId().getText().equals("M"))
+            return true;
+        return false;
+    }
     public ArrayList<Cardinality> getTextObjs() {
         return conns;
     }
@@ -256,4 +299,5 @@ public class Relationship extends ShapeObject {
     public AttributeSet getAttrs() {
         return attrs;
     }
+
 }
