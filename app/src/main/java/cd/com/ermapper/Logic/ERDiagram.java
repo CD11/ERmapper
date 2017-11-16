@@ -78,50 +78,9 @@ public class ERDiagram implements Parcelable {
 
 
     public void deleteO(ShapeObject i) {
-        String s = i.getClass().toString();
-
-        switch(s){
-            case"Entity":
-
-                for(Attribute a:((Entity)i).getAttr().getElements()){
-                    ((Entity)i).getAttr().getElements().remove(a);
-                }
-
-                // check relationships
-                for(Relationship r: this.getRelationships()){
-                    if(r.getObj1()== i || r.getObj2()== i){
-                        this.getRelationships().remove(r);
-                    }
-                }
-                break;
-            case"Attribute":
-
-                for(Entity e:this.getEntities()){
-                    if(e.getAttr().getElements().contains(i)){
-                        e.getAttr().getElements().remove(i);
-                    }
-                }
-                // check relationships
-                for(Relationship r: this.getRelationships()){
-                    if(r.getObj1()== i || r.getObj2()== i){
-                        this.getRelationships().remove(r);
-                    }
-                }
-                break;
-
-            case"Relationship":
-                // check relationships
-                for(Relationship r: this.getRelationships()){
-                    if(r.getObj1()== i || r.getObj2()== i){
-                        this.getRelationships().remove(r);
-                    }
-                }
-                break;
-        }
         objects.remove(i);
     }
-
-
+    
      // Get all entity shape objects
     public ArrayList<Entity> getEntities() {
         ArrayList<Entity> e = new ArrayList<>();

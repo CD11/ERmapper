@@ -1,15 +1,24 @@
 package cd.com.ermapper.Logic;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 
+import android.os.Environment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import cd.com.ermapper.R;
@@ -448,6 +457,21 @@ public class FDNormalization extends AppCompatActivity {
         }
 
 
+        public void createDB(View v){
+
+            Database db = new Database(this.getBaseContext(), diagram.getName(), null, 1, relations);
+            AlertDialog ad = new AlertDialog.Builder(this).create();
+            ad.setTitle("DB Creation");
+            ad.setMessage(db.toString() );
+            ad.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            ad.show();
+
+    }
 /*
         private void openFile(File dataFile){
             //System.out.println("openFile()");
@@ -468,7 +492,7 @@ public class FDNormalization extends AppCompatActivity {
 
 
         }
-
+*/
         private void saveFile(File aFile){
             System.out.println("saveFile()");
             if(aFile == null) return;
@@ -477,7 +501,7 @@ public class FDNormalization extends AppCompatActivity {
 
             try{
                 outputFileStream = new PrintWriter(new FileWriter(aFile));
-                for(FunctionalDependency fd : functionalDependencies){
+                for(FunctionalDependency fd : functionalDependencies.getElements()){
                     outputFileStream.println(fd);
                 }
                 outputFileStream.close();
@@ -491,5 +515,5 @@ public class FDNormalization extends AppCompatActivity {
             }
         }
 
-*/
+
 }

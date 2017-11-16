@@ -130,12 +130,21 @@ public class Relationship extends ShapeObject {
     }
 
     public boolean contains(float v, float v1) {
+
         float x = this.getCoordinates().centerX();
         float y = this.getCoordinates().centerY();
         float w = 50;
         float h = 50;
         Coordinates c = new Coordinates(x - w, y - h, x + w, y + h);
         return c.contains(v, v1);
+    }
+
+    @Override
+    public void remove() {
+        this.attrs.clear();
+        this.conns = null;
+        this.getObjs().clear();
+
     }
 
     public ShapeObject getObj1() {
@@ -235,6 +244,17 @@ public class Relationship extends ShapeObject {
 
         return false;
     }
+    public ArrayList<Cardinality> getTextObjs() {
+        return conns;
+    }
+
+    public ArrayList<Entity> getObjs() {
+        return objs;
+    }
+
+    public AttributeSet getAttrs() {
+        return attrs;
+    }
 
     public boolean isBinary(){
         return  objs.size() ==2;
@@ -288,16 +308,6 @@ public class Relationship extends ShapeObject {
             return true;
         return false;
     }
-    public ArrayList<Cardinality> getTextObjs() {
-        return conns;
-    }
 
-    public ArrayList<Entity> getObjs() {
-        return objs;
-    }
-
-    public AttributeSet getAttrs() {
-        return attrs;
-    }
 
 }

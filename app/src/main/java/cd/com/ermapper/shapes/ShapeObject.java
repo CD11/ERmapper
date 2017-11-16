@@ -47,6 +47,7 @@ public abstract class ShapeObject implements Parcelable {
     public String toString(){ return name;}
 
     // getters and setters
+
     public Coordinates getCoordinates() {
         return coordinates;
     }
@@ -59,24 +60,29 @@ public abstract class ShapeObject implements Parcelable {
         this.name = name;
 
     }
+    public String getName() {
+        return name;
+    }
 
     public void setCoordinateX(float coordinateX) {
         this.coordinates.x = coordinateX;
     }
-
     public void setCoordinateY(float coordinateY) {
         this.coordinates.y = coordinateY;
     }
-
-
     public void setCoordinateW(float coordinateW) {
         this.coordinates.width = coordinateW;
     }
-
     public void setCoordinateH(float coordinateH) {
         this.coordinates.height = coordinateH;
     }
+    public boolean contains(float v, float v1) {
+        return  this.getCoordinates().contains(v,v1);
+    }
 
+    public void setEditText(EditText e){
+        eName = e;
+    }
 
     public void moveName() {
         float w = getEditId().getWidth();
@@ -91,10 +97,9 @@ public abstract class ShapeObject implements Parcelable {
 
 
 
+    public abstract void remove();
 
-    public String getName() {
-        return name;
-    }
+
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
@@ -107,13 +112,7 @@ public abstract class ShapeObject implements Parcelable {
     }
 
 
-    public boolean contains(float v, float v1) {
-      return  this.getCoordinates().contains(v,v1);
-    }
 
-    public void setEditText(EditText e){
-        eName = e;
-    }
 
 
 }

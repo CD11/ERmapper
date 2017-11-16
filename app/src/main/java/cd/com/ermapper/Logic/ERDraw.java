@@ -32,7 +32,7 @@ public class ERDraw extends AppCompatActivity {
     public RelativeLayout textLayer;
 
 
-    // This creates the ERDraw activity 
+    // This creates the ERDraw activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -146,6 +146,9 @@ public class ERDraw extends AppCompatActivity {
 
     }
 
+    public void delete(View  v) {
+        object.setState(5);
+    }
     // every object has an editable name set to this
     public void setET(final EditText et){
         // set Edit text

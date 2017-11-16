@@ -181,11 +181,17 @@ public class Entity extends ShapeObject {
 
 
     @Override
+    public void remove() {
+        this.attr.getElements().clear();
+        this.weak.clear();
+    }
+    @Override
     public void writeToParcel(Parcel parcel, int i) {
         super.writeToParcel(parcel, i);
         parcel.writeTypedObject(attr, i);
         parcel.writeByte((byte) (isWeak() ? 1 : 0));
         parcel.writeTypedList(weak);
     }
+
 
 }

@@ -137,12 +137,20 @@ public class Attribute extends ShapeObject {
         }
         return as;
     }
+
+
+    @Override
+    public void remove() {
+       values.clear();
+    }
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(this.getName());
         parcel.writeByte((byte) (primary ? 1 : 0));
         parcel.writeTypedList(values);
     }
+
+
 
 
 }

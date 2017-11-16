@@ -21,46 +21,42 @@
 
 
     </LinearLayout>
+
     <RelativeLayout
         android:id="@+id/textLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/diagramLayout"
         android:layout_margin="8dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         android:background="@android:color/transparent"
         android:orientation="vertical"
         android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/delete"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintStart_toEndOf="@+id/diagramLayout"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        android:layout_marginLeft="8dp">
+        app:layout_constraintVertical_bias="0.0">
 
     </RelativeLayout>
+
     <Button
         android:id="@+id/Select"
-        android:layout_width="165dp"
+        android:layout_width="86dp"
         android:layout_height="49dp"
         android:layout_marginBottom="16dp"
-        android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:onClick="SelectObject"
         android:text="Select "
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toRightOf="@+id/relationship" />
+        app:layout_constraintStart_toEndOf="@+id/relationship"
+        android:layout_marginLeft="8dp" />
 
     <Button
         android:id="@+id/entity"
-        android:layout_width="165dp"
+        android:layout_width="wrap_content"
         android:layout_height="49dp"
         android:layout_marginBottom="16dp"
         android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
         android:onClick="addEntity"
         android:text="Entity "
         app:layout_constraintBottom_toBottomOf="parent"
@@ -68,11 +64,10 @@
 
     <Button
         android:id="@+id/relationship"
-        android:layout_width="165dp"
+        android:layout_width="wrap_content"
         android:layout_height="49dp"
         android:layout_marginBottom="16dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
         android:onClick="addRelationship"
         android:text="Relationships "
         app:layout_constraintBottom_toBottomOf="parent"
@@ -80,31 +75,39 @@
 
     <Button
         android:id="@+id/attribute"
-        android:layout_width="165dp"
+        android:layout_width="wrap_content"
         android:layout_height="49dp"
         android:layout_marginBottom="16dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
         android:onClick="addAttribute"
         android:text="Attribute "
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@+id/entity" />
 
     <Button
+        android:id="@+id/delete"
+        android:layout_width="88dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="8dp"
+        android:onClick="delete"
+        android:text="Delete"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/Select" />
+
+    <Button
         android:id="@+id/Normalize"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:onClick="Normalize"
         android:text="Normalize"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintLeft_toRightOf="@+id/Select"
         app:layout_constraintRight_toRightOf="parent" />
-
-
 
 
 </android.support.constraint.ConstraintLayout>
