@@ -13,16 +13,16 @@ import java.util.ArrayList;
 import cd.com.ermapper.relations.Relation;
 import cd.com.ermapper.shapes.Attribute;
 
-public class Database extends SQLiteOpenHelper {
+public class DatabaseHandler extends SQLiteOpenHelper {
 
-    // Database Version
+    // DatabaseHandler Version
     private final int DATABASE_VERSION = 1;
-    // Database Name
+    // DatabaseHandler Name
     private String DATABASE_NAME;
     private ArrayList<Relation> relations;
 
 
-    public Database(Context context, String name, SQLiteDatabase.CursorFactory factory, int version,  ArrayList<Relation> relations) {
+    public DatabaseHandler(Context context, String name, SQLiteDatabase.CursorFactory factory, int version, ArrayList<Relation> relations) {
         super(context, name, null, version);
         this.DATABASE_NAME = name;
         this.relations = relations;

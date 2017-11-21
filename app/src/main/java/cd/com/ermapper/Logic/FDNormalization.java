@@ -3,12 +3,10 @@ package cd.com.ermapper.Logic;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
-import android.os.Environment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -459,10 +457,10 @@ public class FDNormalization extends AppCompatActivity {
 
         public void createDB(View v){
 
-            Database db = new Database(this.getBaseContext(), diagram.getName(), null, 1, relations);
+            DatabaseHandler db = new DatabaseHandler(this.getBaseContext(), diagram.getName(), null, 1, relations);
             AlertDialog ad = new AlertDialog.Builder(this).create();
             ad.setTitle("DB Creation");
-            ad.setMessage(db.toString() );
+            ad.setMessage(db.getDatabaseName() +" Successfully created");
             ad.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
@@ -471,49 +469,9 @@ public class FDNormalization extends AppCompatActivity {
                     });
             ad.show();
 
+
     }
-/*
-        private void openFile(File dataFile){
-            //System.out.println("openFile()");
-            //Parse the data file
-            functionalDependencies.clear();
-            selectedDependency = null;
-            DependencySet FDs = Normalizer.parseInputFile(dataFile);
-            for(FunctionalDependency fd : FDs.getElements()){
-                functionalDependencies.addAll(fd);
-            }
 
-            AttributeSet allAttributes = FDs.getAllAttributes();
-            Collections.sort(allAttributes.getElements());
-            attributes.clear();
-            for(Attribute a : allAttributes.getElements()) attributes.add(a);
-            //allAttributes.printToSystemOut();
-
-
-
-        }
-*/
-        private void saveFile(File aFile){
-            System.out.println("saveFile()");
-            if(aFile == null) return;
-            //save the chartModel to disk
-            PrintWriter outputFileStream = null;
-
-            try{
-                outputFileStream = new PrintWriter(new FileWriter(aFile));
-                for(FunctionalDependency fd : functionalDependencies.getElements()){
-                    outputFileStream.println(fd);
-                }
-                outputFileStream.close();
-
-            } catch (FileNotFoundException e) {
-                System.out.println("Error: Cannot open file" + outputFileStream + " for writing.");
-
-            } catch (IOException e) {
-                System.out.println("Error: Cannot write to file: " + outputFileStream);
-
-            }
-        }
 
 
 }

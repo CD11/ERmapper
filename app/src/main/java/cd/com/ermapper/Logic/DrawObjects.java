@@ -55,7 +55,7 @@ public class DrawObjects extends View {
         this.state = state;
     }
 
-    @Override
+    /*@Override
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         paint = new Paint();
@@ -79,8 +79,6 @@ public class DrawObjects extends View {
 
             // draw  relationships objects
             if (e.getClass() == Relationship.class) {
-
-
                 if (((Relationship) e).isRelationship()) {
                     paint.setStyle(Paint.Style.STROKE);
                     canvas.drawPath(((Relationship) e).drawLines(), paint);
@@ -127,6 +125,36 @@ public class DrawObjects extends View {
 
         }
     }
+*/
+    @Override
+    public void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        paint = new Paint();
+        // If this is a new relationship, draw a line that follows the mouse
+        if (state == 3 && rCurr != null) {
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setColor(Color.BLACK);
+            canvas.drawLine(rCurr.getCoordinates().getX(), rCurr.getCoordinates().getY(), rCurr.getCoordinates().getWidth(), rCurr.getCoordinates().getHeight(), paint);
+        }
+
+        // check each object in the diagram
+        for (ShapeObject o : d.getObjects()) {
+            // Draw all lines
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setColor(Color.BLACK);
+            o.drawLines(canvas, paint);
+        }
+        for (ShapeObject o : d.getObjects()) {
+           // draw shape with with fill
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(Color.WHITE);
+            o.drawShape(canvas,paint);
+            //draw shape with black stroke
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setColor(Color.BLACK);
+            o.drawShape(canvas,paint);
+        }
+    }
 
 
     @Override
@@ -162,7 +190,7 @@ public class DrawObjects extends View {
 
 
                 // check of an object was clicked
-                for (ShapeObject i : d.getObjects()) {
+                for (ShapeObject i : d.getDrawnObjects()) {
                     if (i.contains(startX + 10, startY + 10)) {
                         curr = i;
                         // set x,y for a new relationship
@@ -239,54 +267,56 @@ public class DrawObjects extends View {
                 // get even position
                 endX = event.getX();
                 endY = event.getY();
-
-
-
                          /* Get Movement */
                 //  Find connecting relationship
                 if (rCurr != null && curr != null ) {
-                    for (ShapeObject i : d.getObjects()) {
+                    for (ShapeObject i : d.getDrawnObjects()) {
                         // Object clicked
                         if (i.contains(endX + 10, endY + 10) && !(i == curr)) {
                             curr1 = i;
                             // Check Entities
                             if (curr.getClass() == Entity.class && curr1.getClass() == Attribute.class) {  // if curr is an entity, add attribute curr1 to entity
                                 ((Entity) curr).addAttribute((Attribute) curr1);
+                                d.deleteO(curr1);
                             } else if (curr1.getClass() == Entity.class && curr.getClass() == Attribute.class) {// if curr1 is an entity, add attriubte curr to entity
                                 ((Entity) curr1).addAttribute((Attribute) curr);
+                                d.deleteO(curr);
                                 // Check Attribute
                             } else if (curr1.getClass() == Attribute.class && curr.getClass() == Attribute.class) { // if attribute is multivalued
                                 //  check for other values already being stored.
                                 if (((Attribute) curr).getValues().isEmpty() && !((Attribute) curr1).getValues().isEmpty()) {
                                     ((Attribute) curr1).addAttribute((Attribute) curr);
+                                    d.deleteO(curr);
                                 } else {
                                     ((Attribute) curr).addAttribute((Attribute) curr1);
+                                    d.deleteO(curr1);
                                 }
                                 //Check Relationship
                             } else if (curr1.getClass() == Attribute.class && curr.getClass() == Relationship.class) { // Add Attributes to a relationship
                                 ((Relationship) curr).addAttribute((Attribute) curr1);
+                                d.deleteO(curr1);
+
 
                             } else if (curr1.getClass() == Relationship.class && curr.getClass() == Attribute.class) { // Add Attributes to a relationship
                                 ((Relationship) curr1).addAttribute((Attribute) curr);
-
+                                d.deleteO(curr);
                             } else if (curr1.getClass() == Entity.class && curr.getClass() == Relationship.class) {
                                 rCurr.setObj1(curr, c);
                                 ((Relationship) curr).addObj((Entity) curr1, c);
                                 // adds the edit text to the layer so you can edit cardinality
                                 textLayer.addView(((Relationship) curr).addObj((Entity) curr1, c));
+                                d.deleteO(curr1);
 
                                 break;
                             } else if (curr1.getClass() == Relationship.class && curr.getClass() == Entity.class) {
                                 rCurr.setObj2(curr1, c);
                                 textLayer.addView(((Relationship) curr1).addObj((Entity) curr, c));
-
+                                d.deleteO(curr);
                                 break;
-
                             }
+                            // this is a new relationship
                             rCurr.setObj2(curr1, c);
                             rCurr.setObj1(curr, c);
-
-
                             rCurr.update();
                             if (rCurr.isRelationship()) {
                                 // only add the relationship to the diagram if it is valid
@@ -295,8 +325,6 @@ public class DrawObjects extends View {
                                 for (Cardinality e : rCurr.getTextObjs()) {
                                     textLayer.addView(e.getNum());
                                 }
-
-
                             }
                             d.addObject(rCurr);
                             break;
@@ -307,18 +335,17 @@ public class DrawObjects extends View {
                         curr.setCoordinateX(endX);
                         curr.setCoordinateY(endY);
                         this.getContext();
-                        curr.moveName();
+                        if(curr.getEditId()!=null)
+                         curr.moveName();
                     }
-
-
+                    state =4;
                     invalidate();
-
-
                     break;
                 }
                 curr = null;
                 curr1 = null;
                 rCurr = null;
+                state =4;
             }
         }
         return true;

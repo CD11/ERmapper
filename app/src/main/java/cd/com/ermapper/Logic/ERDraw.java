@@ -16,6 +16,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import java.io.IOException;
+
 import cd.com.ermapper.R;
 import cd.com.ermapper.shapes.Attribute;
 import cd.com.ermapper.shapes.Entity;
@@ -148,6 +150,28 @@ public class ERDraw extends AppCompatActivity {
 
     public void delete(View  v) {
         object.setState(5);
+    }
+
+    public void SavetoXml(View v){
+        AlertDialog ad = new AlertDialog.Builder(this).create();
+        ad.setTitle("Save to XML");
+        FileOperations f = new FileOperations();
+        try {
+             f.SaveDiagram(diagram, this);
+            ad.setMessage("File Successfully Saved");
+        }catch(IOException e) {
+            ad.setMessage("Error Saving File "+ e);
+
+        }
+
+
+        ad.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        ad.show();
     }
     // every object has an editable name set to this
     public void setET(final EditText et){

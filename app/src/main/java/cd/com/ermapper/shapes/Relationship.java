@@ -1,11 +1,12 @@
 package cd.com.ermapper.shapes;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Path;
 import android.os.Parcel;
 
-import android.view.Window;
 import android.widget.EditText;
 import java.util.ArrayList;
 import cd.com.ermapper.relations.AttributeSet;
@@ -69,34 +70,50 @@ public class Relationship extends ShapeObject {
     };
 
     // Draw the lines to each Entity in the relationship
-    public Path drawLines(){
+    public void drawLines(Canvas canvas, Paint paint){
         Path p = new Path();
         Coordinates c =  this.getCoordinates();
         float x = c.centerX(); // center of diamond
         float y = c.centerY();  // center of diamond
         p.setLastPoint(x,y); // Center of the diamond
 
-        // Draw a line to each entity
-        for(Attribute o: attrs.getElements()){
-            p.lineTo(x,y);
-            p.lineTo(o.getCoordinates().centerX(), o.getCoordinates().centerY());
-        }
+        // Draw a line to each attribute
+        // Draw a line to each attribute
+        this.getObj1().drawLines(canvas, paint);
+        this.getObj2().drawLines(canvas,paint);
 
-        for(Cardinality co: conns){
-            p.lineTo(x,y);
-            p.lineTo(co.getO().getCoordinates().centerX(), co.getO().getCoordinates().centerY());
-            // set the coordinates in the middle of the line
+        if(this.getObj1().getClass() == Attribute.class || this.getObj2().getClass() ==Attribute.class){
+            canvas.drawLine(this.getObj1().getCoordinates().centerX(), this.getObj1().getCoordinates().centerY(),this.getObj2().getCoordinates().centerX(), this.getObj2().getCoordinates().centerY(),paint);
+        }else { // both objects must be entities for it to be weak
+            for (Entity o : getObjs()) {
+                p.lineTo(x, y);
+                p.lineTo(o.getCoordinates().centerX(), o.getCoordinates().centerY());
+                for (Attribute a : o.getAttr().getElements()) {
+                    o.drawLines(canvas, paint);
+                    o.drawShape(canvas, paint);
+                }
+            }
+            for(Cardinality co: conns){
+                p.lineTo(x,y);
+                p.lineTo(co.getO().getCoordinates().centerX(), co.getO().getCoordinates().centerY());
+                // set the coordinates in the middle of the line
                 co.getNum().setX(((x + co.getO().getCoordinates().centerX())/2));
                 co.getNum().setY(((y + co.getO().getCoordinates().centerY())/2));
-
+            }
         }
 
-        return p;
+        // Draw a line to each attribute
+        for(Attribute o: attrs.getElements()){
+            o.drawLines(canvas,paint);
+            o.drawShape(canvas,paint);
+        }
+        canvas.drawPath(p, paint);
     }
 
-
     // This gets the path from the coordinates of the objects that will be draw the diamond to the canvas
-    public Path drawDiamond(){
+    public void drawShape(Canvas canvas, Paint paint){
+        if(!(this.obj1.getClass() == Entity.class && this.getObj2().getClass() == Entity.class))
+            return;
        Coordinates c =  this.getCoordinates();
        float x =c.centerX();
        float y =c.centerY();
@@ -109,10 +126,10 @@ public class Relationship extends ShapeObject {
         p.lineTo(x+w,y );
         p.lineTo(x,y-h);
         p.lineTo(x-w, y);
-        return p;
+        canvas.drawPath(p, paint);
     }
 
-    public Path drawOuterDiamond() {
+    public void drawOuterDiamond(Canvas canvas, Paint paint) {
             Coordinates c =  this.getCoordinates();
 
             float x =c.centerX();
@@ -126,7 +143,7 @@ public class Relationship extends ShapeObject {
             p.lineTo(x+w,y );
             p.lineTo(x,y-h);
             p.lineTo(x-w, y);
-            return p;
+        canvas.drawPath(p, paint);
     }
 
     public boolean contains(float v, float v1) {
@@ -144,9 +161,26 @@ public class Relationship extends ShapeObject {
         this.attrs.clear();
         this.conns = null;
         this.getObjs().clear();
-
     }
 
+    @Override
+    public ArrayList<ShapeObject> getallobjects() {
+        ArrayList<ShapeObject> s = new ArrayList<>();
+        s.add(this);
+        for(Attribute a: this.attrs.getElements()) {
+            s.addAll(a.getallobjects());
+        }
+        if(this.getObjs().isEmpty()){
+            s.addAll(this.getObj1().getallobjects());
+            s.addAll(this.getObj2().getallobjects());
+        }else {
+            for (Entity e : this.getObjs()) {
+                s.addAll(e.getallobjects());
+            }
+        }
+
+        return s;
+    }
     public ShapeObject getObj1() {
         return obj1;
     }
@@ -155,15 +189,15 @@ public class Relationship extends ShapeObject {
     }
 
     public EditText addObj(Entity obj, Context c){
+        if(obj ==null )
+            return null;
         Cardinality cd = null;
         if(!objs.contains(obj)) { // Check for duplicates
             objs.add(obj);
-          cd = new Cardinality(c, obj);
+            cd = new Cardinality(c, obj);
             conns.add(cd);
         }
-
         return cd.getNum();
-
     }
     public void setObj1(ShapeObject obj1, Context c) {
         this.obj1 = obj1;
@@ -171,7 +205,6 @@ public class Relationship extends ShapeObject {
         this.setCoordinateY(obj1.getCoordinates().centerY());
         if(obj1.getClass() == Entity.class)
             addObj((Entity)obj1, c);
-
     }
 
     public void setObj2(ShapeObject obj2, Context c) {

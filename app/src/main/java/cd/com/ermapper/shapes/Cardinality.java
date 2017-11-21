@@ -6,9 +6,13 @@ import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
+import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 
 import java.util.ArrayList;
+
+import static android.graphics.Color.BLACK;
 
 /**
  * Created by CD on 11/9/2017.
@@ -16,19 +20,54 @@ import java.util.ArrayList;
 
 public class Cardinality implements Parcelable {
 
-    EditText num;
-    ShapeObject o;
+    private EditText num;
+    private ShapeObject object;
 
     public Cardinality(Context c, ShapeObject o){
       num = new EditText(c);
       num.setText("1");
-      this.o = o;
+      this.object = o;
+        num.setHint("Name");
+        num.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        num.setSingleLine();
+        num.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
+        num.setTextColor(BLACK);
+        num.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if(!view.hasFocus()){
+                    object.setName(String.valueOf(num.getText()));
+                }
+            }
+        });
+
+
+    }
+    public Cardinality(Context c){
+        num = new EditText(c);
+        num.setText("1");
+        num.setHint("Name");
+        num.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        num.setSingleLine();
+        num.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
+        num.setTextColor(BLACK);
+        num.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if(!view.hasFocus()){
+                    object.setName(String.valueOf(num.getText()));
+                }
+            }
+        });
+
 
     }
 
 
     protected Cardinality(Parcel in) {
-        o = in.readParcelable(ShapeObject.class.getClassLoader());
+        object = in.readParcelable(ShapeObject.class.getClassLoader());
     }
 
     public static final Creator<Cardinality> CREATOR = new Creator<Cardinality>() {
@@ -48,7 +87,7 @@ public class Cardinality implements Parcelable {
     }
 
     public ShapeObject getO() {
-        return o;
+        return object;
     }
 
     @Override
@@ -58,6 +97,6 @@ public class Cardinality implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeParcelable(o, i);
+        parcel.writeParcelable(object, i);
     }
 }

@@ -7,6 +7,7 @@ import android.util.Log;
 import java.util.ArrayList;
 
 import cd.com.ermapper.relations.AttributeSet;
+import cd.com.ermapper.relations.Relation;
 import cd.com.ermapper.shapes.Attribute;
 import cd.com.ermapper.shapes.Entity;
 import cd.com.ermapper.shapes.Relationship;
@@ -80,7 +81,7 @@ public class ERDiagram implements Parcelable {
     public void deleteO(ShapeObject i) {
         objects.remove(i);
     }
-    
+
      // Get all entity shape objects
     public ArrayList<Entity> getEntities() {
         ArrayList<Entity> e = new ArrayList<>();
@@ -210,4 +211,12 @@ public class ERDiagram implements Parcelable {
         parcel.writeTypedList(getRelationships());
     }
 
+    public ArrayList<ShapeObject> getDrawnObjects() {
+        ArrayList s = new ArrayList<>();
+        s.addAll(objects);
+        for(ShapeObject o : objects){
+            s.addAll(o.getallobjects());
+        }
+        return s;
+    }
 }

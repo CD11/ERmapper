@@ -96,7 +96,8 @@
         android:onClick="delete"
         android:text="Delete"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/Select" />
+        app:layout_constraintStart_toEndOf="@+id/Select"
+        android:layout_marginLeft="8dp" />
 
     <Button
         android:id="@+id/Normalize"
@@ -108,6 +109,16 @@
         android:text="Normalize"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
+    <Button
+        android:id="@+id/Save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginRight="8dp"
+        android:onClick="SavetoXml"
+        android:text="Save"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/Normalize" />
 
 
 </android.support.constraint.ConstraintLayout>

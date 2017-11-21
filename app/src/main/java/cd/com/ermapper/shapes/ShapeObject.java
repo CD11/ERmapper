@@ -1,9 +1,14 @@
 package cd.com.ermapper.shapes;
 
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Path;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 import android.widget.EditText;
+
+import java.util.ArrayList;
 
 import cd.com.ermapper.relations.AttributeSet;
 import cd.com.ermapper.shapes.Coordinates;
@@ -98,7 +103,9 @@ public abstract class ShapeObject implements Parcelable {
 
 
     public abstract void remove();
-
+    public abstract void drawLines(Canvas c, Paint p);
+    public abstract void drawShape(Canvas c, Paint p);
+    public abstract ArrayList<ShapeObject> getallobjects();
 
 
     @Override
@@ -110,9 +117,6 @@ public abstract class ShapeObject implements Parcelable {
     public int describeContents() {
         return 0;
     }
-
-
-
 
 
 }

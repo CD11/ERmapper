@@ -1,6 +1,9 @@
 package cd.com.ermapper.shapes;
 
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.os.Parcel;
 import android.widget.EditText;
@@ -9,6 +12,9 @@ import java.util.ArrayList;
 
 import cd.com.ermapper.relations.AttributeSet;
 import cd.com.ermapper.relations.FunctionalDependency;
+
+import static android.graphics.Color.BLACK;
+import static android.graphics.Color.WHITE;
 
 /**
  * Created by cd on 2015-11-04.
@@ -37,6 +43,14 @@ public class Attribute extends ShapeObject {
         primary = false;
         values = new ArrayList<>();
     }
+    public Attribute(EditText editId, Attribute o) {
+        super(o.getEditId(),o.getName(), o.getCoordinates().getX(),o.getCoordinates().getY());
+        primary = false;
+        values = new ArrayList<>();
+        setCoordinateX(o.getCoordinates().getX());
+        setCoordinateY(o.getCoordinates().getY());
+    }
+
 
     public Attribute(Parcel in) {
         super(in);
@@ -57,7 +71,43 @@ public class Attribute extends ShapeObject {
     };
 
 
+    @Override
+    public ArrayList<ShapeObject> getallobjects() {
+        ArrayList<ShapeObject>s = new ArrayList<>();
+        s.add(this);
+        for(Attribute a: this.getValuesSet().getElements())
+            s.add(a);
 
+        return s;
+    }
+
+    // Draw the lines to each Entity in the relationship
+    public void drawLines(Canvas canvas, Paint paint){
+        Path p = new Path();
+        Coordinates c =  this.getCoordinates();
+        p.setLastPoint(c.centerX(),c.centerY()); // Center of the entity
+        // Draw a line to each attribute
+        for(Attribute o: this.getValuesSet().getElements()) {
+            p.lineTo(c.centerX(), c.centerY());
+            p.lineTo(o.getCoordinates().centerX(), o.getCoordinates().centerY());
+        }
+
+        canvas.drawPath(p, paint);
+    }
+    // Draw the shape to each Entity in the relationship
+    public void drawShape(Canvas canvas, Paint paint){
+        Path p = new Path();
+        Coordinates c =  this.getCoordinates();
+        p.setLastPoint(c.centerX(),c.centerY()); // Center of the entity
+        // Draw a line to each attribute
+        for(Attribute o: this.getValuesSet().getElements()) {
+             p.addOval(o.getCoordinates().getX(), o.getCoordinates().getY(),o.getCoordinates().getWidth(), o.getCoordinates().getHeight(),Path.Direction.CW );
+        }
+        // draw
+        p.addOval(c.getX(),c.getY(),c.getWidth(),c.getHeight(),Path.Direction.CW );
+
+        canvas.drawPath(p, paint);
+    }
     // Getters and Setters
 
     public String toString(){ return this.getName()+" ";}

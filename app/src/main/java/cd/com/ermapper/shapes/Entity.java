@@ -1,6 +1,9 @@
 package cd.com.ermapper.shapes;
 
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.os.Parcel;
 import android.util.Log;
@@ -67,7 +70,65 @@ public class Entity extends ShapeObject {
             return new Entity[size];
         }
     };
+    // Draw the line to each Entity in the relationship
+    public void drawLines(Canvas canvas, Paint paint){
+        Path p = new Path();
+        Coordinates c =  this.getCoordinates();
+        p.setLastPoint(c.centerX(),c.centerY()); // Center of the entity
+        // Draw a line to each attribute
+        for(Attribute o: this.attr.getElements()){
+            Attribute a = o;
+            a.drawLines(canvas, paint);
+        }
+        for(Attribute o: this.attr.getElements()){
+            Attribute a = o;
+            a.drawShape(canvas, paint);
+        }
 
+
+        // draw a line to each  weak entity
+        for(Entity o: this.getWeak()){
+            Relationship r = new Relationship("", this, o);
+            r.drawLines(canvas, paint);
+            r.drawShape(canvas, paint);
+            r.drawOuterDiamond(canvas, paint);
+        }
+        //draw all lines
+        canvas.drawPath(p,paint);
+    }
+
+    // Draw the Shapes to each Entity in the relationship
+    public void drawShape(Canvas canvas, Paint paint){
+        Path p = new Path();
+        Coordinates c =  this.getCoordinates();
+        p.setLastPoint(c.centerX(),c.centerY()); // Center of the entity
+        // Draw a line to each attribute
+        for(Attribute o: this.attr.getElements()){
+            o.drawLines(canvas, paint);
+            o.drawShape(canvas, paint);
+        }
+
+        // draw a line to each  weak entity
+        for(Entity o: this.getWeak()){
+            // draw weak entity
+            p.addRect(o.getCoordinates().getX()+15,o.getCoordinates().getY()+15,o.getCoordinates().getWidth()+15,o.getCoordinates().getHeight()+15,Path.Direction.CW );
+        }
+
+        // draw
+        p.addRect(c.getX(),c.getY(),c.getWidth(),c.getHeight(),Path.Direction.CW );
+
+        canvas.drawPath(p, paint);
+    }
+
+    @Override
+    public ArrayList<ShapeObject> getallobjects() {
+        ArrayList<ShapeObject>s = new ArrayList<>();
+        s.add(this);
+        for(Attribute a: this.getAttr().getElements())
+            s.addAll(a.getallobjects());
+        s.addAll(this.getWeak());
+        return s;
+    }
 
     /////////////////////  Setters and getters
     public AttributeSet getAttr() {
@@ -82,7 +143,6 @@ public class Entity extends ShapeObject {
     public String toString(){
         return this.getName() + " " + this.getAttr().toString();
     }
-
 
     /*
         Fuctions: SetCoordinateX() and SetCoordinateY()
