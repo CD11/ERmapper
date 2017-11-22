@@ -2,16 +2,11 @@ package cd.com.ermapper.shapes;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 import android.widget.EditText;
 
 import java.util.ArrayList;
-
-import cd.com.ermapper.relations.AttributeSet;
-import cd.com.ermapper.shapes.Coordinates;
 
 /**
  * Created by CD on 9/15/2017.

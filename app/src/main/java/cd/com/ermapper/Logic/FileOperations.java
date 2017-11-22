@@ -107,7 +107,7 @@ public class FileOperations {
             for (Relationship o: diagram.getRelationships()) {
                 serializer.startTag(null, "Relationship");
 
-                for (Entity e : o.getObjs()) {
+                for (Entity e : o.getObjs().getElements()) {
                     serializer.startTag("", "Entity");
                     entityToXML(e, serializer);
                     serializer.endTag("", "Entity");

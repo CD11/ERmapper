@@ -3,6 +3,7 @@ package cd.com.ermapper.shapes;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.drawable.shapes.Shape;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
@@ -27,27 +28,6 @@ public class Cardinality implements Parcelable {
       num = new EditText(c);
       num.setText("1");
       this.object = o;
-        num.setHint("Name");
-        num.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        num.setSingleLine();
-        num.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
-        num.setTextColor(BLACK);
-        num.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-
-            @Override
-            public void onFocusChange(View view, boolean b) {
-                if(!view.hasFocus()){
-                    object.setName(String.valueOf(num.getText()));
-                }
-            }
-        });
-
-
-    }
-    public Cardinality(Context c){
-        num = new EditText(c);
-        num.setText("1");
-        num.setHint("Name");
         num.setImeOptions(EditorInfo.IME_ACTION_DONE);
         num.setSingleLine();
         num.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));

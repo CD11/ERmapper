@@ -9,18 +9,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.RelativeLayout;
-
-import cd.com.ermapper.R;
 import cd.com.ermapper.shapes.Attribute;
 import cd.com.ermapper.shapes.Cardinality;
-import cd.com.ermapper.shapes.Coordinates;
 import cd.com.ermapper.shapes.Entity;
 import cd.com.ermapper.shapes.Relationship;
 import cd.com.ermapper.shapes.ShapeObject;
 
-import static android.graphics.Color.WHITE;
+import static android.graphics.Color.RED;
 
 
 public class DrawObjects extends View {
@@ -55,77 +51,7 @@ public class DrawObjects extends View {
         this.state = state;
     }
 
-    /*@Override
-    public void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-        paint = new Paint();
-        // If this is a new relationship, draw a line that follows the mouse
-        if (state == 3 && rCurr != null) {
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setColor(Color.BLACK);
-            canvas.drawLine(rCurr.getCoordinates().getX(), rCurr.getCoordinates().getY(), rCurr.getCoordinates().getWidth(), rCurr.getCoordinates().getHeight(), paint);
 
-            if (rCurr.isRelationship()) {
-
-                paint.setStyle(Paint.Style.FILL);
-                paint.setColor(WHITE);
-                canvas.drawPath(rCurr.drawDiamond(), paint);
-
-            }
-        }
-        // check each object in the diagram
-        for (ShapeObject e : d.getSortedObjects()) {
-            Coordinates c = e.getCoordinates();
-
-            // draw  relationships objects
-            if (e.getClass() == Relationship.class) {
-                if (((Relationship) e).isRelationship()) {
-                    paint.setStyle(Paint.Style.STROKE);
-                    canvas.drawPath(((Relationship) e).drawLines(), paint);
-                    paint.setColor(Color.BLACK);
-
-                    paint.setStyle(Paint.Style.FILL);
-                    paint.setColor(WHITE);
-                    canvas.drawPath(((Relationship) e).drawDiamond(), paint);
-                    paint.setStyle(Paint.Style.STROKE);
-                    paint.setColor(Color.BLACK);
-                    canvas.drawPath(((Relationship) e).drawDiamond(), paint);
-                    if (((Relationship) e).isWeak()) {
-                        canvas.drawPath(((Relationship) e).drawOuterDiamond(), paint);
-                    }
-
-                } else {
-                    canvas.drawLine(c.getX(), c.getY(), c.getWidth(), c.getHeight(), paint);
-                }
-            }
-
-            // draw entities pbjects
-            else if (e.getClass() == Entity.class) {
-                paint.setStyle(Paint.Style.FILL);
-                paint.setColor(WHITE);
-                canvas.drawRect(c.getX(), c.getY(), c.getWidth(), c.getHeight(), paint);
-                paint.setStyle(Paint.Style.STROKE);
-                paint.setColor(Color.BLACK);
-                canvas.drawRect(c.getX(), c.getY(), c.getWidth(), c.getHeight(), paint);
-                if (((Entity) e).isWeak()) {
-                    canvas.drawRect(c.getX() - 15, c.getY() - 15, c.getWidth() + 15, c.getHeight() + 15, paint);
-
-                }
-            }
-
-            // draw attribute objects
-            else if (e.getClass() == Attribute.class) {
-                paint.setStyle(Paint.Style.FILL);
-                paint.setColor(WHITE);
-                canvas.drawOval(c.getX(), c.getY(), c.getWidth(), c.getHeight(), paint);
-                paint.setStyle(Paint.Style.STROKE);
-                paint.setColor(Color.BLACK);
-                canvas.drawOval(c.getX(), c.getY(), c.getWidth(), c.getHeight(), paint);
-            }
-
-        }
-    }
-*/
     @Override
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -277,10 +203,12 @@ public class DrawObjects extends View {
                             // Check Entities
                             if (curr.getClass() == Entity.class && curr1.getClass() == Attribute.class) {  // if curr is an entity, add attribute curr1 to entity
                                 ((Entity) curr).addAttribute((Attribute) curr1);
-                                d.deleteO(curr1);
+                                Log.d("edit",  String.valueOf(curr1.getEditId())+String.valueOf(curr1.getEditId().getOnFocusChangeListener()));
+
+                               // d.deleteO(curr1);
                             } else if (curr1.getClass() == Entity.class && curr.getClass() == Attribute.class) {// if curr1 is an entity, add attriubte curr to entity
                                 ((Entity) curr1).addAttribute((Attribute) curr);
-                                d.deleteO(curr);
+                               // d.deleteO(curr);
                                 // Check Attribute
                             } else if (curr1.getClass() == Attribute.class && curr.getClass() == Attribute.class) { // if attribute is multivalued
                                 //  check for other values already being stored.
@@ -321,7 +249,14 @@ public class DrawObjects extends View {
                             if (rCurr.isRelationship()) {
                                 // only add the relationship to the diagram if it is valid
                                 rCurr.setTexts(c);
+                                rCurr.moveName();
+                                rCurr.getEditId().setBackgroundColor(RED);
+                                Log.d("editText", String.valueOf(textLayer.getChildCount()));
                                 textLayer.addView(rCurr.getEditId());
+                                textLayer.bringChildToFront(rCurr.getEditId());
+                                Log.d("editText", String.valueOf(textLayer.getChildCount()));
+
+                                //rCurr.moveName();
                                 for (Cardinality e : rCurr.getTextObjs()) {
                                     textLayer.addView(e.getNum());
                                 }

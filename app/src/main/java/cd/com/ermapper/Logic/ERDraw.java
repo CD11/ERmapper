@@ -58,7 +58,7 @@ public class ERDraw extends AppCompatActivity {
             Log.d("DiagramErrors ", " diagram is Null");
             entity = null;
         }else{
-            entity = new Entity(et, String.valueOf(et.getText()),50, 50);
+            entity = new Entity(et, "object"+String.valueOf(diagram.getDrawnObjects().size()),50, 50);
 
             if(entity != null){
                 diagram.addObject(entity);
@@ -68,11 +68,12 @@ public class ERDraw extends AppCompatActivity {
             }
         }
         object.setState(1);
-        object.invalidate();
+
         textLayer.addView(et);
         textLayer.bringToFront();
         Log.d("er Context", this.toString() +" " + textLayer.getChildCount());
-
+        entity.moveName();
+        object.invalidate();
     }
 
     // if add attribute is pressed
@@ -85,7 +86,7 @@ public class ERDraw extends AppCompatActivity {
             Log.d("DiagramErrors ", " diagram is Null");
             attribute = null;
         }else{
-            attribute= new Attribute(et, String.valueOf(et.getText()), 50, 50);
+            attribute= new Attribute(et, "object"+String.valueOf(diagram.getDrawnObjects().size()), 50, 50);
         if(attribute != null) {
             diagram.addObject(attribute);
         }
@@ -93,6 +94,7 @@ public class ERDraw extends AppCompatActivity {
 
         textLayer.addView(et);
         object.setState(2);
+        attribute.moveName();
         object.invalidate();
 
     }
@@ -187,7 +189,7 @@ public class ERDraw extends AppCompatActivity {
             public void onFocusChange(View view, boolean b) {
 
                 if(!view.hasFocus()){
-                    for(ShapeObject e: diagram.getObjects()){
+                    for(ShapeObject e: diagram.getDrawnObjects()){
                         if(e.getEditId() == view){
                             e.setName(String.valueOf(et.getText()));
                             break;

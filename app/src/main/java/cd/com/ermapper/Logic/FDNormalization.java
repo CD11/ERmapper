@@ -7,6 +7,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import cd.com.ermapper.R;
 import cd.com.ermapper.relations.AttributeSet;
 import cd.com.ermapper.relations.DependencySet;
+import cd.com.ermapper.relations.EntitySet;
 import cd.com.ermapper.relations.FunctionalDependency;
 import cd.com.ermapper.relations.Relation;
 import cd.com.ermapper.relations.SetOfAttributeSets;
@@ -75,7 +77,7 @@ public class FDNormalization extends AppCompatActivity {
 
     public DependencySet findDependencies(){
         FunctionalDependency fd;
-        ArrayList<Entity> entities = diagram.getBinaryEntities(); // simplifies all N-ary Relationships
+        EntitySet entities = diagram.getBinaryEntities(); // simplifies all N-ary Relationships
         ArrayList<Relationship> relationships = diagram.getRelationshipsObjs();
         // Temp values
         Relation tempR;
@@ -140,7 +142,7 @@ public class FDNormalization extends AppCompatActivity {
         }
 
 
-        for( Entity e: entities) {
+        for( Entity e: entities.getElements()) {
 
             //////////////////////// Step 1
             // get attributes for Strong Entities;  strong -> FD
@@ -191,17 +193,16 @@ public class FDNormalization extends AppCompatActivity {
         // plus the primary key attribute K-as a foreign key in R-of the relation that represents the entity type of relationship type that has A as an attribute.
        // The primary key of R is the combination of A and K. If the multivalued attribute is composite, we include its simple components.
 
-        primarkey.clear();
-        attributes.clear();
-        for(Entity e: entities){
+        for(Entity e: entities.getElements()){
             for(Attribute a: e.getAttr().getElements()){ // for each attribute a in e
+                primarkey.clear();
+                attributes.clear();
                 if(!a.getValues().isEmpty()) {            // check if a is complex and create its own relation.
-                    for (Attribute subA : e.getAttr().getElements()) {
-                        if (a.isPrimary() || a.isForeign() && a.getName() != "-1")
-                            primarkey.add(subA);
-                        attributes.add(subA);
-                    }
-                    tempR = new Relation(primarkey, attributes, a.getName());
+                    primarkey.add(a);
+                    attributes.add(a);
+                    attributes.addAll(a.getValuesSet());
+                    Log.d("name", String.valueOf(attributes.containsAll(primarkey)));
+                    tempR = new Relation(attributes, primarkey, a.getName());
                     relations.add(tempR);
                 }
 

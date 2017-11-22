@@ -1,10 +1,8 @@
 package cd.com.ermapper.shapes;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.PorterDuff;
 import android.os.Parcel;
 import android.util.Log;
 import android.widget.EditText;
@@ -13,8 +11,6 @@ import android.widget.EditText;
 import java.util.ArrayList;
 
 import cd.com.ermapper.relations.AttributeSet;
-import cd.com.ermapper.relations.Relation;
-
 
 /**
  * Created by me on 9/6/2017.
@@ -72,52 +68,32 @@ public class Entity extends ShapeObject {
     };
     // Draw the line to each Entity in the relationship
     public void drawLines(Canvas canvas, Paint paint){
-        Path p = new Path();
-        Coordinates c =  this.getCoordinates();
-        p.setLastPoint(c.centerX(),c.centerY()); // Center of the entity
+        Coordinates c =  this.getCoordinates();// Center of the entity
         // Draw a line to each attribute
         for(Attribute o: this.attr.getElements()){
             Attribute a = o;
-            a.drawLines(canvas, paint);
-        }
-        for(Attribute o: this.attr.getElements()){
-            Attribute a = o;
-            a.drawShape(canvas, paint);
+            canvas.drawLine(c.centerX(), c.centerY(), a.getCoordinates().centerX(), a.getCoordinates().centerY(), paint);
         }
 
-
-        // draw a line to each  weak entity
-        for(Entity o: this.getWeak()){
-            Relationship r = new Relationship("", this, o);
-            r.drawLines(canvas, paint);
-            r.drawShape(canvas, paint);
-            r.drawOuterDiamond(canvas, paint);
-        }
-        //draw all lines
-        canvas.drawPath(p,paint);
     }
 
     // Draw the Shapes to each Entity in the relationship
     public void drawShape(Canvas canvas, Paint paint){
         Path p = new Path();
         Coordinates c =  this.getCoordinates();
-        p.setLastPoint(c.centerX(),c.centerY()); // Center of the entity
         // Draw a line to each attribute
         for(Attribute o: this.attr.getElements()){
-            o.drawLines(canvas, paint);
             o.drawShape(canvas, paint);
         }
-
-        // draw a line to each  weak entity
-        for(Entity o: this.getWeak()){
+        if(this.isWeak()){
             // draw weak entity
-            p.addRect(o.getCoordinates().getX()+15,o.getCoordinates().getY()+15,o.getCoordinates().getWidth()+15,o.getCoordinates().getHeight()+15,Path.Direction.CW );
+            canvas.drawRect(c.getX()-15,c.getY()-15,c.getWidth()+15,c.getHeight()+15,paint );
         }
 
         // draw
-        p.addRect(c.getX(),c.getY(),c.getWidth(),c.getHeight(),Path.Direction.CW );
+        canvas.drawRect(c.getX(),c.getY(),c.getWidth(),c.getHeight(),paint);
 
-        canvas.drawPath(p, paint);
+
     }
 
     @Override
@@ -169,6 +145,7 @@ public class Entity extends ShapeObject {
     //  Add an attribute to the entity
     public void addAttribute(Attribute a) {
         this.attr.add(a);
+        Log.d("edit", String.valueOf(a.getEditId())+" "  + String.valueOf(a.getEditId().getOnFocusChangeListener()));
     }
 
     /*

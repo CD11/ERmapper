@@ -1,15 +1,22 @@
 package cd.com.ermapper.shapes;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.os.Parcel;
 
+import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import java.util.ArrayList;
 import cd.com.ermapper.relations.AttributeSet;
+import cd.com.ermapper.relations.EntitySet;
+
+import static android.graphics.Color.BLACK;
+import static android.graphics.Color.RED;
 
 
 /**
@@ -22,7 +29,7 @@ public class Relationship extends ShapeObject {
         if a connection is between two entites, defined by its name as well as the two objects
         It also represents a connection between two objects with just a line
      */
-    ArrayList<Entity> objs;
+    EntitySet objs;
     ArrayList<Cardinality> conns;
     ShapeObject obj1;
     ShapeObject obj2;
@@ -30,7 +37,7 @@ public class Relationship extends ShapeObject {
 
     public Relationship(String name, Entity e1, Entity e2) {
         super(null,name, 0, 0, 0,0);
-        objs = new ArrayList<>();
+        objs = new EntitySet();
         attrs = new AttributeSet();
         conns = new ArrayList<>();
         obj1 = e1;
@@ -38,7 +45,7 @@ public class Relationship extends ShapeObject {
     }
     public Relationship() {
         super(null,"relationship", 0, 0, 0,0);
-        objs = new ArrayList<>();
+        objs = new EntitySet();
         attrs = new AttributeSet();
         conns = new ArrayList<>();
     }
@@ -49,7 +56,7 @@ public class Relationship extends ShapeObject {
         obj1 = in.readParcelable(ShapeObject.class.getClassLoader());
         obj2 = in.readParcelable(ShapeObject.class.getClassLoader());
         attrs = in.readTypedObject(AttributeSet.CREATOR);
-        objs = in.createTypedArrayList(Entity.CREATOR);
+        objs = in.readTypedObject(EntitySet.CREATOR);
     }
 
     @Override
@@ -75,51 +82,54 @@ public class Relationship extends ShapeObject {
         Coordinates c =  this.getCoordinates();
         float x = c.centerX(); // center of diamond
         float y = c.centerY();  // center of diamond
-        p.setLastPoint(x,y); // Center of the diamond
 
-        // Draw a line to each attribute
-        // Draw a line to each attribute
-        this.getObj1().drawLines(canvas, paint);
-        this.getObj2().drawLines(canvas,paint);
-
-        if(this.getObj1().getClass() == Attribute.class || this.getObj2().getClass() ==Attribute.class){
+        for(Attribute a: this.getAttrs().getElements()){
+            a.drawLines(canvas, paint);
+        }
+        //
+        if(this.getObjs().isEmpty()){
+            // then it must be an attribute
             canvas.drawLine(this.getObj1().getCoordinates().centerX(), this.getObj1().getCoordinates().centerY(),this.getObj2().getCoordinates().centerX(), this.getObj2().getCoordinates().centerY(),paint);
+           // obj1.drawShape(canvas,paint);
+           // obj2.drawShape(canvas,paint);
         }else { // both objects must be entities for it to be weak
-            for (Entity o : getObjs()) {
-                p.lineTo(x, y);
-                p.lineTo(o.getCoordinates().centerX(), o.getCoordinates().centerY());
-                for (Attribute a : o.getAttr().getElements()) {
-                    o.drawLines(canvas, paint);
-                    o.drawShape(canvas, paint);
+            for (Entity o : getObjs().getElements()) {
+                // Draws 2 lines to show total participation of weak entities
+                for(Attribute a: o.getAttr().getElements()){
+                    canvas.drawLine(o.getCoordinates().centerX(), o.getCoordinates().centerY(), a.getCoordinates().centerX(), a.getCoordinates().centerY(),paint);
                 }
-            }
+
+                if(o.isWeak()){
+
+                    canvas.drawLine(x,y+20,o.getCoordinates().centerX(), o.getCoordinates().centerY() +20,paint);
+                    canvas.drawLine(x,y-20,o.getCoordinates().centerX(), o.getCoordinates().centerY() -20,paint);
+
+
+                }else{  /// only draw 1 line
+                    canvas.drawLine(x,y,o.getCoordinates().centerX(), o.getCoordinates().centerY(),paint);
+                }
+                          }
             for(Cardinality co: conns){
-                p.lineTo(x,y);
-                p.lineTo(co.getO().getCoordinates().centerX(), co.getO().getCoordinates().centerY());
                 // set the coordinates in the middle of the line
                 co.getNum().setX(((x + co.getO().getCoordinates().centerX())/2));
                 co.getNum().setY(((y + co.getO().getCoordinates().centerY())/2));
             }
         }
-
-        // Draw a line to each attribute
-        for(Attribute o: attrs.getElements()){
-            o.drawLines(canvas,paint);
-            o.drawShape(canvas,paint);
-        }
-        canvas.drawPath(p, paint);
     }
 
     // This gets the path from the coordinates of the objects that will be draw the diamond to the canvas
     public void drawShape(Canvas canvas, Paint paint){
-        if(!(this.obj1.getClass() == Entity.class && this.getObj2().getClass() == Entity.class))
-            return;
        Coordinates c =  this.getCoordinates();
        float x =c.centerX();
        float y =c.centerY();
        float w = 100;
        float h = 100;
 
+        for(Attribute a: this.attrs.getElements()){
+            a.drawShape(canvas, paint);
+        }
+
+        if(this.getObj1().getClass()==Entity.class && this.getObj2().getClass()==Entity.class){
         Path p = new Path();
         p.setLastPoint(x-w, y);
         p.lineTo(x,y+h);
@@ -127,6 +137,18 @@ public class Relationship extends ShapeObject {
         p.lineTo(x,y-h);
         p.lineTo(x-w, y);
         canvas.drawPath(p, paint);
+
+
+        for(Entity e:objs.getElements()) {
+            e.drawShape(canvas, paint);
+            if (e.isWeak()) {
+                drawOuterDiamond(canvas, paint);
+            }
+        }
+        }else{
+            obj1.drawShape(canvas, paint);
+            obj2.drawShape(canvas, paint);
+        }
     }
 
     public void drawOuterDiamond(Canvas canvas, Paint paint) {
@@ -134,8 +156,8 @@ public class Relationship extends ShapeObject {
 
             float x =c.centerX();
             float y =c.centerY();
-            float w = 100;
-            float h = 100;
+            float w = 115;
+            float h = 115;
 
             Path p = new Path();
             p.setLastPoint(x-w, y);
@@ -174,7 +196,7 @@ public class Relationship extends ShapeObject {
             s.addAll(this.getObj1().getallobjects());
             s.addAll(this.getObj2().getallobjects());
         }else {
-            for (Entity e : this.getObjs()) {
+            for (Entity e : this.getObjs().getElements()) {
                 s.addAll(e.getallobjects());
             }
         }
@@ -188,17 +210,26 @@ public class Relationship extends ShapeObject {
         return obj2;
     }
 
+    // Is the relationship is between two objects, then add objects to entity set
     public EditText addObj(Entity obj, Context c){
-        if(obj ==null )
+        if(obj == null )
             return null;
+        // Create a cardinality for the object
         Cardinality cd = null;
         if(!objs.contains(obj)) { // Check for duplicates
             objs.add(obj);
             cd = new Cardinality(c, obj);
             conns.add(cd);
         }
+
         return cd.getNum();
     }
+
+    public void moveName() {
+        this.getEditId().setX(this.getCoordinates().centerX()-60);
+        this.getEditId().setY(this.getCoordinates().centerY()-60);
+    }
+
     public void setObj1(ShapeObject obj1, Context c) {
         this.obj1 = obj1;
         this.setCoordinateX(obj1.getCoordinates().centerX());
@@ -224,17 +255,32 @@ public class Relationship extends ShapeObject {
             this.setCoordinateW(obj2.getCoordinates().centerX());
           this.setCoordinateH(obj2.getCoordinates().centerY());
         if(this.getEditId() != null) {
-            this.getEditId().setX(this.getCoordinates().centerX());
-            this.getEditId().setY(this.getCoordinates().centerY());
+            moveName();
         }
     }
     //  For cardinality purposes
     // Initiates Edit texts  for name and cardinality and positions them in their proper place
     public void setTexts(Context c){
         // Give name edit
-        EditText e = new EditText(c);
-        e.setBackgroundColor(Color.BLACK);
+        final EditText e = new EditText(c);
+        e.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        e.setSingleLine();
+        e.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
+        e.setTextColor(BLACK);
+        e.setHint("name");
+
+        e.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if(!view.hasFocus()){
+                    setName(String.valueOf(e.getText()));
+                }
+            }
+        });
+
         this.setEditText(e);
+        moveName();
     }
 
 
@@ -260,7 +306,7 @@ public class Relationship extends ShapeObject {
         dest.writeParcelable(obj1, flags);
         dest.writeParcelable(obj2, flags);
         dest.writeTypedObject(attrs,flags);
-        dest.writeTypedList(objs);
+        dest.writeTypedObject(objs,flags);
     }
 
     public void addAttribute(Attribute curr1) {
@@ -269,19 +315,21 @@ public class Relationship extends ShapeObject {
 
     // Relationship properties
     public boolean isWeak() {
-        for (ShapeObject o : objs) {
-            if (o.getClass() == Entity.class)
-                if (((Entity) o).isWeak())
-                    return true;
+        boolean result = false;
+        for (Entity o : objs.getElements()) {
+            if (o.isWeak()) {
+                result = true;
+                break;
+            }
         }
 
-        return false;
+        return result;
     }
     public ArrayList<Cardinality> getTextObjs() {
         return conns;
     }
 
-    public ArrayList<Entity> getObjs() {
+    public EntitySet getObjs() {
         return objs;
     }
 
