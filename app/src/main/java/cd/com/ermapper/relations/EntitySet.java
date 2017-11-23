@@ -13,7 +13,8 @@ import cd.com.ermapper.shapes.Entity;
  */
 
 public class EntitySet implements Parcelable {
-
+    /* This class holds a unique set of Entity objects
+     */
     private ArrayList<Entity> elements;
 
     public EntitySet() {

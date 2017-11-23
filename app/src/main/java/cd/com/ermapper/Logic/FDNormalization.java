@@ -26,6 +26,7 @@ import cd.com.ermapper.relations.DependencySet;
 import cd.com.ermapper.relations.EntitySet;
 import cd.com.ermapper.relations.FunctionalDependency;
 import cd.com.ermapper.relations.Relation;
+import cd.com.ermapper.relations.RelationSchema;
 import cd.com.ermapper.relations.SetOfAttributeSets;
 import cd.com.ermapper.shapes.Attribute;
 import cd.com.ermapper.shapes.Entity;
@@ -37,8 +38,8 @@ public class FDNormalization extends AppCompatActivity {
 
     //list of functional dependencies
     private DependencySet functionalDependencies;
-    private ArrayList<Relation> relations;
     private AttributeSet attributes;
+    private RelationSchema relationSchema;
 
     //to display lists to screen
     private ListView attributesView;
@@ -56,13 +57,17 @@ public class FDNormalization extends AppCompatActivity {
 
         //list of functional dependencies
         functionalDependencies = new DependencySet();
-        relations = new ArrayList<>();
         attributes = new AttributeSet();
         functionalDependenciesView= (ListView) findViewById(R.id.FDList);
         attributesView = (ListView) findViewById(R.id.AttributeList);
         diagram = this.getIntent().getParcelableExtra("diagram");
+
+        EntitySet entities = diagram.getBinaryEntities(); // simplifies all N-ary Relationships
+        ArrayList<Relationship> relationships = diagram.getRelationshipsObjs();
+        RelationSchema relationSchema = new RelationSchema(entities, relationships);
+
         // get the ER diagram
-        functionalDependencies.addAll(findDependencies()); // get all functional dependencies
+        functionalDependencies.addAll(findDependencies(relationSchema)); // get all functional dependencies
 
         //TODO: check these methods and decide how they work
          performNormalization();  // Perform normalization
@@ -75,143 +80,11 @@ public class FDNormalization extends AppCompatActivity {
     }
 
 
-    public DependencySet findDependencies(){
+    public DependencySet findDependencies(RelationSchema relations){
         FunctionalDependency fd;
-        EntitySet entities = diagram.getBinaryEntities(); // simplifies all N-ary Relationships
-        ArrayList<Relationship> relationships = diagram.getRelationshipsObjs();
-        // Temp values
-        Relation tempR;
-        AttributeSet primarkey = new AttributeSet();
-        AttributeSet attributes = new AttributeSet();
-    /* follows the ER->Relational mapping rules in fundamentals of DB systems by Ramex Elmasri & Shamkant B. Navathe
-        1. For all Regular entity types
-            a. assign a Relation, pick a primary key
-                if the primary key is a complex attribute: all attributes will be included
-           b. if  an attribute is complex, create a new relation
-        2. For all Weak Entities, create a foreign key that references all Primary keys of its Strong relation
-        3. For all 1:1 relationships do
-            a. Choose one of the relations-say S-and include a foreign key in S the primary key of T.
-            b. It is better to choose an entity type with total participation in R in the role of S.
-        4. for All  1:N relationships do
-           a. identify the relation S that represent the participating entity type at the N-side of the relationship type.
-           b. Include as foreign key in S the primary key of the relation T that represents the 1 side of the relationship type
-           c. Include any simple attributes of the 1:N relation type as attributes of S.
-        5.  For all M:N
-         a. For each regular binary M:N relationship type R, create a new relation S to represent R.
-         b. Include as foreign key attributes in S the primary keys of the relations that represent the participating entity types; their combination will form the primary key of S.
-         c. Also include any simple attributes of the M:N relationship type (or simple components of composite attributes) as attributes of S.
-        6.  For multivariable attributes
-            a. For each multivalued attribute A, create a new relation R.
-            b.This relation R will include an attribute corresponding to A, plus the primary key attribute K-as a foreign key in R-of the relation that represents the entity type of relationship type that has A as an attribute.
-            c. The primary key of R is the combination of A and K. If the multivalued attribute is composite, we include its simple components.
-
-*/
-
-        // Steps 3 -> 5 require modifying an existing relation based on the diagram entity
-        // we will update the entity and then create the Relation per steps 1 and 2.
-        for(Relationship r: relationships){
-            if(r!= null && r.getObj1().getClass() == Entity.class && r.getObj2().getClass() == Entity.class) {
-                Entity e1 = (Entity) r.getObj1();
-                Entity e2 = (Entity) r.getObj2();
-
-                ////////////////////// Step 3 //////////////////////////////////////
-                //Choose one of the relations-say S-and include a foreign key in S the primary key of T.
-                if(r.isOneToOne()) {
-                    ((Entity) r.getObj1()).getAttr().addAll(((Entity) r.getObj2()).foreignAttrs());
-                }
-                /////////////////// Step 4  //////////////////////////////////
-                //a. identify the relation S that represent the participating entity type at the N-side of the relationship type.
-                if (r.isOneToN()) {
-                   if(r.getTextObjs().get(0).getNum().getText().equals("N")) //  obj1 is S
-                       //b. Include as foreign key in S the primary key of the relation T that represents the 1 side of the relationship type
-                       ((Entity) r.getObj1()).getAttr().addAll(((Entity) r.getObj2()).foreignAttrs());
-                   else// obj2 is s
-                        //b. Include as foreign key in S the primary key of the relation T that represents the 1 side of the relationship type
-                        ((Entity) r.getObj2()).getAttr().addAll(((Entity) r.getObj1()).foreignAttrs());
-
-
-                    ///////////////////  Step 5 //////////////////////////////////////////////
-                    //a. For each regular binary M:N relationship type R, create a new relation S to represent R.
-                }else if(r.isMToN()){
-                    //b. Include as foreign key attributes in S the primary keys of the relations that represent the participating entity types; their combination will form the primary key of S.
-                    //c. Also include any simple attributes of the M:N relationship type (or simple components of composite attributes) as attributes of S.
-                    Relation newRelation = new Relation((Entity)r.getObj1(), (Entity)r.getObj2());
-                    relations.add(newRelation);
-                }
-            }
-        }
-
-
-        for( Entity e: entities.getElements()) {
-
-            //////////////////////// Step 1
-            // get attributes for Strong Entities;  strong -> FD
-            if (!e.isWeak()) {
-                for (Attribute a : e.getAttr().getElements()) {
-                    if (a.isPrimary() ||a.isForeign() && a.getName() != "-1") {
-                        primarkey.add(a);
-                    }
-                    attributes.add(a);
-                }
-                tempR = new Relation(attributes, primarkey, e.getName());
-                relations.add(tempR);
-            }
-
-            primarkey.clear();
-            attributes.clear();
-
-            /////////////////// Step 2
-            // Check weak Entities
-            if (!e.equals(null) || !e.getWeak().isEmpty()) {
-                /* if entity has weak Entities add the primary key of its strong relation to it */
-                for (Entity eW : e.getWeak()) {
-                    // add Strong entity primary key as key to weak entity
-                    for (Attribute a : e.getAttr().getElements()) {
-                        if (a.isPrimary() || a.isForeign() && a.getName() != "-1")
-                            eW.getAttr().add(a);
-                    }
-                    // add attributes of weak entites;   weak -> FD
-                    for (Attribute a : eW.getAttr().getElements()) {
-                        if (a.isPrimary() || a.isForeign() && a.getName() != "-1") {
-                            primarkey.add(a);
-                        }
-                        attributes.add(a);
-                    }
-                    //    fd = new FunctionalDependency(primarkey, attributes, e.getName());
-                    //   if(fd != null || !fd.isTrivial()) functionalDependencies.add(fd);
-                    tempR = new Relation(attributes, primarkey, e.getName());
-                    relations.add(tempR);
-                }
-            }
-        }
-
-
-        ////////////// Step 6 ///////////////////////////
-        // check for multiple attributes.
-       // For each multivalued attribute A, create a new relation R.
-       // This relation R will include an attribute corresponding to A,
-        // plus the primary key attribute K-as a foreign key in R-of the relation that represents the entity type of relationship type that has A as an attribute.
-       // The primary key of R is the combination of A and K. If the multivalued attribute is composite, we include its simple components.
-
-        for(Entity e: entities.getElements()){
-            for(Attribute a: e.getAttr().getElements()){ // for each attribute a in e
-                primarkey.clear();
-                attributes.clear();
-                if(!a.getValues().isEmpty()) {            // check if a is complex and create its own relation.
-                    primarkey.add(a);
-                    attributes.add(a);
-                    attributes.addAll(a.getValuesSet());
-                    Log.d("name", String.valueOf(attributes.containsAll(primarkey)));
-                    tempR = new Relation(attributes, primarkey, a.getName());
-                    relations.add(tempR);
-                }
-
-            }
-        }
-
         //////////////////// To FD //////////////////////////////////////////////
         // Relations arraylist now contains all proper Relations  we can now find the FDs
-        for(Relation r: relations) {
+        for(Relation r: relations.getRelations()) {
             fd = new FunctionalDependency(r.getPrimaryKey(), r.getAttributes(), r.getName());
             if (fd != null || !fd.isTrivial()) functionalDependencies.add(fd);
         }
@@ -458,7 +331,7 @@ public class FDNormalization extends AppCompatActivity {
 
         public void createDB(View v){
 
-            DatabaseHandler db = new DatabaseHandler(this.getBaseContext(), diagram.getName(), null, 1, relations);
+            DatabaseHandler db = new DatabaseHandler(this.getBaseContext(), diagram.getName(), null, 1, relationSchema.getRelations());
             AlertDialog ad = new AlertDialog.Builder(this).create();
             ad.setTitle("DB Creation");
             ad.setMessage(db.getDatabaseName() +" Successfully created");

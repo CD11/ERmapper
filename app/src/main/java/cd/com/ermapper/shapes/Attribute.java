@@ -3,7 +3,6 @@ package cd.com.ermapper.shapes;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.os.Parcel;
 import android.widget.EditText;
@@ -94,10 +93,27 @@ public class Attribute extends ShapeObject {
         // draw
         canvas.drawOval(c.getX(),c.getY(),c.getWidth(),c.getHeight(),paint);
     }
+
+
+    @Override
+    public boolean containsObj(ShapeObject curr) {
+        for(Attribute a: values)
+            if(a.equals(curr)) return true;
+        return false;
+
+    }
+
+    @Override
+    public void remove() {
+        values.clear();
+    }
+
+    @Override
+    public void removeObj(ShapeObject curr) {
+        if(values.contains(curr)) values.remove(curr);
+    }
     // Getters and Setters
-
     public String toString(){ return this.getName()+" ";}
-
     public void setCoordinateX(float coordinateX) {
         this.getCoordinates().setX(coordinateX);
         float w = coordinateX + getEditId().getWidth()+ width;
@@ -105,13 +121,15 @@ public class Attribute extends ShapeObject {
             w += 100;
         this.getCoordinates().setWidth(w);
     }
-
     public void setCoordinateY(float coordinateY) {
         this.getCoordinates().setY(coordinateY);
         this.getCoordinates().setHeight(coordinateY + height);
 
     }
-
+    /*
+        Checks to see what if object is primary or not and sets it to the opposing,
+        updates the edit text to allow and for the text to be underlined
+     */
     public void setPrimary() {
         if (primary == false){
             primary = true;
@@ -123,7 +141,6 @@ public class Attribute extends ShapeObject {
             primary = false;
         }
     }
-
     public void setPrimary(boolean b) {
         primary = b;
         if(getEditId() != null) {
@@ -136,9 +153,7 @@ public class Attribute extends ShapeObject {
     public boolean isPrimary(){
         return primary;
     }
-
-    public void setForeign(Boolean b)
-    {
+    public void setForeign(Boolean b) {
         foreign = b;
         if(getEditId()!= null) {
             if (b == true)
@@ -148,24 +163,12 @@ public class Attribute extends ShapeObject {
         }
     }
     public boolean isForeign() {return foreign;}
-
-
     public void addAttribute(Attribute curr) {
         values.add(curr);
     }
-
     public ArrayList<Attribute> getValues() {
         return values;
     }
-
-    public FunctionalDependency toFD() {
-        AttributeSet key = new AttributeSet();
-        AttributeSet v = getValuesSet();
-        key.add(this);
-        FunctionalDependency fd = new FunctionalDependency(key, v, this.getName());
-        return fd;
-    }
-
     public AttributeSet getValuesSet() {
         AttributeSet as = new AttributeSet();
         for(Attribute a: values){
@@ -173,26 +176,6 @@ public class Attribute extends ShapeObject {
         }
         return as;
     }
-
-
-    @Override
-    public void remove() {
-       values.clear();
-    }
-
-    @Override
-    public boolean containsObj(ShapeObject curr) {
-        for(Attribute a: values)
-            if(a.equals(curr)) return true;
-        return false;
-
-    }
-
-    @Override
-    public void removeObj(ShapeObject curr) {
-        if(values.contains(curr)) values.remove(curr);
-    }
-
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {

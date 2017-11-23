@@ -20,10 +20,16 @@ import static android.graphics.Color.BLACK;
  */
 
 public class Cardinality implements Parcelable {
+    /* this class represents the cardinality of an Entity obejct in a relationship
+        - contains an edit text id
+        - is related to an object.
+     */
 
+    // variables
     private EditText num;
     private ShapeObject object;
 
+    // constructors
     public Cardinality(Context c, ShapeObject o){
       num = new EditText(c);
       num.setText("1");
@@ -62,14 +68,16 @@ public class Cardinality implements Parcelable {
         }
     };
 
+    // Setters and Getters
     public EditText getNum() {
         return num;
     }
-
     public ShapeObject getO() {
         return object;
     }
-
+    public void setO(ShapeObject o) {
+        this.object = o;
+    }
     @Override
     public int describeContents() {
         return 0;
@@ -80,7 +88,5 @@ public class Cardinality implements Parcelable {
         parcel.writeParcelable(object, i);
     }
 
-    public void setO(ShapeObject o) {
-        this.object = o;
-    }
+
 }

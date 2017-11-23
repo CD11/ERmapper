@@ -74,6 +74,7 @@ public class Entity extends ShapeObject {
         // Draw a line to each attribute
         for(Attribute o: this.attr.getElements()){
             Attribute a = o;
+            o.drawLines(canvas, paint);
             canvas.drawLine(c.centerX(), c.centerY(), a.getCoordinates().centerX(), a.getCoordinates().centerY(), paint);
         }
 
@@ -96,6 +97,31 @@ public class Entity extends ShapeObject {
         canvas.drawRect(c.getX(),c.getY(),c.getWidth(),c.getHeight(),paint);
 
 
+    }
+
+    @Override
+    public boolean containsObj(ShapeObject curr) {
+        for(Attribute a: attr.getElements())
+            if(a.equals(curr)) return true;
+        for(Entity e :weak)
+            if(e.equals(curr))return true;
+        return false;
+
+    }
+
+    @Override
+    public void removeObj(ShapeObject curr) {
+        if(curr.getClass() == Attribute.class)
+            if(attr.contains((Attribute) curr)) attr.remove((Attribute) curr);
+        if(curr.getClass() == Entity.class)
+            if(weak.contains(curr)) weak.remove(curr);
+
+    }
+
+    @Override
+    public void remove() {
+        this.attr.getElements().clear();
+        this.weak.clear();
     }
 
     @Override
@@ -200,8 +226,6 @@ public class Entity extends ShapeObject {
     }
 
 
-
-
     // This function takes an the AttributesSet of an Entity
     // and sets any primary keys to foreign keys
     // This is used to convert N-ary relationships to Binary relationships
@@ -219,11 +243,6 @@ public class Entity extends ShapeObject {
 
 
     @Override
-    public void remove() {
-        this.attr.getElements().clear();
-        this.weak.clear();
-    }
-    @Override
     public void writeToParcel(Parcel parcel, int i) {
         super.writeToParcel(parcel, i);
         parcel.writeTypedObject(attr, i);
@@ -231,24 +250,7 @@ public class Entity extends ShapeObject {
         parcel.writeTypedList(weak);
     }
 
-    @Override
-    public boolean containsObj(ShapeObject curr) {
-        for(Attribute a: attr.getElements())
-            if(a.equals(curr)) return true;
-        for(Entity e :weak)
-            if(e.equals(curr))return true;
-        return false;
 
-    }
-
-    @Override
-    public void removeObj(ShapeObject curr) {
-        if(curr.getClass() == Attribute.class)
-            if(attr.contains((Attribute) curr)) attr.remove((Attribute) curr);
-        if(curr.getClass() == Entity.class)
-            if(weak.contains(curr)) weak.remove(curr);
-
-    }
 
 
 }

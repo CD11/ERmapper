@@ -47,23 +47,14 @@ public abstract class ShapeObject implements Parcelable {
     public String toString(){ return name;}
 
     // getters and setters
-
     public Coordinates getCoordinates() {
         return coordinates;
     }
-
-    public EditText getEditId() {
-        return eName;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-
-    }
+    public EditText getEditId() {return eName; }
+    public void setName(String name) {this.name = name;}
     public String getName() {
         return name;
     }
-
     public void setCoordinateX(float coordinateX) {
         this.coordinates.x = coordinateX;
     }
@@ -79,11 +70,11 @@ public abstract class ShapeObject implements Parcelable {
     public boolean contains(float v, float v1) {
         return  this.getCoordinates().contains(v,v1);
     }
-
     public void setEditText(EditText e){
         eName = e;
     }
 
+    // Updates the edit text name object to the middle of the shape object
     public void moveName() {
         float w = getEditId().getWidth();
         float h = getEditId().getHeight();
@@ -95,13 +86,12 @@ public abstract class ShapeObject implements Parcelable {
         eName.setY(this.getCoordinates().centerY()-h/2);
     }
 
-
-
     public abstract void remove();
     public abstract void drawLines(Canvas c, Paint p);
     public abstract void drawShape(Canvas c, Paint p);
     public abstract ArrayList<ShapeObject> getallobjects();
-
+    public abstract boolean containsObj(ShapeObject curr);
+    public abstract void removeObj(ShapeObject curr);
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
@@ -114,7 +104,4 @@ public abstract class ShapeObject implements Parcelable {
     }
 
 
-    public abstract boolean containsObj(ShapeObject curr);
-
-    public abstract void removeObj(ShapeObject curr);
 }

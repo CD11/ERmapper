@@ -10,10 +10,14 @@ import android.os.Parcelable;
 public class Coordinates implements Parcelable {
     /* This Class represents where on the canvas an object is located
      */
+
+    // local Variables
     float x;
     float y;
     float width;
     float height;
+
+    //Constructors
 
     Coordinates(float i, float i1, float i2, float i3) {
         this.x = i;
@@ -42,20 +46,48 @@ public class Coordinates implements Parcelable {
         }
     };
 
+    // check if x and y are contained in teh objects coordinates
     public boolean contains(float x, float y) {
         return this.x < x && this.width > x && this.y < y && this.height > y;
     }
 
+    // Get center on X axis
     public float centerX() {
         float c;
         c = this.x + ((this.width - this.x)/2);
         return c;
     }
-
+    // Get center on Y axis
     public float centerY() {
         float c;
         c = this.y + ((this.height - this.y)/2);
         return c;
+    }
+
+    // Setters and getters
+    public float getX() {
+        return x;
+    }
+    public float getY() {
+        return y;
+    }
+    public float getWidth() {
+        return width;
+    }
+    public float getHeight() {
+        return height;
+    }
+    public void setX(float x) {
+        this.x = x;
+    }
+    public void setWidth(float width) {
+        this.width = width;
+    }
+    public void setY(float y) {
+        this.y = y;
+    }
+    public void setHeight(float height) {
+        this.height = height;
     }
 
     @Override
@@ -69,37 +101,5 @@ public class Coordinates implements Parcelable {
         parcel.writeFloat(y);
         parcel.writeFloat(width);
         parcel.writeFloat(height);
-    }
-
-    public float getX() {
-        return x;
-    }
-
-    public float getY() {
-        return y;
-    }
-
-    public float getWidth() {
-        return width;
-    }
-
-    public float getHeight() {
-        return height;
-    }
-
-    public void setX(float x) {
-        this.x = x;
-    }
-
-    public void setWidth(float width) {
-        this.width = width;
-    }
-
-    public void setY(float y) {
-        this.y = y;
-    }
-
-    public void setHeight(float height) {
-        this.height = height;
     }
 }

@@ -28,11 +28,15 @@ public class Relationship extends ShapeObject {
         This class represents a connection between two or more Entity objects represented by a diamond
         - > a relationship can have an attribute.
      */
+
+    // Local variables
     EntitySet objs;
     ArrayList<Cardinality> conns;
     ShapeObject obj1;
     ShapeObject obj2;
     AttributeSet attrs;
+
+    // costructors
 
     public Relationship(String name, Entity e1, Entity e2) {
         super(null,name, 0, 0, 0,0);
@@ -94,7 +98,8 @@ public class Relationship extends ShapeObject {
             for (Entity o : getObjs().getElements()) {
                 // Draws 2 lines to show total participation of weak entities
                 for (Attribute a : o.getAttr().getElements()) {
-                    canvas.drawLine(o.getCoordinates().centerX(), o.getCoordinates().centerY(), a.getCoordinates().centerX(), a.getCoordinates().centerY(), paint);
+                    o.drawLines(canvas,paint);
+                    //canvas.drawLine(o.getCoordinates().centerX(), o.getCoordinates().centerY(), a.getCoordinates().centerX(), a.getCoordinates().centerY(), paint);
                 }
 
                 if (o.isWeak()) {
@@ -172,6 +177,18 @@ public class Relationship extends ShapeObject {
             p.lineTo(x-w, y);
         canvas.drawPath(p, paint);
     }
+    // Checks for valid objts and updates name coordinates
+    public void update(){
+        if(obj1 != null)
+            this.setCoordinateX(obj1.getCoordinates().centerX());
+        this.setCoordinateY(obj1.getCoordinates().centerY());
+        if(obj2 != null)
+            this.setCoordinateW(obj2.getCoordinates().centerX());
+        this.setCoordinateH(obj2.getCoordinates().centerY());
+        if(this.getEditId() != null) {
+            moveName();
+        }
+    }
 
     public boolean contains(float v, float v1) {
 
@@ -188,6 +205,14 @@ public class Relationship extends ShapeObject {
         this.attrs.clear();
         this.conns = null;
         this.getObjs().clear();
+    }
+    @Override
+    public void removeObj(ShapeObject curr) {
+        if(objs.contains((Entity) curr)) objs.remove((Entity) curr);
+        for(Cardinality c : conns){
+            if(c.getO().equals(curr))
+                c.setO(null);
+        }
     }
 
     @Override
@@ -208,13 +233,59 @@ public class Relationship extends ShapeObject {
 
         return s;
     }
+
+    // Checks if the relationship contains a certain object
+    @Override
+    public boolean containsObj(ShapeObject curr) {
+        if(obj1.containsObj(curr)) return true;
+        if(obj2.containsObj(curr)) return true;
+        for(Entity e: objs.getElements())
+            if(e.equals(curr)) return true;
+
+        return false;
+
+    }
+
+    /* When an object in a relationship is removed
+            - if it is binary, the remaining object needs to get added back into the general list
+                and the relationship itself needs to be deleted
+            - if it is n-ary,  the single object needs to be deleted, but the relationship is still valid.
+
+     */
+
+
+    //moves name
+    public void moveName() {
+        this.getEditId().setX(this.getCoordinates().centerX()-60);
+        this.getEditId().setY(this.getCoordinates().centerY()-60);
+    }
+
+
+    // Getters and settrs
     public ShapeObject getObj1() {
         return obj1;
     }
     public ShapeObject getObj2() {
         return obj2;
     }
+    // Sets obj1 and updates coordinates
+    public void setObj1(ShapeObject obj1, Context c) {
+        this.obj1 = obj1;
+        this.setCoordinateX(obj1.getCoordinates().centerX());
+        this.setCoordinateY(obj1.getCoordinates().centerY());
+        if(obj1.getClass() == Entity.class)
+            addObj((Entity)obj1, c);
+    }
+    // sets obj2 and updates coordinates 2
+    public void setObj2(ShapeObject obj2, Context c) {
+        this.obj2 = obj2;
+        this.setCoordinateW(obj2.getCoordinates().centerX());
+        this.setCoordinateH(obj2.getCoordinates().centerY());
+        if(obj2.getClass() == Entity.class)
+            addObj((Entity)obj2, c);
+    }
 
+    public EntitySet getObjs() { return objs;}
     // Is the relationship is between two objects, then add objects to entity set
     public EditText addObj(Entity obj, Context c){
         if(obj == null )
@@ -229,41 +300,14 @@ public class Relationship extends ShapeObject {
 
         return cd.getNum();
     }
-
-    public void moveName() {
-        this.getEditId().setX(this.getCoordinates().centerX()-60);
-        this.getEditId().setY(this.getCoordinates().centerY()-60);
+    public void addAttribute(Attribute curr1) {
+        attrs.add(curr1);
     }
+    public AttributeSet getAttrs() { return attrs;  }
 
-    public void setObj1(ShapeObject obj1, Context c) {
-        this.obj1 = obj1;
-        this.setCoordinateX(obj1.getCoordinates().centerX());
-        this.setCoordinateY(obj1.getCoordinates().centerY());
-        if(obj1.getClass() == Entity.class)
-            addObj((Entity)obj1, c);
-    }
-
-    public void setObj2(ShapeObject obj2, Context c) {
-        this.obj2 = obj2;
-        this.setCoordinateW(obj2.getCoordinates().centerX());
-        this.setCoordinateH(obj2.getCoordinates().centerY());
-        if(obj2.getClass() == Entity.class)
-            addObj((Entity)obj2, c);
-    }
-
-    // Checks for valid objts and updates name coordinates
-    public void update(){
-        if(obj1 != null)
-            this.setCoordinateX(obj1.getCoordinates().centerX());
-          this.setCoordinateY(obj1.getCoordinates().centerY());
-        if(obj2 != null)
-            this.setCoordinateW(obj2.getCoordinates().centerX());
-          this.setCoordinateH(obj2.getCoordinates().centerY());
-        if(this.getEditId() != null) {
-            moveName();
-        }
-    }
     //  For cardinality purposes
+    // gets all cardniality objects for the relationship
+    public ArrayList<Cardinality> getTextObjs() {return conns;}
     // Initiates Edit texts  for name and cardinality and positions them in their proper place
     public void setTexts(Context c){
         // Give name edit
@@ -288,9 +332,10 @@ public class Relationship extends ShapeObject {
         moveName();
     }
 
-
     /* checks that the connection is it is a relationship or a connection
      */
+    // Relationship properties
+    // isRelationship = between 2 entities
     public boolean isRelationship() {
         boolean result = false;
             try {
@@ -305,20 +350,6 @@ public class Relationship extends ShapeObject {
             }
         return  result;
     }
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        dest.writeParcelable(obj1, flags);
-        dest.writeParcelable(obj2, flags);
-        dest.writeTypedObject(attrs,flags);
-        dest.writeTypedObject(objs,flags);
-    }
-
-    public void addAttribute(Attribute curr1) {
-        attrs.add(curr1);
-    }
-
-    // Relationship properties
     public boolean isWeak() {
         boolean result = false;
         for (Entity o : objs.getElements()) {
@@ -330,29 +361,15 @@ public class Relationship extends ShapeObject {
 
         return result;
     }
-    public ArrayList<Cardinality> getTextObjs() {
-        return conns;
-    }
-
-    public EntitySet getObjs() {
-        return objs;
-    }
-
-    public AttributeSet getAttrs() {
-        return attrs;
-    }
-
     public boolean isBinary(){
         return  objs.size() ==2;
     }
-
     public boolean isTernary(){
         return  objs.size() ==3;
     }
     public boolean isNary(){
         return  objs.size() >3;
     }
-
 
     /*  Function: isOneToOne()
         Purpose:
@@ -396,28 +413,12 @@ public class Relationship extends ShapeObject {
     }
 
     @Override
-    public boolean containsObj(ShapeObject curr) {
-        if(obj1.containsObj(curr)) return true;
-        if(obj2.containsObj(curr)) return true;
-        for(Entity e: objs.getElements())
-            if(e.equals(curr)) return true;
-
-        return false;
-
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeParcelable(obj1, flags);
+        dest.writeParcelable(obj2, flags);
+        dest.writeTypedObject(attrs,flags);
+        dest.writeTypedObject(objs,flags);
     }
 
-    /* When an object in a relationship is removed
-            - if it is binary, the remaining object needs to get added back into the general list
-                and the relationship itself needs to be deleted
-            - if it is n-ary,  the single object needs to be deleted, but the relationship is still valid.
-
-     */
-    @Override
-    public void removeObj(ShapeObject curr) {
-        if(objs.contains((Entity) curr)) objs.remove((Entity) curr);
-        for(Cardinality c : conns){
-           if(c.getO().equals(curr))
-               c.setO(null);
-        }
-    }
 }
