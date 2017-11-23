@@ -11,6 +11,7 @@ import cd.com.ermapper.relations.AttributeSet;
 import cd.com.ermapper.relations.EntitySet;
 import cd.com.ermapper.relations.Relation;
 import cd.com.ermapper.shapes.Attribute;
+import cd.com.ermapper.shapes.Cardinality;
 import cd.com.ermapper.shapes.Entity;
 import cd.com.ermapper.shapes.Relationship;
 import cd.com.ermapper.shapes.ShapeObject;
@@ -202,4 +203,11 @@ public class ERDiagram implements Parcelable {
     }
 
 
+    public ArrayList<Cardinality> getAllCardinalities() {
+        ArrayList<Cardinality> c = new ArrayList<>();
+        for(Relationship r: getRelationships()){
+            c.addAll(r.getTextObjs());
+        }
+        return c;
+    }
 }

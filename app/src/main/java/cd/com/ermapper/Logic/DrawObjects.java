@@ -128,11 +128,34 @@ public class DrawObjects extends View {
                             textLayer.removeView(curr.getEditId());
                             if(curr.getClass() == Relationship.class){
                                 for(Cardinality cc :((Relationship)curr).getTextObjs()){
-                                    textLayer.removeView(cc.getNum());
+                                    if(cc.getO().equals(curr))
+                                        textLayer.removeView(cc.getNum());
                                 }
                             }
-                            curr.remove();
-                            d.deleteO(curr);
+                            for(Cardinality c: d.getAllCardinalities()){
+                                if(c.getO() == null)
+                                    textLayer.removeView(c.getNum());
+                            }
+
+                            /////////////////////
+                            for (ShapeObject o : d.getObjects()) {
+                                if (o.containsObj(curr)) {
+                                    d.getObjects().addAll(o.getallobjects());
+                                    if (o.getClass() == Relationship.class) {
+                                        if (((Relationship) o).isBinary())
+                                            textLayer.removeView(o.getEditId());
+                                            for(Cardinality c: ((Relationship) o).getTextObjs()){
+                                                textLayer.removeView(c.getNum());
+                                            }
+                                            d.getObjects().remove(o);
+                                    }
+                                    o.removeObj(curr);
+
+                                }
+                                break;
+                            }
+                            if (d.getObjects().contains(curr)) d.getObjects().remove(curr);
+                            /////////////////////
                             curr = null;
                             invalidate();
                             state = 4; // set state to select to prevent accidental deletions
@@ -203,28 +226,28 @@ public class DrawObjects extends View {
                             // Check Entities
                             if (curr.getClass() == Entity.class && curr1.getClass() == Attribute.class) {  // if curr is an entity, add attribute curr1 to entity
                                 ((Entity) curr).addAttribute((Attribute) curr1);
-                                Log.d("edit",  String.valueOf(curr1.getEditId())+String.valueOf(curr1.getEditId().getOnFocusChangeListener()));
-
-                               // d.deleteO(curr1);
+                                d.deleteO(curr1);
+                                break;
                             } else if (curr1.getClass() == Entity.class && curr.getClass() == Attribute.class) {// if curr1 is an entity, add attriubte curr to entity
                                 ((Entity) curr1).addAttribute((Attribute) curr);
-                               // d.deleteO(curr);
+                                d.deleteO(curr);
+                                break;
                                 // Check Attribute
                             } else if (curr1.getClass() == Attribute.class && curr.getClass() == Attribute.class) { // if attribute is multivalued
                                 //  check for other values already being stored.
                                 if (((Attribute) curr).getValues().isEmpty() && !((Attribute) curr1).getValues().isEmpty()) {
                                     ((Attribute) curr1).addAttribute((Attribute) curr);
                                     d.deleteO(curr);
+                                    break;
                                 } else {
                                     ((Attribute) curr).addAttribute((Attribute) curr1);
                                     d.deleteO(curr1);
+                                    break;
                                 }
                                 //Check Relationship
                             } else if (curr1.getClass() == Attribute.class && curr.getClass() == Relationship.class) { // Add Attributes to a relationship
                                 ((Relationship) curr).addAttribute((Attribute) curr1);
                                 d.deleteO(curr1);
-
-
                             } else if (curr1.getClass() == Relationship.class && curr.getClass() == Attribute.class) { // Add Attributes to a relationship
                                 ((Relationship) curr1).addAttribute((Attribute) curr);
                                 d.deleteO(curr);
@@ -234,7 +257,6 @@ public class DrawObjects extends View {
                                 // adds the edit text to the layer so you can edit cardinality
                                 textLayer.addView(((Relationship) curr).addObj((Entity) curr1, c));
                                 d.deleteO(curr1);
-
                                 break;
                             } else if (curr1.getClass() == Relationship.class && curr.getClass() == Entity.class) {
                                 rCurr.setObj2(curr1, c);
@@ -242,7 +264,7 @@ public class DrawObjects extends View {
                                 d.deleteO(curr);
                                 break;
                             }
-                            // this is a new relationship
+                            // this only gets reached if it is 2 entity objects
                             rCurr.setObj2(curr1, c);
                             rCurr.setObj1(curr, c);
                             rCurr.update();
@@ -262,6 +284,9 @@ public class DrawObjects extends View {
                                 }
                             }
                             d.addObject(rCurr);
+                            d.getObjects().remove(curr);
+                            d.getObjects().remove(curr1);
+                            invalidate();
                             break;
                         }
                     }

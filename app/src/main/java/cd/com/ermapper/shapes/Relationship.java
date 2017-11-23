@@ -25,9 +25,8 @@ import static android.graphics.Color.RED;
 
 public class Relationship extends ShapeObject {
     /*
-        This class represents a connection between two objects represented by a  diamond
-        if a connection is between two entites, defined by its name as well as the two objects
-        It also represents a connection between two objects with just a line
+        This class represents a connection between two or more Entity objects represented by a diamond
+        - > a relationship can have an attribute.
      */
     EntitySet objs;
     ArrayList<Cardinality> conns;
@@ -90,27 +89,33 @@ public class Relationship extends ShapeObject {
         if(this.getObjs().isEmpty()){
             // then it must be an attribute
             canvas.drawLine(this.getObj1().getCoordinates().centerX(), this.getObj1().getCoordinates().centerY(),this.getObj2().getCoordinates().centerX(), this.getObj2().getCoordinates().centerY(),paint);
-           // obj1.drawShape(canvas,paint);
-           // obj2.drawShape(canvas,paint);
+
         }else { // both objects must be entities for it to be weak
             for (Entity o : getObjs().getElements()) {
                 // Draws 2 lines to show total participation of weak entities
-                for(Attribute a: o.getAttr().getElements()){
-                    canvas.drawLine(o.getCoordinates().centerX(), o.getCoordinates().centerY(), a.getCoordinates().centerX(), a.getCoordinates().centerY(),paint);
+                for (Attribute a : o.getAttr().getElements()) {
+                    canvas.drawLine(o.getCoordinates().centerX(), o.getCoordinates().centerY(), a.getCoordinates().centerX(), a.getCoordinates().centerY(), paint);
                 }
 
-                if(o.isWeak()){
+                if (o.isWeak()) {
+                    // Calculates a second line at an offset of 20.
+                    float offset = 20;
+                    float x2 = o.getCoordinates().centerX();
+                    float y2 = o.getCoordinates().centerY();
+                    float L = (float) Math.sqrt((x-x2)*(x-x2)+(y-y2)*(y-y2));
 
-                    canvas.drawLine(x,y+20,o.getCoordinates().centerX(), o.getCoordinates().centerY() +20,paint);
-                    canvas.drawLine(x,y-20,o.getCoordinates().centerX(), o.getCoordinates().centerY() -20,paint);
-
-
-                }else{  /// only draw 1 line
-                    canvas.drawLine(x,y,o.getCoordinates().centerX(), o.getCoordinates().centerY(),paint);
+                    float x1p = x + offset * (y2-y) / L;
+                    float x2p = x2 + offset * (y2-y) / L;
+                    float y1p = y + offset * (x-x2) / L;
+                    float y2p = y2 + offset * (x-x2) / L;
+                    canvas.drawLine(x, y, o.getCoordinates().centerX(), o.getCoordinates().centerY() , paint);
+                    canvas.drawLine(x1p, y1p,x2p,y2p, paint);
+                } else {  /// only draw 1 line
+                    canvas.drawLine(x, y, o.getCoordinates().centerX(), o.getCoordinates().centerY(), paint);
                 }
-                          }
+            }
+            // add the cardinality to the correct position
             for(Cardinality co: conns){
-                // set the coordinates in the middle of the line
                 co.getNum().setX(((x + co.getO().getCoordinates().centerX())/2));
                 co.getNum().setY(((y + co.getO().getCoordinates().centerY())/2));
             }
@@ -188,7 +193,7 @@ public class Relationship extends ShapeObject {
     @Override
     public ArrayList<ShapeObject> getallobjects() {
         ArrayList<ShapeObject> s = new ArrayList<>();
-        s.add(this);
+        //s.add(this);
         for(Attribute a: this.attrs.getElements()) {
             s.addAll(a.getallobjects());
         }
@@ -390,5 +395,29 @@ public class Relationship extends ShapeObject {
         return false;
     }
 
+    @Override
+    public boolean containsObj(ShapeObject curr) {
+        if(obj1.containsObj(curr)) return true;
+        if(obj2.containsObj(curr)) return true;
+        for(Entity e: objs.getElements())
+            if(e.equals(curr)) return true;
 
+        return false;
+
+    }
+
+    /* When an object in a relationship is removed
+            - if it is binary, the remaining object needs to get added back into the general list
+                and the relationship itself needs to be deleted
+            - if it is n-ary,  the single object needs to be deleted, but the relationship is still valid.
+
+     */
+    @Override
+    public void removeObj(ShapeObject curr) {
+        if(objs.contains((Entity) curr)) objs.remove((Entity) curr);
+        for(Cardinality c : conns){
+           if(c.getO().equals(curr))
+               c.setO(null);
+        }
+    }
 }

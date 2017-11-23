@@ -79,4 +79,8 @@ public class Cardinality implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeParcelable(object, i);
     }
+
+    public void setO(ShapeObject o) {
+        this.object = o;
+    }
 }

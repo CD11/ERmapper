@@ -179,12 +179,28 @@ public class Attribute extends ShapeObject {
     public void remove() {
        values.clear();
     }
+
+    @Override
+    public boolean containsObj(ShapeObject curr) {
+        for(Attribute a: values)
+            if(a.equals(curr)) return true;
+        return false;
+
+    }
+
+    @Override
+    public void removeObj(ShapeObject curr) {
+        if(values.contains(curr)) values.remove(curr);
+    }
+
+
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(this.getName());
         parcel.writeByte((byte) (primary ? 1 : 0));
         parcel.writeTypedList(values);
     }
+
 
 
 

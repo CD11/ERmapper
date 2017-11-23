@@ -8,6 +8,8 @@ import android.util.Log;
 import android.widget.EditText;
 
 
+import org.w3c.dom.Attr;
+
 import java.util.ArrayList;
 
 import cd.com.ermapper.relations.AttributeSet;
@@ -145,7 +147,6 @@ public class Entity extends ShapeObject {
     //  Add an attribute to the entity
     public void addAttribute(Attribute a) {
         this.attr.add(a);
-        Log.d("edit", String.valueOf(a.getEditId())+" "  + String.valueOf(a.getEditId().getOnFocusChangeListener()));
     }
 
     /*
@@ -228,6 +229,25 @@ public class Entity extends ShapeObject {
         parcel.writeTypedObject(attr, i);
         parcel.writeByte((byte) (isWeak() ? 1 : 0));
         parcel.writeTypedList(weak);
+    }
+
+    @Override
+    public boolean containsObj(ShapeObject curr) {
+        for(Attribute a: attr.getElements())
+            if(a.equals(curr)) return true;
+        for(Entity e :weak)
+            if(e.equals(curr))return true;
+        return false;
+
+    }
+
+    @Override
+    public void removeObj(ShapeObject curr) {
+        if(curr.getClass() == Attribute.class)
+            if(attr.contains((Attribute) curr)) attr.remove((Attribute) curr);
+        if(curr.getClass() == Entity.class)
+            if(weak.contains(curr)) weak.remove(curr);
+
     }
 
 
