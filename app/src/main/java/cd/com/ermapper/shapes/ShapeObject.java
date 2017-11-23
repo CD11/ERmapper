@@ -23,13 +23,13 @@ public abstract class ShapeObject implements Parcelable {
 
     // Constructors
     public ShapeObject(EditText eName, String name, float x, float y, float w, float h){
-        this.name = "Name";
+        this.name = name;
         this.eName = eName;
         this.coordinates = new Coordinates(x,y,w,h);
 
     }
     public ShapeObject(EditText eName, String name, float x, float y){
-        this.name = "Name";
+        this.name = name;
         this.eName = eName;
         this.coordinates = new Coordinates(x,y,0,0);
 

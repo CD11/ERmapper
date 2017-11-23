@@ -65,7 +65,7 @@ public class FDNormalization extends AppCompatActivity {
         EntitySet entities = diagram.getBinaryEntities(); // simplifies all N-ary Relationships
         ArrayList<Relationship> relationships = diagram.getRelationshipsObjs();
         RelationSchema relationSchema = new RelationSchema(entities, relationships);
-
+        relationSchema.removalAllTemp();
         // get the ER diagram
         functionalDependencies.addAll(findDependencies(relationSchema)); // get all functional dependencies
 
@@ -148,7 +148,6 @@ public class FDNormalization extends AppCompatActivity {
         DependencySet FDs = new DependencySet();
         TextView tv  = (TextView) findViewById(R.id.results);
         tv.setMovementMethod(new ScrollingMovementMethod());
-
 
         //Gather all the functional dependencies
         for(FunctionalDependency fd : functionalDependencies.getElements()){FDs.add(fd);}
@@ -330,7 +329,6 @@ public class FDNormalization extends AppCompatActivity {
 
 
         public void createDB(View v){
-
             DatabaseHandler db = new DatabaseHandler(this.getBaseContext(), diagram.getName(), null, 1, relationSchema.getRelations());
             AlertDialog ad = new AlertDialog.Builder(this).create();
             ad.setTitle("DB Creation");

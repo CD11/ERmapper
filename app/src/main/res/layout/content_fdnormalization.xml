@@ -3,105 +3,109 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/baseLayout"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     tools:context=".Logic.FDNormalization"
     tools:showIn="@layout/activity_fdnormalization">
 
-    <TextView
-        android:id="@+id/AttributesHeader"
-        android:layout_width="215dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="11dp"
-        android:ems="10"
-        android:inputType="none"
-        android:text="@string/attributes"
-        android:textSize="24sp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ListView
-        android:id="@+id/AttributeList"
-        android:layout_width="213dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="3dp"
-        android:headerDividersEnabled="false"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/AttributesHeader" />
-
-    <TextView
-        android:id="@+id/FDHeader"
-        android:layout_width="400dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="50dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="50dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:text="@string/functional_dependencies"
-        android:textSize="24sp"
-        app:layout_constraintLeft_toRightOf="@+id/AttributesHeader"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/ResultsHeader"
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:ems="10"
-        android:inputType="none"
-        android:text="@string/results"
-        android:textSize="24sp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/AttributeList" />
-
-    <ListView
-        android:id="@+id/FDList"
-        android:layout_width="450dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_height="727dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
+        android:layout_weight=".5"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toRightOf="@+id/AttributeList"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/FDHeader"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:id="@+id/results"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="7dp"
-        android:scrollHorizontally="true"
-        android:scrollbars="vertical"
-        android:text="TextView"
-        android:textSize="18sp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ResultsHeader" />
+
+        <LinearLayout
+            android:id="@+id/Headers"
+            android:layout_width="match_parent"
+            android:layout_height="53dp"
+            android:layout_weight="0"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/AttributesHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:ems="10"
+                android:text="@string/attributes"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/FDHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:ems="10"
+                android:text="@string/functional_dependencies"
+                android:textSize="24sp" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/Lists"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:baselineAligned="false"
+            android:gravity="top|center_horizontal"
+            android:orientation="horizontal"
+            tools:layout_editor_absoluteX="854dp">
+
+            <ListView
+                android:id="@+id/AttributeList"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight=".5" />
+
+            <ListView
+                android:id="@+id/FDList"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight=".5" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/ResultsHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:ems="10"
+            android:layout_margin="16dp"
+            android:text="@string/results"
+            android:textSize="24sp" />
+
+
+        <TextView
+            android:id="@+id/results"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:scrollHorizontally="true"
+            android:scrollbars="vertical"
+            android:text="TextView"
+            android:textSize="18sp"
+
+            app:layout_constraintTop_toBottomOf="@+id/ResultsHeader" />
+
+    </LinearLayout>
 
     <Button
         android:id="@+id/db"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:onClick="createDB"
         android:text="@string/create_database"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginRight="8dp" />
 
 </android.support.constraint.ConstraintLayout>

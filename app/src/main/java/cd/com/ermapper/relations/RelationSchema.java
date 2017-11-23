@@ -170,4 +170,12 @@ public class RelationSchema {
             }
         }
     }
+
+
+    public void removalAllTemp(){
+        for(Relation r: relations) {
+            r.getPrimaryKey().removeTemp();
+            r.getAttributes().removeTemp();
+        }
+    }
 }

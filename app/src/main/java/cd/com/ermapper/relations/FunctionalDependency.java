@@ -42,8 +42,6 @@ public class FunctionalDependency implements Parcelable{
             lhs = new AttributeSet();
             rhs = new AttributeSet();
             lhs.addAll(aLHS);
-
-
             rhs.addAll(aRHS);
         }
     }
@@ -89,6 +87,7 @@ public class FunctionalDependency implements Parcelable{
         if(!lhs.equals(anFD.lhs)) return false;
         return rhs.equals(anFD.rhs);
     }
+
 
     public boolean isTrivial(){
         //Answer whether this functional dependency is trivial.

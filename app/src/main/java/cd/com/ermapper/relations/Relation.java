@@ -48,7 +48,7 @@ public class Relation implements Parcelable{
         temp.addAll(obj2.foreignAttrs());
         attributes.addAll(temp);
         for(Attribute a: temp.getElements()){
-            if(a.isForeign() ||a.isPrimary() && a.getName() != "-1"){
+            if(a.isForeign()||a.isPrimary()){
                 primaryKey.add(a);
             }
         }

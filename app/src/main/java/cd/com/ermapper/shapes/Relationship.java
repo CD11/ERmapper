@@ -99,7 +99,7 @@ public class Relationship extends ShapeObject {
                 // Draws 2 lines to show total participation of weak entities
                 for (Attribute a : o.getAttr().getElements()) {
                     o.drawLines(canvas,paint);
-                    //canvas.drawLine(o.getCoordinates().centerX(), o.getCoordinates().centerY(), a.getCoordinates().centerX(), a.getCoordinates().centerY(), paint);
+                    canvas.drawLine(o.getCoordinates().centerX(), o.getCoordinates().centerY(), a.getCoordinates().centerX(), a.getCoordinates().centerY(), paint);
                 }
 
                 if (o.isWeak()) {

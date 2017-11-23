@@ -61,7 +61,7 @@ public class AttributeSet implements Parcelable {
     public void add(Attribute anAttribute) {
         //Add anAttribute without duplication
         if(anAttribute == null) return;
-        for(Attribute a : elements) if(a.equals(anAttribute)) return; //don't add duplicates
+        for(Attribute a : elements) if(a.getName().equals(anAttribute.getName()) || a.equals(anAttribute)) return; //don't add duplicates
         elements.add(anAttribute);
     }
     public void addAll(AttributeSet anAttributeSet) {
@@ -87,7 +87,7 @@ public class AttributeSet implements Parcelable {
     public boolean contains(Attribute anAttribute){
         //answer whether this contains an Attribute equal to anAttribute
         for(Attribute a : elements)
-            if (a.getName().equals(anAttribute.getName()) || a.equals(anAttribute)) return true;
+            if (a.getName().equals(anAttribute.getName()) || a.equals(anAttribute) ) return true;
 
         return false;
     }
@@ -105,6 +105,14 @@ public class AttributeSet implements Parcelable {
         if(anAttributeSet == null) return false;
         if(!anAttributeSet.containsAll(this)) return false;
         return this.containsAll(anAttributeSet);
+    }
+
+    public void removeTemp() {
+        int size = elements.size();
+        for(int i = size-1; i >= 0; i--) {
+            if (elements.get(i).getName().equals("-1"))
+                elements.remove(i);
+        }
     }
 
     public AttributeSet closure(DependencySet F){
@@ -279,4 +287,6 @@ public class AttributeSet implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeTypedList(elements);
     }
+
+
 }

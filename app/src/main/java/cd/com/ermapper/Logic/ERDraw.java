@@ -86,7 +86,8 @@ public class ERDraw extends AppCompatActivity {
             Log.d("DiagramErrors ", " diagram is Null");
             attribute = null;
         }else{
-            attribute= new Attribute(et, "object"+String.valueOf(diagram.getDrawnObjects().size()), 50, 50);
+            String name = "Object" + diagram.getDrawnObjects().size();
+            attribute= new Attribute(et, name, 50, 50);
         if(attribute != null) {
             diagram.addObject(attribute);
         }
