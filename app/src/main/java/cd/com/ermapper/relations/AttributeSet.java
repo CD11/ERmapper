@@ -6,6 +6,7 @@ package cd.com.ermapper.relations;
  */
         import android.os.Parcel;
         import android.os.Parcelable;
+        import android.util.Log;
 
         import java.util.ArrayList;
 
@@ -86,17 +87,16 @@ public class AttributeSet implements Parcelable {
     public boolean contains(Attribute anAttribute){
         //answer whether this contains an Attribute equal to anAttribute
         for(Attribute a : elements)
-            if(a.equals(anAttribute)) return true;
+            if (a.getName().equals(anAttribute.getName()) || a.equals(anAttribute)) return true;
+
         return false;
     }
 
     public boolean containsAll(AttributeSet anAttributeSet){
         //answer whether this contains all attributes in anAttributeSet
         if(anAttributeSet.isEmpty()) return true;
-
         for(Attribute a : anAttributeSet.elements)
             if(!this.contains(a)) return false;
-
         return true;
     }
 
