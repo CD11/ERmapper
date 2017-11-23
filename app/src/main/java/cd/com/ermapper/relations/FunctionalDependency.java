@@ -42,8 +42,6 @@ public class FunctionalDependency implements Parcelable{
             lhs = new AttributeSet();
             rhs = new AttributeSet();
             lhs.addAll(aLHS);
-
-
             rhs.addAll(aRHS);
         }
     }

@@ -5,11 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 import java.util.ArrayList;
-import java.util.concurrent.locks.ReentrantLock;
 
-import cd.com.ermapper.relations.AttributeSet;
-import cd.com.ermapper.relations.EntitySet;
-import cd.com.ermapper.relations.Relation;
 import cd.com.ermapper.shapes.Attribute;
 import cd.com.ermapper.shapes.Entity;
 import cd.com.ermapper.shapes.Relationship;
@@ -28,9 +24,14 @@ public class ERDiagram implements Parcelable {
      */
     private String name;
     private ArrayList<ShapeObject> objects;   // We hold a list of all objects because we do not know what objects are connect right away
-    private EntitySet entityObjs;     // upon time to normalize we can pass all entity objs with their attributes to the FDNormalization.
-    private ArrayList<Relationship> relationshipsobjs;
+    private ArrayList<Entity> entityObjs;     // upon time to normalize we can pass all entity objs with their attributes to the FDNormalization.
 
+
+
+    public ERDiagram(){
+        this.name = "erDiagram";
+        this.objects = new ArrayList<>();
+    }
 
     public ERDiagram(String name){
         this.name = name;
@@ -41,12 +42,9 @@ public class ERDiagram implements Parcelable {
 
     protected ERDiagram(Parcel in) {
         objects = new ArrayList<>();
-        entityObjs= new EntitySet();
-        relationshipsobjs = new ArrayList<>();
+        entityObjs= new ArrayList<>();
         name = in.readString();
-        entityObjs = in.readTypedObject(EntitySet.CREATOR);
-        relationshipsobjs = in.createTypedArrayList(Relationship.CREATOR);
-
+        entityObjs = in.createTypedArrayList(Entity.CREATOR);
     }
 
     public static final Creator<ERDiagram> CREATOR = new Creator<ERDiagram>() {
@@ -76,117 +74,117 @@ public class ERDiagram implements Parcelable {
 
 
     public void deleteO(ShapeObject i) {
+        String s = i.getClass().toString();
+
+        switch(s){
+            case"Entity":
+
+                for(Attribute a:((Entity)i).getAttr().getElements()){
+                    ((Entity)i).getAttr().getElements().remove(a);
+                }
+                // check relationships
+                for(Relationship r: this.getRelationships()){
+                    if(r.getObj1()== i || r.getObj2()== i){
+                        this.getRelationships().remove(r);
+                    }
+                }
+                break;
+            case"Attribute":
+
+                for(Entity e:this.getEntities()){
+                    if(e.getAttr().getElements().contains(i)){
+                        e.getAttr().getElements().remove(i);
+                    }
+
+                }
+                // check relationships
+                for(Relationship r: this.getRelationships()){
+                    if(r.getObj1()== i || r.getObj2()== i){
+                        this.getRelationships().remove(r);
+                    }
+                }
+                break;
+
+            case"Relationship":
+                // check relationships
+                for(Relationship r: this.getRelationships()){
+                    if(r.getObj1()== i || r.getObj2()== i){
+                        this.getRelationships().remove(r);
+                    }
+                }
+                break;
+
+        }
+
         objects.remove(i);
     }
 
-    // searches through each element for any sub attributes
-    public ArrayList<ShapeObject> getDrawnObjects() {
-        ArrayList s = new ArrayList<>();
-        s.addAll(objects);
+
+     // Get all entity shape objects
+    public ArrayList<Entity> getEntities() {
+        ArrayList<Entity> e = new ArrayList<>();
+
         for(ShapeObject o : objects){
-            s.addAll(o.getallobjects());
-        }
-        return s;
-    }
-    // Get all entity shape objects
-    public EntitySet getAllEntities() {
-        EntitySet e = new EntitySet();
-        for(ShapeObject o : objects){
-            // If entity then add the entity along with any weak entites
             if(o.getClass() == Entity.class){
                 e.add((Entity)o);
-                e.addAll(((Entity) o).getWeak());
-            }
-            // If Relationship, check for any entities in the relationship
-            if(o.getClass() == Relationship.class){
-                for(Entity sub: ((Relationship)o).getObjs().getElements()){
-                    e.add(sub);
-                    e.addAll(sub.getWeak());
-                }
             }
         }
+
+        for(Relationship r: getRelationships()){
+
+        }
+
         return e;
     }
+    // get all attribute shapeobjects
+    public ArrayList<Attribute> getAttributes() {
+        ArrayList<Attribute> a = new ArrayList<>();
 
+        for(ShapeObject o : objects){
+            if(o.getClass() == Attribute.class){
+                a.add((Attribute) o);
+            }
+        }
+
+        return a;
+    }
     // get all relationship shapeobjects
     public ArrayList<Relationship> getRelationships() {
         ArrayList<Relationship> r = new ArrayList<>();
+
         for(ShapeObject o : objects){
-            if(o.getClass() == Relationship.class && !r.contains(o)){
+            if(o.getClass() == Relationship.class){
                 r.add((Relationship) o);
+
             }
         }
+
         return r;
     }
-    // get all relationship shapeobjects
-    public ArrayList<Relationship> getRelationshipsObjs() {
-        return relationshipsobjs;
-    }
+    public ArrayList<Entity> getEntityObj() {
+        ArrayList<Entity> es = new ArrayList<>();
 
-
-
-    /* Funciton: getBinaryEntities()
-       Purpose:
-            -> Searches all Diagram relationships, if they are not Binary converts them to binary
-            -> Also removes any  redundant entites ( weak entites are stored in 2 places
-     */
-    public EntitySet getBinaryEntities() {
-        EntitySet es = new EntitySet();
-        ArrayList<Relationship> tempR = new ArrayList<>();
-        for(Relationship r: relationshipsobjs){
-             /* If Relationship is ternary
-                1. replace the relationship between the 3 entities with a new entity E and
-                create relationships E -> E1, E->E2, E->E3
-                2. Give E a temporary primary key
-                3. add any attributes of R to E
-            */
-
-             /////////////////////// Converts all N-ary relationships to Binary
-            if(r.isTernary()){
-                Entity newE = new Entity("-1");
-                Relationship EA = new Relationship("-1", newE, (Entity)r.getObjs().getElements().get(0));
-                Relationship EB = new Relationship("-1", newE, (Entity)r.getObjs().getElements().get(1));
-                Relationship EC = new Relationship("-1", newE, (Entity)r.getObjs().getElements().get(2));
-                Attribute temp = new Attribute("-1");
-                Attribute temp2 = new Attribute("-1");
-                temp.setPrimary();
-                newE.addAttribute(temp2);
-                newE.addAttribute(temp);
-                newE.getAttr().addAll(((Entity)r.getObjs().getElements().get(0)).foreignAttrs());
-                newE.getAttr().addAll(((Entity)r.getObjs().getElements().get(1)).foreignAttrs());
-                newE.getAttr().addAll(((Entity)r.getObjs().getElements().get(2)).foreignAttrs());
-                newE.getAttr().addAll(r.getAttrs());
-                es.add(newE);
-                addObject(EA);
-                addObject(EB);
-                addObject(EC);
-                tempR.add(EA);
-                tempR.add(EB);
-                tempR.add(EC);
-                r = null;  // this relaitonship isn't needed
-            }
-
-        }
-        relationshipsobjs.addAll(tempR);
-
-
-        for(Relationship r: getRelationships()){
-            // If Relationship is binary add both entity objects
-            if(r.isBinary()){
-                es.add(((Entity)r.getObj1()));
-                es.add(((Entity)r.getObj2()));
-            }
-        }
-
-
-        ////////////////////////// Step 2 in normalization
-        for(Entity e: entityObjs.getElements()) {
+        for(Entity e: entityObjs) {
             if(!e.isWeak()){
                 es.add(e);
             }
 
         }
         return es;
+    }
+
+    /* Sorts objects so that all relationship objects are first,
+        this allows for them to be drawn first onto the canvas,
+        allowing unwanted lines to be covered.
+     */
+
+    public ArrayList<ShapeObject> getSortedObjects() {
+        ArrayList<ShapeObject> sortedObjects = new ArrayList<>();
+
+        sortedObjects.addAll(this.getRelationships());
+        sortedObjects.addAll(this.getEntities());
+        sortedObjects.addAll(this.getAttributes());
+        return sortedObjects;
     }
 
     @Override
@@ -197,9 +195,11 @@ public class ERDiagram implements Parcelable {
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(name);
-        parcel.writeTypedObject(getAllEntities(),i);
-        parcel.writeTypedList(getRelationships());
+        parcel.writeTypedList(getEntities());
     }
 
 
+    public void removeO(ShapeObject curr) {
+        objects.remove(curr);
+    }
 }

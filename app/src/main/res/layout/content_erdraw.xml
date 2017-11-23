@@ -2,6 +2,7 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/diagramLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -9,54 +10,25 @@
     tools:showIn="@layout/activity_erdraw">
 
 
-    <LinearLayout
-        android:id="@+id/diagramLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-
-    </LinearLayout>
-
-    <RelativeLayout
-        android:id="@+id/textLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/diagramLayout"
-        android:layout_margin="8dp"
-        android:background="@android:color/transparent"
-        android:orientation="vertical"
-        android:visibility="visible"
-        app:layout_constraintBottom_toTopOf="@+id/delete"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/diagramLayout"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
-
-    </RelativeLayout>
-
     <Button
         android:id="@+id/Select"
-        android:layout_width="86dp"
+        android:layout_width="165dp"
         android:layout_height="49dp"
         android:layout_marginBottom="16dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:onClick="SelectObject"
         android:text="Select "
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/relationship"
-        android:layout_marginLeft="8dp" />
+        app:layout_constraintLeft_toRightOf="@+id/relationship" />
 
     <Button
         android:id="@+id/entity"
-        android:layout_width="wrap_content"
+        android:layout_width="165dp"
         android:layout_height="49dp"
         android:layout_marginBottom="16dp"
         android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
         android:onClick="addEntity"
         android:text="Entity "
         app:layout_constraintBottom_toBottomOf="parent"
@@ -64,10 +36,11 @@
 
     <Button
         android:id="@+id/relationship"
-        android:layout_width="wrap_content"
+        android:layout_width="165dp"
         android:layout_height="49dp"
         android:layout_marginBottom="16dp"
         android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
         android:onClick="addRelationship"
         android:text="Relationships "
         app:layout_constraintBottom_toBottomOf="parent"
@@ -75,50 +48,74 @@
 
     <Button
         android:id="@+id/attribute"
-        android:layout_width="wrap_content"
+        android:layout_width="165dp"
         android:layout_height="49dp"
         android:layout_marginBottom="16dp"
         android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
         android:onClick="addAttribute"
         android:text="Attribute "
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@+id/entity" />
 
     <Button
-        android:id="@+id/delete"
-        android:layout_width="88dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginBottom="16dp"
-        android:layout_marginStart="8dp"
-        android:onClick="delete"
-        android:text="Delete"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/Select"
-        android:layout_marginLeft="8dp" />
-
-    <Button
         android:id="@+id/Normalize"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:onClick="Normalize"
         android:text="Normalize"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintLeft_toRightOf="@+id/Select"
         app:layout_constraintRight_toRightOf="parent" />
-    <Button
-        android:id="@+id/Save"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginRight="8dp"
-        android:onClick="SavetoXml"
-        android:text="Save"
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        tools:layout_editor_absoluteX="8dp"
+        tools:layout_editor_absoluteY="8dp"></LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/textLayout"
+        android:layout_width="159dp"
+        android:layout_height="310dp"
+        android:layout_margin="8dp"
+        android:layout_marginBottom="100dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="613dp"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/transparent"
+        android:elevation="0dp"
+        android:orientation="vertical"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/Normalize" />
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
+
+        <RadioGroup
+            android:id="@+id/RelationshipMenu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="825dp"
+            android:layout_marginStart="825dp">
+
+            <RadioButton
+                android:id="@+id/one-to-one"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:checked="false"
+                android:text="one to one" />
+        </RadioGroup>
+    </RelativeLayout>
 
 
 </android.support.constraint.ConstraintLayout>

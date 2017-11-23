@@ -2,12 +2,8 @@ package cd.com.ermapper.relations;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
-
-import org.w3c.dom.Attr;
 
 import cd.com.ermapper.shapes.Attribute;
-import cd.com.ermapper.shapes.Entity;
 
 /**
  * Created by ldnel_000 on 2015-11-04.
@@ -26,7 +22,6 @@ public class Relation implements Parcelable{
     // constructors
     public Relation(AttributeSet theAttributes, AttributeSet key, String name) {
         this.name = name;
-        Log.d("name", String.valueOf(theAttributes.containsAll(key)));
         if (theAttributes == null)
             throw new NullPointerException(name + " attribute set is null");
         if (theAttributes.isEmpty())
@@ -41,19 +36,6 @@ public class Relation implements Parcelable{
             primaryKey.addAll(key);
         }
     }
-
-    public Relation(Entity obj1, Entity obj2) {
-        AttributeSet temp = new AttributeSet();
-        temp.addAll(obj1.foreignAttrs());
-        temp.addAll(obj2.foreignAttrs());
-        attributes.addAll(temp);
-        for(Attribute a: temp.getElements()){
-            if(a.isForeign() ||a.isPrimary() && a.getName() != "-1"){
-                primaryKey.add(a);
-            }
-        }
-    }
-
 
     public Relation(FunctionalDependency FD) {
 
@@ -72,6 +54,7 @@ public class Relation implements Parcelable{
 
         primaryKey = new AttributeSet();
         primaryKey.addAll(FD.getLHS());
+
         attributes = new AttributeSet();
         attributes.addAll(FD.getLHS());
         attributes.addAll(FD.getRHS());
@@ -108,14 +91,14 @@ public class Relation implements Parcelable{
         }
     };
 
-
     public AttributeSet getAttributes() {
         return attributes;
     }
+
     public AttributeSet getPrimaryKey() {
         return primaryKey;
     }
-    public String getName(){return  name;}
+
     public boolean containsAll(Relation r) {
         return attributes.containsAll(r.attributes);
     }

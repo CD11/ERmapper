@@ -1,12 +1,11 @@
 package cd.com.ermapper.shapes;
 
-import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 import android.widget.EditText;
 
-import java.util.ArrayList;
+
 
 /**
  * Created by CD on 9/15/2017.
@@ -47,7 +46,6 @@ public abstract class ShapeObject implements Parcelable {
     public String toString(){ return name;}
 
     // getters and setters
-
     public Coordinates getCoordinates() {
         return coordinates;
     }
@@ -57,32 +55,28 @@ public abstract class ShapeObject implements Parcelable {
     }
 
     public void setName(String name) {
+        Log.d("Changing name", this.name+" - >" + name );
         this.name = name;
 
-    }
-    public String getName() {
-        return name;
     }
 
     public void setCoordinateX(float coordinateX) {
         this.coordinates.x = coordinateX;
     }
+
     public void setCoordinateY(float coordinateY) {
         this.coordinates.y = coordinateY;
     }
+
+
     public void setCoordinateW(float coordinateW) {
         this.coordinates.width = coordinateW;
     }
+
     public void setCoordinateH(float coordinateH) {
         this.coordinates.height = coordinateH;
     }
-    public boolean contains(float v, float v1) {
-        return  this.getCoordinates().contains(v,v1);
-    }
 
-    public void setEditText(EditText e){
-        eName = e;
-    }
 
     public void moveName() {
         float w = getEditId().getWidth();
@@ -91,27 +85,29 @@ public abstract class ShapeObject implements Parcelable {
             w = 100;
             h = 100;
         }
-        eName.setX(this.getCoordinates().centerX()- w/2);
-        eName.setY(this.getCoordinates().centerY()-h/2);
+        eName.setX(this.getCoordinates().centerX() - w/2);
+        eName.setY(this.getCoordinates().centerY() - h/2);
+        Log.d("newPos", eName.getX() +" " + eName.getY());
     }
 
 
-
-    public abstract void remove();
-    public abstract void drawLines(Canvas c, Paint p);
-    public abstract void drawShape(Canvas c, Paint p);
-    public abstract ArrayList<ShapeObject> getallobjects();
-
+    public String getName() {
+        return name;
+    }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.name);
-    }
 
+
+    }
     @Override
     public int describeContents() {
         return 0;
     }
 
 
+    public boolean contains(float v, float v1) {
+      return  this.getCoordinates().contains(v,v1);
+    }
 }

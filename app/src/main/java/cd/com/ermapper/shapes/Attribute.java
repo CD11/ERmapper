@@ -1,13 +1,12 @@
 package cd.com.ermapper.shapes;
 
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.os.Parcel;
 import android.widget.EditText;
+
 import java.util.ArrayList;
+
 import cd.com.ermapper.relations.AttributeSet;
 import cd.com.ermapper.relations.FunctionalDependency;
 
@@ -20,7 +19,6 @@ public class Attribute extends ShapeObject {
     public static final float width  =  80;
     public static final float height   = 150;
     private boolean primary;
-    private boolean foreign;
     private ArrayList<Attribute> values;   // this is an arraylist and not an attribute set because it becomes circluar if it is an attributeset
 
 
@@ -30,6 +28,7 @@ public class Attribute extends ShapeObject {
         values = new ArrayList<>();
         setCoordinateX(x);
         setCoordinateY(y);
+        moveName();
     }
 
     public Attribute(String anAttributeName)
@@ -38,14 +37,6 @@ public class Attribute extends ShapeObject {
         primary = false;
         values = new ArrayList<>();
     }
-    public Attribute(EditText editId, Attribute o) {
-        super(o.getEditId(),o.getName(), o.getCoordinates().getX(),o.getCoordinates().getY());
-        primary = false;
-        values = new ArrayList<>();
-        setCoordinateX(o.getCoordinates().getX());
-        setCoordinateY(o.getCoordinates().getY());
-    }
-
 
     public Attribute(Parcel in) {
         super(in);
@@ -66,34 +57,7 @@ public class Attribute extends ShapeObject {
     };
 
 
-    @Override
-    public ArrayList<ShapeObject> getallobjects() {
-        ArrayList<ShapeObject>s = new ArrayList<>();
-        s.add(this);
-        for(Attribute a: this.getValuesSet().getElements())
-            s.add(a);
 
-        return s;
-    }
-
-    // Draw the lines to each Entity in the relationship
-    public void drawLines(Canvas canvas, Paint paint){
-        Coordinates c =  this.getCoordinates();
-        // Draw a line to each attribute
-        for(Attribute o: this.getValuesSet().getElements()) {
-            canvas.drawLine(c.centerX(), c.centerY(), o.getCoordinates().centerX(), o.getCoordinates().centerY(), paint);
-        }
-    }
-    // Draw the shape to each Entity in the relationship
-    public void drawShape(Canvas canvas, Paint paint){
-        Coordinates c =  this.getCoordinates();
-        // Draw a line to each attribute
-        for(Attribute o: this.getValuesSet().getElements()) {
-             canvas.drawOval(o.getCoordinates().getX(), o.getCoordinates().getY(),o.getCoordinates().getWidth(), o.getCoordinates().getHeight(),paint );
-        }
-        // draw
-        canvas.drawOval(c.getX(),c.getY(),c.getWidth(),c.getHeight(),paint);
-    }
     // Getters and Setters
 
     public String toString(){ return this.getName()+" ";}
@@ -115,39 +79,16 @@ public class Attribute extends ShapeObject {
     public void setPrimary() {
         if (primary == false){
             primary = true;
-            if(getEditId() != null)
-             getEditId().getBackground().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
+            getEditId().getBackground().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
         }else {
-            if(getEditId() != null)
             getEditId().getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
             primary = false;
-        }
-    }
-
-    public void setPrimary(boolean b) {
-        primary = b;
-        if(getEditId() != null) {
-            if (b == true)
-                getEditId().getBackground().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
-            else
-                getEditId().getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
         }
     }
     public boolean isPrimary(){
         return primary;
     }
 
-    public void setForeign(Boolean b)
-    {
-        foreign = b;
-        if(getEditId()!= null) {
-            if (b == true)
-                getEditId().getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
-            else
-                getEditId().getBackground().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
-        }
-    }
-    public boolean isForeign() {return foreign;}
 
 
     public void addAttribute(Attribute curr) {
@@ -173,19 +114,12 @@ public class Attribute extends ShapeObject {
         }
         return as;
     }
-
-
-    @Override
-    public void remove() {
-       values.clear();
-    }
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(this.getName());
         parcel.writeByte((byte) (primary ? 1 : 0));
         parcel.writeTypedList(values);
     }
-
 
 
 
