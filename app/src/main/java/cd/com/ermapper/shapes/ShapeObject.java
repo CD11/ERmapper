@@ -114,7 +114,4 @@ public abstract class ShapeObject implements Parcelable {
     }
 
 
-    public abstract boolean containsObj(ShapeObject curr);
-
-    public abstract void removeObj(ShapeObject curr);
 }
