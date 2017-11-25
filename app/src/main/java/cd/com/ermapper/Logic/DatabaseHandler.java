@@ -10,8 +10,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
 
-import cd.com.ermapper.relations.Relation;
-import cd.com.ermapper.shapes.Attribute;
+import cd.com.ermapper.Components.Relation;
+import cd.com.ermapper.Components.Attribute;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 

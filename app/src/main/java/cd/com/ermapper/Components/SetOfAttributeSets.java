@@ -1,4 +1,4 @@
-package cd.com.ermapper.relations;
+package cd.com.ermapper.Components;
 
 
 /**
@@ -108,15 +108,6 @@ public class SetOfAttributeSets implements Parcelable
     }
 
 
-
-
-    public void printToSystemOut(){
-        //System.out.println("SetOfAttributeSets:");
-        //System.out.println("--------------");
-        for(int i=0; i<elements.size(); i++){
-            System.out.println(elements.get(i));
-        }
-    }
     public String toString(){
         String returnString = "";
         for(int i=0; i<elements.size(); i++){

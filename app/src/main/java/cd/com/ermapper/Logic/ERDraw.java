@@ -19,10 +19,10 @@ import android.widget.RelativeLayout;
 import java.io.IOException;
 
 import cd.com.ermapper.R;
-import cd.com.ermapper.shapes.Attribute;
-import cd.com.ermapper.shapes.Entity;
-import cd.com.ermapper.shapes.Relationship;
-import cd.com.ermapper.shapes.ShapeObject;
+import cd.com.ermapper.Components.Attribute;
+import cd.com.ermapper.Components.Entity;
+import cd.com.ermapper.Components.Relationship;
+import cd.com.ermapper.Components.ShapeObject;
 
 import static android.graphics.Color.BLACK;
 
@@ -32,6 +32,7 @@ public class ERDraw extends AppCompatActivity {
     public DrawObjects object;
     public LinearLayout layout;
     public RelativeLayout textLayer;
+    public int count =0;
 
 
     // This creates the ERDraw activity
@@ -86,7 +87,8 @@ public class ERDraw extends AppCompatActivity {
             Log.d("DiagramErrors ", " diagram is Null");
             attribute = null;
         }else{
-            String name = "Object" + diagram.getDrawnObjects().size();
+            count++;
+            String name = "Object" + count;
             attribute= new Attribute(et, name, 50, 50);
         if(attribute != null) {
             diagram.addObject(attribute);

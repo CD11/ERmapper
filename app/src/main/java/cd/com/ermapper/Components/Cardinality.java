@@ -1,17 +1,13 @@
-package cd.com.ermapper.shapes;
+package cd.com.ermapper.Components;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.graphics.drawable.shapes.Shape;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-
-import java.util.ArrayList;
 
 import static android.graphics.Color.BLACK;
 

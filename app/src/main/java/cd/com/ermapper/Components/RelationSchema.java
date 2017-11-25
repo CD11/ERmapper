@@ -1,15 +1,8 @@
-package cd.com.ermapper.relations;
+package cd.com.ermapper.Components;
 
 import android.util.Log;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-
-import cd.com.ermapper.Logic.ERDiagram;
-import cd.com.ermapper.R;
-import cd.com.ermapper.shapes.Attribute;
-import cd.com.ermapper.shapes.Entity;
-import cd.com.ermapper.shapes.Relationship;
 
 /**
  * Created by CD on 11/22/2017.
@@ -21,10 +14,12 @@ public class RelationSchema {
      */
     // variables
     ArrayList<Relation>  relations;
+    DependencySet dependencies;
 
     // Constructors
     public RelationSchema(){
         relations = new ArrayList<>();
+        dependencies = new DependencySet();
     }
     public void add(Relation relation){
         if(!relations.contains(relation))
@@ -35,12 +30,14 @@ public class RelationSchema {
             add(r);
     }
     public ArrayList<Relation> getRelations(){return relations;}
-
+    public DependencySet getDependencies(){return dependencies;}
+    public void addDependencies(DependencySet d){ this.dependencies = d;}
     /*
     takes the ERDiagram  and creates the relational Schema
      */
     public RelationSchema(EntitySet entities, ArrayList<Relationship> relationships){
         this.relations = new ArrayList<>();
+        dependencies = new DependencySet();
         Relation tempR;
         AttributeSet primarkey = new AttributeSet();
         AttributeSet attributes = new AttributeSet();
@@ -138,9 +135,7 @@ public class RelationSchema {
                         }
                         attributes.add(a);
                     }
-                    //    fd = new FunctionalDependency(primarkey, attributes, e.getName());
-                    //   if(fd != null || !fd.isTrivial()) functionalDependencies.add(fd);
-                    tempR = new Relation(attributes, primarkey, e.getName());
+                      tempR = new Relation(attributes, primarkey, e.getName());
                     relations.add(tempR);
                 }
             }
@@ -172,10 +167,26 @@ public class RelationSchema {
     }
 
 
+    public Relation findRedunantTable(){
+        //Find and return any relation within database whose attributes are all contained within another
+        //table
+        for(Relation r : getRelations()){
+            for(Relation r2 : this.getRelations()){
+                if(r != r2 && r2.containsAll(r)) return r;
+
+            }
+        }
+        return null;
+    }
+
     public void removalAllTemp(){
         for(Relation r: relations) {
             r.getPrimaryKey().removeTemp();
             r.getAttributes().removeTemp();
         }
+    }
+
+    public void remove(Relation redunantTable) {
+        this.getRelations().remove(redunantTable);
     }
 }

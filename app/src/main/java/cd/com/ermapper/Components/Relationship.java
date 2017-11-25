@@ -1,4 +1,4 @@
-package cd.com.ermapper.shapes;
+package cd.com.ermapper.Components;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -8,15 +8,17 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.os.Parcel;
 
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+
+import org.xmlpull.v1.XmlSerializer;
+
+import java.io.IOException;
 import java.util.ArrayList;
-import cd.com.ermapper.relations.AttributeSet;
-import cd.com.ermapper.relations.EntitySet;
 
 import static android.graphics.Color.BLACK;
-import static android.graphics.Color.RED;
 
 
 /**
@@ -30,11 +32,11 @@ public class Relationship extends ShapeObject {
      */
 
     // Local variables
-    EntitySet objs;
-    ArrayList<Cardinality> conns;
-    ShapeObject obj1;
-    ShapeObject obj2;
-    AttributeSet attrs;
+    private EntitySet objs;
+    private ArrayList<Cardinality> conns;
+    private ShapeObject obj1;
+    private ShapeObject obj2;
+    private AttributeSet attrs;
 
     // costructors
 
@@ -419,6 +421,30 @@ public class Relationship extends ShapeObject {
         dest.writeParcelable(obj2, flags);
         dest.writeTypedObject(attrs,flags);
         dest.writeTypedObject(objs,flags);
+    }
+
+    public void shapeToXML( XmlSerializer serializer) throws IOException {
+        try {
+            serializer.startTag(null, "Relationship");
+            for (Entity e : this.getObjs().getElements()) {
+               // serializer.startTag("", "Entity");
+                e.shapeToXML(serializer);
+              //  serializer.endTag("", "Entity");
+            }
+
+            if (!this.getAttrs().isEmpty()) {
+               // serializer.startTag("", "Attributes");
+                for (Attribute a : this.getAttrs().getElements()) {
+                    a.shapeToXML(serializer);
+                }
+               // serializer.endTag(null, "Attributes");
+
+            }
+            serializer.endTag(null, "Relationship");
+        }catch (IOException exception){
+            Log.d("R XML Exception", String.valueOf(exception));
+            throw exception;
+        }
     }
 
 }

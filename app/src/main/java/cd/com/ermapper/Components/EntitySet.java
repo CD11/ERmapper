@@ -1,12 +1,9 @@
-package cd.com.ermapper.relations;
+package cd.com.ermapper.Components;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.ArrayList;
-
-import cd.com.ermapper.shapes.Attribute;
-import cd.com.ermapper.shapes.Entity;
 
 /**
  * Created by CD on 11/21/2017.

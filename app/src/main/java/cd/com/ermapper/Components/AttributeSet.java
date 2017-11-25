@@ -1,4 +1,4 @@
-package cd.com.ermapper.relations;
+package cd.com.ermapper.Components;
 
 
 /**
@@ -6,11 +6,8 @@ package cd.com.ermapper.relations;
  */
         import android.os.Parcel;
         import android.os.Parcelable;
-        import android.util.Log;
 
         import java.util.ArrayList;
-
-        import cd.com.ermapper.shapes.Attribute;
 
 public class AttributeSet implements Parcelable {
 	/*
@@ -267,15 +264,6 @@ public class AttributeSet implements Parcelable {
             returnString = returnString.substring(0, returnString.length()-1);
 
         return returnString;
-    }
-
-    public void printToSystemOut(){
-        System.out.println("Attribute Set:");
-        System.out.println("--------------");
-        for(int i=0; i<elements.size(); i++){
-            System.out.println(elements.get(i));
-        }
-
     }
 
     @Override

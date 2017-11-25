@@ -1,4 +1,4 @@
-package cd.com.ermapper.shapes;
+package cd.com.ermapper.Components;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -89,7 +89,11 @@ public class Coordinates implements Parcelable {
     public void setHeight(float height) {
         this.height = height;
     }
-
+    public String toString(){
+        String s ="";
+        s += this.getX() +","+this.getY() +","+this.getWidth() +","+this.getHeight();
+        return s;
+    }
     @Override
     public int describeContents() {
         return 0;

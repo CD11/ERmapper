@@ -1,14 +1,25 @@
-package cd.com.ermapper.shapes;
+package cd.com.ermapper.Components;
 
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Parcel;
+import android.support.annotation.DrawableRes;
+import android.text.TextPaint;
+import android.util.Log;
 import android.widget.EditText;
+
+import org.xmlpull.v1.XmlSerializer;
+
+import java.io.IOException;
 import java.util.ArrayList;
-import cd.com.ermapper.relations.AttributeSet;
-import cd.com.ermapper.relations.FunctionalDependency;
+
+import cd.com.ermapper.Logic.ERDraw;
+import cd.com.ermapper.R;
 
 /**
  * Created by cd on 2015-11-04.
@@ -16,9 +27,7 @@ import cd.com.ermapper.relations.FunctionalDependency;
 public class Attribute extends ShapeObject {
     //This class represents a functional dependency attribute
     //Attribute equality is based on equality of the name string
-    public static final float width  =  80;
-    public static final float height   = 150;
-    private boolean primary;
+     private boolean primary;
     private boolean foreign;
     private ArrayList<Attribute> values;   // this is an arraylist and not an attribute set because it becomes circluar if it is an attributeset
 
@@ -116,14 +125,14 @@ public class Attribute extends ShapeObject {
     public String toString(){ return this.getName()+" ";}
     public void setCoordinateX(float coordinateX) {
         this.getCoordinates().setX(coordinateX);
-        float w = coordinateX + getEditId().getWidth()+ width;
+        float w = coordinateX + getEditId().getWidth()+ 80;
         if(getEditId().getWidth() == 0)
             w += 100;
         this.getCoordinates().setWidth(w);
     }
     public void setCoordinateY(float coordinateY) {
         this.getCoordinates().setY(coordinateY);
-        this.getCoordinates().setHeight(coordinateY + height);
+        this.getCoordinates().setHeight(coordinateY + 150);
 
     }
     /*
@@ -155,11 +164,17 @@ public class Attribute extends ShapeObject {
     }
     public void setForeign(Boolean b) {
         foreign = b;
+        Paint dash = new Paint();
+        dash.setColor(Color.BLACK);
         if(getEditId()!= null) {
-            if (b == true)
-                getEditId().getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
-            else
-                getEditId().getBackground().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
+            if (b == true) {
+                getEditId().setBackground(Drawable.createFromPath("drawable/dash_line.xml"));
+            }
+            else{
+                dash.setStyle(Paint.Style.FILL);
+            }
+
+
         }
     }
     public boolean isForeign() {return foreign;}
@@ -185,6 +200,30 @@ public class Attribute extends ShapeObject {
     }
 
 
+
+    public void shapeToXML(XmlSerializer serializer) throws IOException {
+        try {
+            serializer.startTag("","Attribute");
+            serializer.attribute("", "name", this.getName());
+            serializer.attribute("", "coordinates", this.getCoordinates().toString());
+            if (this.isPrimary())
+                serializer.attribute("", "primary", "true");
+            if (this.isForeign())
+                serializer.attribute("", "foriegn", "true");
+            if (!this.getValues().isEmpty()) {
+                serializer.startTag(" ", "multiAttribute");
+                for (Attribute subA : this.getValues()) {
+                    subA.shapeToXML(serializer);
+                }
+                serializer.endTag("", "multiAttribyte");
+
+            }
+            serializer.endTag("","Attribute");
+        } catch (IOException exception) {
+            Log.d("Attribute XML Exception", String.valueOf(exception));
+            throw exception;
+        }
+    }
 
 
 

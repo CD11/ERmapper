@@ -1,4 +1,4 @@
-package cd.com.ermapper.shapes;
+package cd.com.ermapper.Components;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -6,6 +6,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.widget.EditText;
 
+import org.xmlpull.v1.XmlSerializer;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -92,7 +95,7 @@ public abstract class ShapeObject implements Parcelable {
     public abstract ArrayList<ShapeObject> getallobjects();
     public abstract boolean containsObj(ShapeObject curr);
     public abstract void removeObj(ShapeObject curr);
-
+    public abstract void shapeToXML(XmlSerializer serializer) throws IOException;
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.name);
