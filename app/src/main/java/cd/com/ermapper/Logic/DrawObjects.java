@@ -168,6 +168,7 @@ public class DrawObjects extends View {
                         // if the curr object is an attribute set it to primary
                         else if (curr.getClass() == Attribute.class) {
                             ((Attribute) curr).setPrimary();
+                            invalidate();
                         }
                         doublepress = true;
 

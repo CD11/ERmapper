@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Parcel;
@@ -91,6 +92,9 @@ public class Attribute extends ShapeObject {
         for(Attribute o: this.getValuesSet().getElements()) {
             canvas.drawLine(c.centerX(), c.centerY(), o.getCoordinates().centerX(), o.getCoordinates().centerY(), paint);
         }
+
+
+
     }
     // Draw the shape to each Entity in the relationship
     public void drawShape(Canvas canvas, Paint paint){
@@ -101,6 +105,25 @@ public class Attribute extends ShapeObject {
         }
         // draw
         canvas.drawOval(c.getX(),c.getY(),c.getWidth(),c.getHeight(),paint);
+
+        // draw a solid line
+        if(this.primary){
+            EditText e = this.getEditId();
+            canvas.drawLine(e.getX(),e.getY() +e.getHeight()+5, e.getX() + e.getWidth(), e.getY()+e.getHeight()+5, paint);
+        }
+
+        // raw a dash effect
+        if(this.foreign){
+            Paint f = new Paint();
+            EditText e = this.getEditId();
+            Path pp = new Path();
+            f.setColor(Color.BLACK);
+            f.setStyle(Paint.Style.STROKE);
+            f.setPathEffect(new DashPathEffect(new float[]{5, 10}, 0));
+            pp.setLastPoint(e.getX(),e.getY() +e.getHeight()+5 );
+            pp.lineTo(e.getX() + e.getWidth(), e.getY()+e.getHeight()+5);
+            canvas.drawPath(pp, f);
+        }
     }
 
 
@@ -142,8 +165,6 @@ public class Attribute extends ShapeObject {
     public void setPrimary() {
         if (primary == false){
             primary = true;
-            if(getEditId() != null)
-             getEditId().getBackground().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
         }else {
             if(getEditId() != null)
             getEditId().getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
@@ -164,18 +185,6 @@ public class Attribute extends ShapeObject {
     }
     public void setForeign(Boolean b) {
         foreign = b;
-        Paint dash = new Paint();
-        dash.setColor(Color.BLACK);
-        if(getEditId()!= null) {
-            if (b == true) {
-                getEditId().setBackground(Drawable.createFromPath("drawable/dash_line.xml"));
-            }
-            else{
-                dash.setStyle(Paint.Style.FILL);
-            }
-
-
-        }
     }
     public boolean isForeign() {return foreign;}
     public void addAttribute(Attribute curr) {

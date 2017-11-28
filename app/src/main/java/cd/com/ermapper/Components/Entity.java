@@ -85,6 +85,10 @@ public class Entity extends ShapeObject {
         Coordinates c =  this.getCoordinates();
         // Draw a line to each attribute
         for(Attribute o: this.attr.getElements()){
+            if(this.isWeak && o.isPrimary()){
+                o.setPrimary(false);
+                o.setForeign(true);
+            }
             o.drawShape(canvas, paint);
         }
         if(this.isWeak()){
