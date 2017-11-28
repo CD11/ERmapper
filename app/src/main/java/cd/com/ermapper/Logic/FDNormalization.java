@@ -7,43 +7,34 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import cd.com.ermapper.R;
-import cd.com.ermapper.relations.AttributeSet;
-import cd.com.ermapper.relations.DependencySet;
-import cd.com.ermapper.relations.EntitySet;
-import cd.com.ermapper.relations.FunctionalDependency;
-import cd.com.ermapper.relations.Relation;
-import cd.com.ermapper.relations.RelationSchema;
-import cd.com.ermapper.relations.SetOfAttributeSets;
-import cd.com.ermapper.shapes.Attribute;
-import cd.com.ermapper.shapes.Entity;
-import cd.com.ermapper.shapes.Relationship;
+import cd.com.ermapper.Components.AttributeSet;
+import cd.com.ermapper.Components.DependencySet;
+import cd.com.ermapper.Components.EntitySet;
+import cd.com.ermapper.Components.FunctionalDependency;
+import cd.com.ermapper.Components.Relation;
+import cd.com.ermapper.Components.RelationSchema;
+import cd.com.ermapper.Components.SetOfAttributeSets;
+import cd.com.ermapper.Components.Attribute;
+import cd.com.ermapper.Components.Relationship;
 
 
 public class FDNormalization extends AppCompatActivity {
 
 
-    //list of functional dependencies
-    private DependencySet functionalDependencies;
-    private AttributeSet attributes;
     private RelationSchema relationSchema;
 
     //to display lists to screen
     private ListView attributesView;
     private ListView functionalDependenciesView;
+    private TextView resultsView;
     private ArrayAdapter fdListAdapter;
     private ArrayAdapter attributesAdapter;
 
@@ -55,79 +46,59 @@ public class FDNormalization extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fdnormalization);
 
-        //list of functional dependencies
-        functionalDependencies = new DependencySet();
-        attributes = new AttributeSet();
+        // list views
         functionalDependenciesView= (ListView) findViewById(R.id.FDList);
         attributesView = (ListView) findViewById(R.id.AttributeList);
+        resultsView  = (TextView) findViewById(R.id.results);
+        resultsView.setMovementMethod(new ScrollingMovementMethod());
         diagram = this.getIntent().getParcelableExtra("diagram");
 
         EntitySet entities = diagram.getBinaryEntities(); // simplifies all N-ary Relationships
         ArrayList<Relationship> relationships = diagram.getRelationshipsObjs();
-        RelationSchema relationSchema = new RelationSchema(entities, relationships);
-
-        // get the ER diagram
-        functionalDependencies.addAll(findDependencies(relationSchema)); // get all functional dependencies
-
-        //TODO: check these methods and decide how they work
-         performNormalization();  // Perform normalization
-         performAttributeClosure(functionalDependencies.getAllAttributes()); // perform Attribute Closure
-    }
-
-    private void addFD(FunctionalDependency anFD){
-        functionalDependencies.add(anFD);
-        rebuiltAttributesList();
+        relationSchema = new RelationSchema(entities, relationships);
+        findDependencies(); // find all dependencies for the relationschema
+        relationSchema.removalAllTemp();
+        performNormalization();  // Perform normalization
+        String closure = performAttributeClosure(relationSchema.getDependencies().getAllAttributes());
+        resultsView.setText(resultsView.getText() + closure);
     }
 
 
-    public DependencySet findDependencies(RelationSchema relations){
+
+    public void findDependencies(){
         FunctionalDependency fd;
         //////////////////// To FD //////////////////////////////////////////////
         // Relations arraylist now contains all proper Relations  we can now find the FDs
-        for(Relation r: relations.getRelations()) {
+        for(Relation r: relationSchema.getRelations()) {
             fd = new FunctionalDependency(r.getPrimaryKey(), r.getAttributes(), r.getName());
-            if (fd != null || !fd.isTrivial()) functionalDependencies.add(fd);
+            if (fd != null || !fd.isTrivial()) relationSchema.getDependencies().add(fd);
         }
-        return functionalDependencies;
     }
 
-    private void rebuiltAttributesList(){
-        //Rebuild the attributes list
-        attributes.clear();
+    private String performAttributeClosure(AttributeSet leftAttributes){
+        String returnString = "";
         DependencySet FDs = new DependencySet();
         //Gather all the functional dependencies
-        for(FunctionalDependency fd : functionalDependencies.getElements()){FDs.add(fd);}
-        AttributeSet allAttributes = functionalDependencies.getAllAttributes();
-       // Collections.sort(allAttributes.getElements());
-           for (Attribute a : allAttributes.getElements()) attributes.add(a);
-    }
-
-    private void performAttributeClosure(AttributeSet leftAttributes){
-        //consoleTextArea.clear(); //clear the console of previous results
-        DependencySet FDs = new DependencySet();
-        //Gather all the functional dependencies
-        for(FunctionalDependency fd : functionalDependencies.getElements()){FDs.add(fd);}
+        for(FunctionalDependency fd : relationSchema.getDependencies().getElements()){FDs.add(fd);}
         //print all the attributes
         AttributeSet allAttributes = FDs.getAllAttributes();
-      //  Collections.sort(allAttributes.getElements());
-
         //print all the attributes
-        System.out.print("ATTRIBUTES:\n");
+        returnString += ("ATTRIBUTES:\n");
         for(Attribute att : allAttributes.getElements())
-            System.out.print(att.toString());
-        System.out.print("\n==================================================\n");
+            returnString +=(att.toString());
+        returnString +=("\n==================================================\n");
 
 
         //print all the functional dependencies created from data file
-        System.out.print("FUNCTIONAL DEPENDENCIES:\n");
-        System.out.print("\n==================================================\n");
+        returnString +=("FUNCTIONAL DEPENDENCIES:\n");
+        returnString +=("\n==================================================\n");
 
-        System.out.print("ATTRIBUTE CLOSURE:\n");
-        System.out.print("CLOSURE {" + leftAttributes + "}+");
+        returnString +=("ATTRIBUTE CLOSURE:\n");
+        returnString +=("CLOSURE {" + leftAttributes + "}+");
         AttributeSet closureSet = leftAttributes.closure(FDs);
-        System.out.print(closureSet.toString());
+        returnString +=(closureSet.toString());
         if(closureSet.containsAll(allAttributes)){
-            System.out.print("{" + leftAttributes + "} is a SUPERKEY");
+            returnString +=("{" + leftAttributes + "} is a SUPERKEY");
             boolean isMinimal = true;
             for(Attribute a : leftAttributes.getElements()){
                 AttributeSet attributesCopy = new AttributeSet(leftAttributes);
@@ -136,22 +107,18 @@ public class FDNormalization extends AppCompatActivity {
                 if(c.containsAll(allAttributes)) isMinimal = false;
             }
             if(isMinimal)
-                System.out.print("{" + leftAttributes + "} is MINIMAL (i.e. is CANDIDATE KEY)");
+                returnString +=("{" + leftAttributes + "} is MINIMAL (i.e. is CANDIDATE KEY)");
             else
-                System.out.print("{" + leftAttributes + "} is NOT MINIMAL");
+                returnString +=("{" + leftAttributes + "} is NOT MINIMAL");
         }
-
+        return  returnString;
     }
 
     private void performNormalization(){
         String returnstring = " ";
         DependencySet FDs = new DependencySet();
-        TextView tv  = (TextView) findViewById(R.id.results);
-        tv.setMovementMethod(new ScrollingMovementMethod());
-
-
         //Gather all the functional dependencies
-        for(FunctionalDependency fd : functionalDependencies.getElements()){FDs.add(fd);}
+        for(FunctionalDependency fd : relationSchema.getDependencies().getElements()){FDs.add(fd);}
 
         //print all the attributes
         AttributeSet allAttributes = FDs.getAllAttributes();
@@ -160,18 +127,18 @@ public class FDNormalization extends AppCompatActivity {
         attributesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, allAttributes.getElements());
         attributesView.setAdapter(attributesAdapter);
 
-
+        /*  This is code provided, however it is redundent
         //print all the attributes
         returnstring += "ATTRIBUTES:\n";
         for(Attribute att : allAttributes.getElements())
             returnstring += att.toString();
         returnstring += "\n==================================================\n";
 
-
         //print all the functional dependencies created from ER diagram
         returnstring += "FUNCTIONAL DEPENDENCIES:\n";
         returnstring += (FDs.toString());
         returnstring += ("\n==================================================\n");
+        */
 
         DependencySet minCover = FDs.minCover();
         returnstring += ("Minimal Cover:");
@@ -215,14 +182,6 @@ public class FDNormalization extends AppCompatActivity {
         returnstring += ("CANDIDATE KEY FOR ALL ATTRIBUTES:\n");
         AttributeSet candidateKey = allAttributes.findCandidateKey(minCover);
         returnstring += (candidateKey.toString());
-
-        returnstring += ("\n-------------------------------------------------------------\n");
-        returnstring += ("ALL CANDIDATE KEYS (FOR SMALL EXAMPLES ONLY):\n");
-
-            SetOfAttributeSets candidateKeys = allAttributes.allCandidateKeys(minCover);
-            if(candidateKeys != null)
-                for (AttributeSet aKey : candidateKeys.getElements())
-                    System.out.print(aKey.toString());
 
         //Create Dependency Preserving 3NF tables
 		/*
@@ -292,7 +251,7 @@ public class FDNormalization extends AppCompatActivity {
 
 
             //Step 1 & 2
-            ArrayList<Relation> database_3nf_lossless_join_dep_preserving = new ArrayList<Relation>();
+            RelationSchema database_3nf_lossless_join_dep_preserving = new RelationSchema();
             for(FunctionalDependency fd : minCover.getElements()) {
                 Relation table = new Relation(fd);
                 database_3nf_lossless_join_dep_preserving.add(table);
@@ -301,7 +260,7 @@ public class FDNormalization extends AppCompatActivity {
             //Step 3: Ensure decomposition contains a key for an imaginary table
             //        consisting of all the attributes
             boolean keyFound = false;
-            for (Relation table : database_3nf_lossless_join_dep_preserving){
+            for (Relation table : database_3nf_lossless_join_dep_preserving.getRelations()){
                 AttributeSet columns = table.getAttributes();
                 if(columns.containsAll(candidateKey)) {
                     keyFound = true;
@@ -316,21 +275,20 @@ public class FDNormalization extends AppCompatActivity {
             //A table is redundant if all of its attributes appears in some other table.
 
             Relation redunantTable = null;
-            while((redunantTable = Normalizer.findRedunantTable(database_3nf_lossless_join_dep_preserving)) != null){
+            while((redunantTable = relationSchema.findRedunantTable()) != null){
                 database_3nf_lossless_join_dep_preserving.remove(redunantTable);
                 returnstring += ("\nRemoving Redundant table: " + redunantTable);
 
             }
 
-            for(Relation r : database_3nf_lossless_join_dep_preserving)
+            for(Relation r : database_3nf_lossless_join_dep_preserving.getRelations())
                 returnstring += (r.toString());
 
-            tv.setText(returnstring);
+            resultsView.setText(returnstring);
         }
 
 
         public void createDB(View v){
-
             DatabaseHandler db = new DatabaseHandler(this.getBaseContext(), diagram.getName(), null, 1, relationSchema.getRelations());
             AlertDialog ad = new AlertDialog.Builder(this).create();
             ad.setTitle("DB Creation");

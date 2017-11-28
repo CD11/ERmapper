@@ -1,4 +1,4 @@
-package cd.com.ermapper.relations;
+package cd.com.ermapper.Components;
 
 
 
@@ -10,8 +10,6 @@ package cd.com.ermapper.relations;
         import android.os.Parcelable;
 
         import java.util.ArrayList;
-
-        import cd.com.ermapper.shapes.Attribute;
 
 public class DependencySet implements Parcelable {
 	/*
@@ -138,19 +136,10 @@ public class DependencySet implements Parcelable {
                     if(Fcopy.equals(F)) {
                         F.remove(fd);
                         F.add(newFD);
-               //         FXApplicationMain.printlnToConsole("REPLACE: " + fd + " with " + newFD);
                         return 1; //made one modification
                     }
 
-                    //System.out.println("TRY REPLACE: " + fd + " with " +  newFD + " in: " + Fcopy + " ::" + Fcopy.equals(F));
-                    //System.out.println("CLOSURE: " + fd + " in " + F + " {" + fd.getLHS().closure(F)+ "}");
-                    //System.out.println("CLOSURE: " + newFD + " in " + Fcopy + " {" + newFD.getLHS().closure(Fcopy)+ "}");
-                    //System.out.println(" ");
-
                 }
-
-                //System.out.println("F restored: " +  F);
-
 
             }
 
@@ -160,10 +149,7 @@ public class DependencySet implements Parcelable {
     }
 
     public DependencySet minCover() {
-
-     //   FXApplicationMain.printlnToConsole("finding min cover:");
-
-        //return a minCover of this dependency set
+                //return a minCover of this dependency set
         DependencySet minCoverSoFar = null;
 
     	/*convert dependencies with compound right had sides to
@@ -175,13 +161,12 @@ public class DependencySet implements Parcelable {
 
         DependencySet singleRightHandSides = new DependencySet();
         for(FunctionalDependency fd : elements){
-            String name = fd.getName();
             if(fd.isTrivial()) {/*don' add it*/}
-            else if(fd.getRHS().size() == 1) singleRightHandSides.add(new FunctionalDependency(fd.getLHS(), fd.getRHS(),fd.getName()));
+            else if(fd.getRHS().size() == 1) singleRightHandSides.add(new FunctionalDependency(fd.getLHS(), fd.getRHS()));
             else{
                 //create a separate FD for each right hand side attribute
                 for(Attribute a : fd.getRHS().getElements()){
-                    FunctionalDependency newFD = new FunctionalDependency(fd.getLHS(), new AttributeSet(a), fd.getName());
+                    FunctionalDependency newFD = new FunctionalDependency(fd.getLHS(), new AttributeSet(a));
                     if(!newFD.isTrivial()) singleRightHandSides.add(newFD);
                 }
             }
@@ -191,26 +176,12 @@ public class DependencySet implements Parcelable {
         minCoverSoFar = singleRightHandSides;
 
 
-     //   FXApplicationMain.printlnToConsole("-----------------------------------");
-     //   FXApplicationMain.printlnToConsole("SINGLE RIGHT HAND SIDES:");
-
-    //    minCoverSoFar.printToTextArea(FXApplicationMain.consoleTextArea);
-
-
     	/*
     	 * Remove any redundant attributes from the left hand side of dependencies
     	 * Replace dependencies with redundant left hand sides with ones with the
     	 * redundancy removed
     	 */
-     //   FXApplicationMain.printlnToConsole("-----------------------------------");
-      //  FXApplicationMain.printlnToConsole("REMOVAL OF REDUNDANT LHS ATTRIBUTES");
-
         while(removeRedundantLeftHandAttributes(minCoverSoFar) > 0) { }
-
-       // minCoverSoFar.printToTextArea(FXApplicationMain.consoleTextArea);
-
-     //   FXApplicationMain.printlnToConsole("-----------------------------------");
-      //  FXApplicationMain.printlnToConsole("REMOVAL OF REDUNDANT DEPENDENCIES");
 
     	/*
     	 * Remove any unnecessary dependencies
@@ -224,35 +195,11 @@ public class DependencySet implements Parcelable {
             if(!fd.getLHS().closure(minCoverSoFar).containsAll(fd.getRHS())) {minCoverSoFar.add(fd);}
             else break; //FXApplicationMain.printlnToConsole("REMOVING: " + fd.toString());
         }
-
-      //  minCoverSoFar.printToTextArea(FXApplicationMain.consoleTextArea);
-
-
         DependencySet minCover = minCoverSoFar;
-
-      //  FXApplicationMain.printlnToConsole("\nEND finding min cover");
-
         return minCover;
 
     }
 
-    /*
-    public void printToSystemOut(){
-        //System.out.println("Dependency Set:");
-        //System.out.println("--------------");
-        for(int i=0; i<elements.size(); i++){
-            System.out.println(elements.get(i));
-        }
-    }
-    */
-
- /*   public void printToTextArea(TextArea area){
-        //System.out.println("Dependency Set:");
-        //System.out.println("--------------");
-        for(int i=0; i<elements.size(); i++){
-            area.appendText(elements.get(i).toString() + "\n");
-        }
-    }*/
     public String toString(){
         String returnString = "";
         for(int i=0; i<elements.size(); i++){

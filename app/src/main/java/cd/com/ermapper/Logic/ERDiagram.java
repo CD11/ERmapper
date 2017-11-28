@@ -5,16 +5,13 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 import java.util.ArrayList;
-import java.util.concurrent.locks.ReentrantLock;
 
-import cd.com.ermapper.relations.AttributeSet;
-import cd.com.ermapper.relations.EntitySet;
-import cd.com.ermapper.relations.Relation;
-import cd.com.ermapper.shapes.Attribute;
-import cd.com.ermapper.shapes.Cardinality;
-import cd.com.ermapper.shapes.Entity;
-import cd.com.ermapper.shapes.Relationship;
-import cd.com.ermapper.shapes.ShapeObject;
+import cd.com.ermapper.Components.EntitySet;
+import cd.com.ermapper.Components.Attribute;
+import cd.com.ermapper.Components.Cardinality;
+import cd.com.ermapper.Components.Entity;
+import cd.com.ermapper.Components.Relationship;
+import cd.com.ermapper.Components.ShapeObject;
 
 
 /**

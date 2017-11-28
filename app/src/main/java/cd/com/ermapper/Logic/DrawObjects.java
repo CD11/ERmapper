@@ -4,20 +4,15 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.text.Layout;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
-import cd.com.ermapper.shapes.Attribute;
-import cd.com.ermapper.shapes.Cardinality;
-import cd.com.ermapper.shapes.Entity;
-import cd.com.ermapper.shapes.Relationship;
-import cd.com.ermapper.shapes.ShapeObject;
-
-import static android.graphics.Color.RED;
-
+import cd.com.ermapper.Components.Attribute;
+import cd.com.ermapper.Components.Cardinality;
+import cd.com.ermapper.Components.Entity;
+import cd.com.ermapper.Components.Relationship;
+import cd.com.ermapper.Components.ShapeObject;
 
 public class DrawObjects extends View {
     /* this class Draws the objects onto a canvas
@@ -173,6 +168,7 @@ public class DrawObjects extends View {
                         // if the curr object is an attribute set it to primary
                         else if (curr.getClass() == Attribute.class) {
                             ((Attribute) curr).setPrimary();
+                            invalidate();
                         }
                         doublepress = true;
 
@@ -272,7 +268,6 @@ public class DrawObjects extends View {
                                 // only add the relationship to the diagram if it is valid
                                 rCurr.setTexts(c);
                                 rCurr.moveName();
-                                rCurr.getEditId().setBackgroundColor(RED);
                                 Log.d("editText", String.valueOf(textLayer.getChildCount()));
                                 textLayer.addView(rCurr.getEditId());
                                 textLayer.bringChildToFront(rCurr.getEditId());

@@ -1,11 +1,9 @@
-package cd.com.ermapper.relations;
+package cd.com.ermapper.Components;
 
 
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
-import cd.com.ermapper.shapes.Attribute;
 
 
 /**
@@ -17,7 +15,6 @@ public class FunctionalDependency implements Parcelable{
 
     private AttributeSet lhs; //left hand side
     private AttributeSet rhs; //right hand side
-    private String name;
 
     public FunctionalDependency(AttributeSet aLHS, AttributeSet aRHS) {
 
@@ -33,7 +30,6 @@ public class FunctionalDependency implements Parcelable{
         }
     }
     public FunctionalDependency(AttributeSet aLHS, AttributeSet aRHS, String name) {
-        this.name = name;
         if (aLHS == null || aRHS == null) {
             System.out.println("ERROR: NULL ATTRITBUTE SET");
         } else if (aLHS.isEmpty() || aRHS.isEmpty()){
@@ -42,8 +38,6 @@ public class FunctionalDependency implements Parcelable{
             lhs = new AttributeSet();
             rhs = new AttributeSet();
             lhs.addAll(aLHS);
-
-
             rhs.addAll(aRHS);
         }
     }
@@ -74,9 +68,7 @@ public class FunctionalDependency implements Parcelable{
 
     public AttributeSet getLHS(){return lhs;}
     public AttributeSet getRHS(){return rhs;}
-    public String getName(){return name; }
-
-    public boolean equals(FunctionalDependency anFD){
+       public boolean equals(FunctionalDependency anFD){
 		/*]
 		 * Perform an equality check based on whether both the left hand side and right hand side
 		 * sets are equal. That is this.lhs equals anFD.lhs and this.rhs equals anFD.rhs.
@@ -89,6 +81,7 @@ public class FunctionalDependency implements Parcelable{
         if(!lhs.equals(anFD.lhs)) return false;
         return rhs.equals(anFD.rhs);
     }
+
 
     public boolean isTrivial(){
         //Answer whether this functional dependency is trivial.

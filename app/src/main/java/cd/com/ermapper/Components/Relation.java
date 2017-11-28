@@ -1,13 +1,8 @@
-package cd.com.ermapper.relations;
+package cd.com.ermapper.Components;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
-
-import org.w3c.dom.Attr;
-
-import cd.com.ermapper.shapes.Attribute;
-import cd.com.ermapper.shapes.Entity;
 
 /**
  * Created by ldnel_000 on 2015-11-04.
@@ -48,7 +43,7 @@ public class Relation implements Parcelable{
         temp.addAll(obj2.foreignAttrs());
         attributes.addAll(temp);
         for(Attribute a: temp.getElements()){
-            if(a.isForeign() ||a.isPrimary() && a.getName() != "-1"){
+            if(a.isForeign()||a.isPrimary()){
                 primaryKey.add(a);
             }
         }
@@ -75,7 +70,6 @@ public class Relation implements Parcelable{
         attributes = new AttributeSet();
         attributes.addAll(FD.getLHS());
         attributes.addAll(FD.getRHS());
-        this.name =  FD.getName();
     }
 
     protected Relation(Parcel in) {

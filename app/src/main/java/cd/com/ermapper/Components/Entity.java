@@ -1,4 +1,4 @@
-package cd.com.ermapper.shapes;
+package cd.com.ermapper.Components;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -8,11 +8,10 @@ import android.util.Log;
 import android.widget.EditText;
 
 
-import org.w3c.dom.Attr;
+import org.xmlpull.v1.XmlSerializer;
 
+import java.io.IOException;
 import java.util.ArrayList;
-
-import cd.com.ermapper.relations.AttributeSet;
 
 /**
  * Created by me on 9/6/2017.
@@ -86,6 +85,10 @@ public class Entity extends ShapeObject {
         Coordinates c =  this.getCoordinates();
         // Draw a line to each attribute
         for(Attribute o: this.attr.getElements()){
+            if(this.isWeak && o.isPrimary()){
+                o.setPrimary(false);
+                o.setForeign(true);
+            }
             o.drawShape(canvas, paint);
         }
         if(this.isWeak()){
@@ -172,7 +175,13 @@ public class Entity extends ShapeObject {
 
     //  Add an attribute to the entity
     public void addAttribute(Attribute a) {
+        if(this.isWeak && a.isPrimary()){
+            a.setPrimary(false);
+            a.setForeign(true);
+        }
         this.attr.add(a);
+
+
     }
 
     /*
@@ -199,8 +208,9 @@ public class Entity extends ShapeObject {
             isWeak = true;
             for(Attribute a:getAttr().getElements()) {
                 if (a.isPrimary()) {
-                    a.setForeign(true);
                     a.setPrimary(false);
+                    a.setForeign(true);
+
                 }
             }
         }else{
@@ -248,6 +258,38 @@ public class Entity extends ShapeObject {
         parcel.writeTypedObject(attr, i);
         parcel.writeByte((byte) (isWeak() ? 1 : 0));
         parcel.writeTypedList(weak);
+    }
+
+    @Override
+    public void shapeToXML(XmlSerializer serializer) throws IOException {
+        try {
+            serializer.startTag(null, "Entity");
+            if (!this.isWeak())
+                serializer.attribute("", "Name", this.getName());
+            serializer.attribute("", "coordinates", this.getCoordinates().toString());
+
+            if(!this.getAttr().isEmpty()){
+                //serializer.startTag("", "Attributes");
+                for (Attribute a : this.getAttr().getElements()) {
+                    a.shapeToXML(serializer);
+                }
+                //serializer.endTag(" ", "Attributes");
+            }
+            if(!this.getWeak().isEmpty()) {
+                serializer.startTag(" ", "weakEntites");
+                for (Entity subE : this.getWeak()) {
+                   this.shapeToXML(serializer);
+                }
+                serializer.endTag("","weakEntities");
+            }
+            serializer.endTag(null,"Entity");
+
+        }catch (IOException exception){
+            Log.d("Entity XML Exception", String.valueOf(exception));
+            throw exception;
+        }
+
+
     }
 
 
