@@ -119,7 +119,7 @@ public class DrawObjects extends View {
                             rCurr.setCoordinateX(startX);
                             rCurr.setCoordinateY(startY);
 
-                        } else if (state == 5 && curr != null) {
+                        } else if (state == 5 && curr != null) {  // delete
                             textLayer.removeView(curr.getEditId());
                             if(curr.getClass() == Relationship.class){
                                 for(Cardinality cc :((Relationship)curr).getTextObjs()){
@@ -132,8 +132,9 @@ public class DrawObjects extends View {
                                     textLayer.removeView(c.getNum());
                             }
 
+                           d.removeO(curr, textLayer);
                             /////////////////////
-                            for (ShapeObject o : d.getObjects()) {
+                           /* for (ShapeObject o : d.getObjects()) {
                                 if (o.containsObj(curr)) {
                                     d.getObjects().addAll(o.getallobjects());
                                     if (o.getClass() == Relationship.class) {
@@ -145,11 +146,11 @@ public class DrawObjects extends View {
                                             d.getObjects().remove(o);
                                     }
                                     o.removeObj(curr);
-
+                                    break;
                                 }
-                                break;
-                            }
-                            if (d.getObjects().contains(curr)) d.getObjects().remove(curr);
+
+                            }*/
+                          //  if (d.getObjects().contains(curr)) d.getObjects().remove(curr);
                             /////////////////////
                             curr = null;
                             invalidate();
@@ -167,7 +168,7 @@ public class DrawObjects extends View {
                         }
                         // if the curr object is an attribute set it to primary
                         else if (curr.getClass() == Attribute.class) {
-                            ((Attribute) curr).setPrimary();
+                            ((Attribute) curr).setPrimary(!((Attribute) curr).isPrimary());
                             invalidate();
                         }
                         doublepress = true;

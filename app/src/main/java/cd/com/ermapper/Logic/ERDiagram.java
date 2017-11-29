@@ -4,6 +4,8 @@ package cd.com.ermapper.Logic;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
+import android.widget.RelativeLayout;
+
 import java.util.ArrayList;
 
 import cd.com.ermapper.Components.EntitySet;
@@ -33,7 +35,6 @@ public class ERDiagram implements Parcelable {
     public ERDiagram(String name){
         this.name = name;
         this.objects = new ArrayList<>();
-        Log.d("CreatedER", this.name);
     }
 
 
@@ -147,7 +148,7 @@ public class ERDiagram implements Parcelable {
                 Relationship EC = new Relationship("-1", newE, (Entity)r.getObjs().getElements().get(2));
                 Attribute temp = new Attribute("-1");
                 Attribute temp2 = new Attribute("-1");
-                temp.setPrimary();
+                temp.setPrimary(true);
                 newE.addAttribute(temp2);
                 newE.addAttribute(temp);
                 newE.getAttr().addAll(((Entity)r.getObjs().getElements().get(0)).foreignAttrs());
@@ -206,5 +207,32 @@ public class ERDiagram implements Parcelable {
             c.addAll(r.getTextObjs());
         }
         return c;
+    }
+
+    public void removeO(ShapeObject curr, RelativeLayout textLayer) {
+
+        for (ShapeObject o : this.objects) {
+            if (o.containsObj(curr)) {
+                this.objects.addAll(o.getallobjects());
+                if (o.getClass() == Relationship.class) {
+                    if (((Relationship) o).isBinary() ) {
+                       if (o.getEditId()!=null) textLayer.removeView(o.getEditId());
+                       for(Cardinality c: ((Relationship) o).getTextObjs()){
+                           textLayer.removeView(c.getNum());
+                           c = null;
+                       }
+                        this.objects.remove(o);
+                    }
+                }
+                this.objects.remove(curr);
+                o.removeObj(curr, textLayer);
+                break;
+            }else  if(o.equals(curr)){
+                this.objects.addAll(curr.getallobjects());
+                this.objects.remove(o);
+                break;
+            }
+
+        }
     }
 }

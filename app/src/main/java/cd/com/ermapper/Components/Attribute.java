@@ -1,26 +1,19 @@
 package cd.com.ermapper.Components;
 
-import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Parcel;
-import android.support.annotation.DrawableRes;
-import android.text.TextPaint;
 import android.util.Log;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 import java.util.ArrayList;
-
-import cd.com.ermapper.Logic.ERDraw;
-import cd.com.ermapper.R;
 
 /**
  * Created by cd on 2015-11-04.
@@ -141,7 +134,7 @@ public class Attribute extends ShapeObject {
     }
 
     @Override
-    public void removeObj(ShapeObject curr) {
+    public void removeObj(ShapeObject curr, RelativeLayout textLayer) {
         if(values.contains(curr)) values.remove(curr);
     }
     // Getters and Setters
@@ -158,27 +151,9 @@ public class Attribute extends ShapeObject {
         this.getCoordinates().setHeight(coordinateY + 150);
 
     }
-    /*
-        Checks to see what if object is primary or not and sets it to the opposing,
-        updates the edit text to allow and for the text to be underlined
-     */
-    public void setPrimary() {
-        if (primary == false){
-            primary = true;
-        }else {
-            if(getEditId() != null)
-            getEditId().getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
-            primary = false;
-        }
-    }
+
     public void setPrimary(boolean b) {
         primary = b;
-        if(getEditId() != null) {
-            if (b == true)
-                getEditId().getBackground().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
-            else
-                getEditId().getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
-        }
     }
     public boolean isPrimary(){
         return primary;

@@ -6,6 +6,7 @@ import android.graphics.Path;
 import android.os.Parcel;
 import android.util.Log;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 
 
 import org.xmlpull.v1.XmlSerializer;
@@ -113,7 +114,7 @@ public class Entity extends ShapeObject {
     }
 
     @Override
-    public void removeObj(ShapeObject curr) {
+    public void removeObj(ShapeObject curr, RelativeLayout textLayer) {
         if(curr.getClass() == Attribute.class)
             if(attr.contains((Attribute) curr)) attr.remove((Attribute) curr);
         if(curr.getClass() == Entity.class)
@@ -130,7 +131,7 @@ public class Entity extends ShapeObject {
     @Override
     public ArrayList<ShapeObject> getallobjects() {
         ArrayList<ShapeObject>s = new ArrayList<>();
-        s.add(this);
+       // s.add(this);
         for(Attribute a: this.getAttr().getElements())
             s.addAll(a.getallobjects());
         s.addAll(this.getWeak());

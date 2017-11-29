@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 
 import org.xmlpull.v1.XmlSerializer;
 
@@ -209,40 +210,38 @@ public class Relationship extends ShapeObject {
         this.getObjs().clear();
     }
     @Override
-    public void removeObj(ShapeObject curr) {
+    public void removeObj(ShapeObject curr, RelativeLayout textLayer) {
         if(objs.contains((Entity) curr)) objs.remove((Entity) curr);
         for(Cardinality c : conns){
             if(c.getO().equals(curr))
-                c.setO(null);
+                textLayer.removeView(c.getNum());
         }
     }
 
     @Override
     public ArrayList<ShapeObject> getallobjects() {
         ArrayList<ShapeObject> s = new ArrayList<>();
-        //s.add(this);
         for(Attribute a: this.attrs.getElements()) {
             s.addAll(a.getallobjects());
         }
         if(this.getObjs().isEmpty()){
-            s.addAll(this.getObj1().getallobjects());
-            s.addAll(this.getObj2().getallobjects());
+            s.add(obj1);
+            s.add(obj2);
         }else {
             for (Entity e : this.getObjs().getElements()) {
                 s.addAll(e.getallobjects());
+                s.add(e);
             }
         }
-
         return s;
     }
 
     // Checks if the relationship contains a certain object
     @Override
     public boolean containsObj(ShapeObject curr) {
-        if(obj1.containsObj(curr)) return true;
-        if(obj2.containsObj(curr)) return true;
-        for(Entity e: objs.getElements())
-            if(e.equals(curr)) return true;
+        if(obj1.equals(curr)) return true;
+        if(obj2.equals(curr)) return true;
+        if(objs.contains((Entity)curr))return  true;
 
         return false;
 
@@ -364,7 +363,7 @@ public class Relationship extends ShapeObject {
         return result;
     }
     public boolean isBinary(){
-        return  objs.size() ==2;
+        return  objs.size() <= 2;
     }
     public boolean isTernary(){
         return  objs.size() ==3;

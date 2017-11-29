@@ -5,6 +5,7 @@ import android.graphics.Paint;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 
 import org.xmlpull.v1.XmlSerializer;
 
@@ -94,7 +95,7 @@ public abstract class ShapeObject implements Parcelable {
     public abstract void drawShape(Canvas c, Paint p);
     public abstract ArrayList<ShapeObject> getallobjects();
     public abstract boolean containsObj(ShapeObject curr);
-    public abstract void removeObj(ShapeObject curr);
+    public abstract void removeObj(ShapeObject curr, RelativeLayout textLayer);
     public abstract void shapeToXML(XmlSerializer serializer) throws IOException;
     @Override
     public void writeToParcel(Parcel dest, int flags) {
