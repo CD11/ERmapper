@@ -2,10 +2,8 @@ package cd.com.ermapper.Logic;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
-
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -14,20 +12,18 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import cd.com.ermapper.R;
+import cd.com.ermapper.Components.Attribute;
 import cd.com.ermapper.Components.AttributeSet;
 import cd.com.ermapper.Components.DependencySet;
 import cd.com.ermapper.Components.EntitySet;
 import cd.com.ermapper.Components.FunctionalDependency;
 import cd.com.ermapper.Components.Relation;
 import cd.com.ermapper.Components.RelationSchema;
-import cd.com.ermapper.Components.SetOfAttributeSets;
-import cd.com.ermapper.Components.Attribute;
 import cd.com.ermapper.Components.Relationship;
+import cd.com.ermapper.R;
 
 
 public class FDNormalization extends AppCompatActivity {
-
 
     private RelationSchema relationSchema;
 
@@ -75,6 +71,17 @@ public class FDNormalization extends AppCompatActivity {
         }
     }
 
+    public DependencySet findDependencies(RelationSchema relationSchema){
+        FunctionalDependency fd;
+        DependencySet d =new DependencySet();
+        //////////////////// To FD //////////////////////////////////////////////
+        // Relations arraylist now contains all proper Relations  we can now find the FDs
+        for(Relation r: relationSchema.getRelations()) {
+            fd = new FunctionalDependency(r.getPrimaryKey(), r.getAttributes(), r.getName());
+            if (fd != null || !fd.isTrivial()) d.add(fd);
+        }
+        return d;
+    }
     private String performAttributeClosure(AttributeSet leftAttributes){
         String returnString = "";
         DependencySet FDs = new DependencySet();
@@ -289,7 +296,7 @@ public class FDNormalization extends AppCompatActivity {
 
 
         public void createDB(View v){
-            DatabaseHandler db = new DatabaseHandler(this.getBaseContext(), diagram.getName(), null, 1, relationSchema.getRelations());
+            DatabaseHandler db = new DatabaseHandler(this.getBaseContext(), diagram.getName(), null, 1, relationSchema);
             AlertDialog ad = new AlertDialog.Builder(this).create();
             ad.setTitle("DB Creation");
             ad.setMessage(db.getDatabaseName() +" Successfully created");
@@ -300,10 +307,14 @@ public class FDNormalization extends AppCompatActivity {
                         }
                     });
             ad.show();
+    }
 
-
+    public void setDiagram(ERDiagram d){
+            this.diagram = d;
     }
 
 
-
+    public void setSchema(RelationSchema schema) {
+        this.relationSchema = schema;
+    }
 }

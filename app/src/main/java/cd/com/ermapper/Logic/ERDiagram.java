@@ -3,7 +3,6 @@ package cd.com.ermapper.Logic;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
@@ -104,6 +103,7 @@ public class ERDiagram implements Parcelable {
                 }
             }
         }
+        entityObjs = e;
         return e;
     }
 
@@ -115,6 +115,7 @@ public class ERDiagram implements Parcelable {
                 r.add((Relationship) o);
             }
         }
+        this.relationshipsobjs = r;
         return r;
     }
     // get all relationship shapeobjects
@@ -122,6 +123,10 @@ public class ERDiagram implements Parcelable {
         return relationshipsobjs;
     }
 
+    // get all relationship shapeobjects
+    public void setRelationshipsObjs(ArrayList<Relationship> r) {
+        this.relationshipsobjs = r;
+    }
 
 
     /* Funciton: getBinaryEntities()
@@ -188,17 +193,6 @@ public class ERDiagram implements Parcelable {
         return es;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(name);
-        parcel.writeTypedObject(getAllEntities(),i);
-        parcel.writeTypedList(getRelationships());
-    }
 
 
     public ArrayList<Cardinality> getAllCardinalities() {
@@ -216,9 +210,9 @@ public class ERDiagram implements Parcelable {
                 this.objects.addAll(o.getallobjects());
                 if (o.getClass() == Relationship.class) {
                     if (((Relationship) o).isBinary() ) {
-                       if (o.getEditId()!=null) textLayer.removeView(o.getEditId());
+                       if (o.getEditId()!=null && textLayer !=null) textLayer.removeView(o.getEditId());
                        for(Cardinality c: ((Relationship) o).getTextObjs()){
-                           textLayer.removeView(c.getNum());
+                          if(textLayer!=null) textLayer.removeView(c.getNum());
                            c = null;
                        }
                         this.objects.remove(o);
@@ -234,5 +228,18 @@ public class ERDiagram implements Parcelable {
             }
 
         }
+    }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(name);
+        parcel.writeTypedObject(getAllEntities(),i);
+        parcel.writeTypedList(getRelationships());
     }
 }

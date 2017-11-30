@@ -2,7 +2,6 @@ package cd.com.ermapper.Components;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 /**
  * Created by ldnel_000 on 2015-11-04.
@@ -21,7 +20,6 @@ public class Relation implements Parcelable{
     // constructors
     public Relation(AttributeSet theAttributes, AttributeSet key, String name) {
         this.name = name;
-        Log.d("name", String.valueOf(theAttributes.containsAll(key)));
         if (theAttributes == null)
             throw new NullPointerException(name + " attribute set is null");
         if (theAttributes.isEmpty())

@@ -205,4 +205,11 @@ public class ERDraw extends AppCompatActivity {
 
     }
 
+    public void setDiagram(ERDiagram diagram) {
+        this.diagram = diagram;
+    }
+
+    public void setOnDraw(DrawObjects object) {
+        this.object = object;
+    }
 }

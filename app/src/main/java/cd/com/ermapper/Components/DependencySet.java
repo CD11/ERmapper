@@ -229,4 +229,7 @@ public class DependencySet implements Parcelable {
     }
 
 
+    public int size() {
+       return this.elements.size();
+    }
 }

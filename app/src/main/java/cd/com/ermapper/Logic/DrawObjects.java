@@ -50,6 +50,7 @@ public class DrawObjects extends View {
     @Override
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        if(this.d == null) return;
         paint = new Paint();
         // If this is a new relationship, draw a line that follows the mouse
         if (state == 3 && rCurr != null) {
@@ -313,5 +314,13 @@ public class DrawObjects extends View {
             This takes the new relationship object from ERDRAW
          */
         this.rCurr = (Relationship) relationship;
+    }
+
+    public Relationship getRelationship() {
+        return this.rCurr;
+    }
+
+    public int getState() {
+        return state;
     }
 }

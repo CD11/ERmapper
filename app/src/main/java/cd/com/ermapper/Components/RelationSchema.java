@@ -157,7 +157,6 @@ public class RelationSchema {
                     primarkey.add(a);
                     attributes.add(a);
                     attributes.addAll(a.getValuesSet());
-                    Log.d("name", String.valueOf(attributes.containsAll(primarkey)));
                     tempR = new Relation(attributes, primarkey, a.getName());
                     relations.add(tempR);
                 }
@@ -188,5 +187,9 @@ public class RelationSchema {
 
     public void remove(Relation redunantTable) {
         this.getRelations().remove(redunantTable);
+    }
+
+    public int size() {
+        return this.relations.size();
     }
 }

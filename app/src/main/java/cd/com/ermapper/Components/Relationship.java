@@ -48,6 +48,8 @@ public class Relationship extends ShapeObject {
         conns = new ArrayList<>();
         obj1 = e1;
         obj2 = e2;
+        addObj(e1,null);
+        addObj(e2,null);
     }
     public Relationship() {
         super(null,"relationship", 0, 0, 0,0);

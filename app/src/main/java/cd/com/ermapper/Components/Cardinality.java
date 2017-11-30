@@ -75,6 +75,7 @@ public class Cardinality implements Parcelable {
     public void setO(ShapeObject o) {
         this.object = o;
     }
+    public void setNum(EditText e){this.num = e;}
     @Override
     public int describeContents() {
         return 0;
