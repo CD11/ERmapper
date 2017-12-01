@@ -186,7 +186,7 @@ public class ERDraw extends AppCompatActivity {
         et.setHint("Name");
         et.setImeOptions(EditorInfo.IME_ACTION_DONE);
         et.setSingleLine();
-        et.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
+        et.setBackgroundTintList(ColorStateList.valueOf(Color.TRANSPARENT));
         et.setTextColor(BLACK);
         et.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 
