@@ -32,6 +32,9 @@ public class Relationship extends ShapeObject {
         - > a relationship can have an attribute.
      */
 
+
+    //Todo Fix issue with Attributes when the are part of a relationship. They are not being deleted correctly
+
     // Local variables
     private EntitySet objs;
     private ArrayList<Cardinality> conns;
@@ -227,8 +230,14 @@ public class Relationship extends ShapeObject {
     @Override
     public void removeObj(ShapeObject curr, RelativeLayout textLayer) {
         for(Entity e: objs.getElements()) {
-            if(e.equals(curr)) this.getObjs().remove((Entity) curr);
-            if (e.containsObj(curr)) e.removeObj(curr,textLayer);
+            if (e.containsObj(curr)){
+                e.removeObj(curr,textLayer);
+                break;
+            }
+            if(e.equals(curr)) {
+                this.getObjs().remove((Entity) curr);
+                break;
+            }
         }
         for(Cardinality c : conns){
             if(c.getO().equals(curr))

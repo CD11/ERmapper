@@ -204,7 +204,6 @@ public class ERDiagram implements Parcelable {
     }
 
     public void removeO(ShapeObject curr, RelativeLayout textLayer) {
-
         for (ShapeObject o : this.objects) {
             if(o.equals(curr)){
                 this.objects.addAll(curr.getallobjects());
@@ -215,12 +214,15 @@ public class ERDiagram implements Parcelable {
                 this.objects.addAll(o.getallobjects());
                 if (o.getClass() == Relationship.class) {
                     if (((Relationship) o).isBinary() ) {
-                       if (o.getEditId()!=null && textLayer !=null) textLayer.removeView(o.getEditId());
+
                        for(Cardinality c: ((Relationship) o).getTextObjs()){
                           if(textLayer!=null) textLayer.removeView(c.getNum());
                            c = null;
                        }
-                        this.objects.remove(o);
+                        if(curr.getClass() != Attribute.class) {// check that it is the entity being removed
+                            this.objects.remove(o);
+                            if (o.getEditId()!=null && textLayer !=null) textLayer.removeView(o.getEditId());
+                       }
                     }
                 }
                 this.objects.remove(curr);
