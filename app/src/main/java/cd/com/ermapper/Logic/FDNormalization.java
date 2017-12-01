@@ -41,9 +41,6 @@ public class FDNormalization extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fdnormalization);
 
-        // list views
-       // resultsView  = (TextView) findViewById(R.id.results);
-        //resultsView.setMovementMethod(new ScrollingMovementMethod());
         diagram = this.getIntent().getParcelableExtra("diagram");
 
         EntitySet entities = diagram.getBinaryEntities(); // simplifies all N-ary Relationships
@@ -52,10 +49,8 @@ public class FDNormalization extends AppCompatActivity {
         relationSchema = new RelationSchema(entities, relationships);
         relationSchema.removalAllTemp();
         findDependencies(); // find all dependencies for the relationschema
-
         performNormalization();  // Perform normalization
-       // String closure = performAttributeClosure(relationSchema.getDependencies().getAllAttributes());
-      //  resultsView.setText(resultsView.getText());
+        performAttributeClosure(relationSchema.getDependencies().getAllAttributes());
         }catch (NullPointerException e){
             AlertDialog ad = new AlertDialog.Builder(this).create();
             ad.setTitle("Error");
@@ -108,7 +103,7 @@ public class FDNormalization extends AppCompatActivity {
             returnString +=(att.toString());
 
         //print all the functional dependencies created from data file
-        returnString +=("CLOSURE {" + leftAttributes + "}+");
+        returnString +=("CLOSURE {" + leftAttributes + "}+\n");
         AttributeSet closureSet = leftAttributes.closure(FDs);
         returnString +=(closureSet.toString());
         if(closureSet.containsAll(allAttributes)){
@@ -121,9 +116,9 @@ public class FDNormalization extends AppCompatActivity {
                 if(c.containsAll(allAttributes)) isMinimal = false;
             }
             if(isMinimal)
-                returnString +=("{" + leftAttributes + "} is MINIMAL (i.e. is CANDIDATE KEY)");
+                returnString +=("{" + leftAttributes + "} is MINIMAL (i.e. is CANDIDATE KEY)\n");
             else
-                returnString +=("{" + leftAttributes + "} is NOT MINIMAL");
+                returnString +=("{" + leftAttributes + "} is NOT MINIMAL\n");
         }
         ac.setText(returnString);
         return  returnString;

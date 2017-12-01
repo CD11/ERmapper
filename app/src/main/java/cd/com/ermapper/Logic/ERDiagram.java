@@ -243,4 +243,14 @@ public class ERDiagram implements Parcelable {
         parcel.writeTypedObject(getAllEntities(),i);
         parcel.writeTypedList(getRelationships());
     }
+
+    public void isValid() {
+        for(ShapeObject o: this.getObjects()){
+            try {
+               o.isValid();
+            } catch (NullPointerException e){
+                throw new NullPointerException(e.getMessage());
+                }
+        }
+    }
 }

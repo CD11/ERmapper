@@ -134,24 +134,7 @@ public class DrawObjects extends View {
                             }
 
                            d.removeO(curr, textLayer);
-                            /////////////////////
-                           /* for (ShapeObject o : d.getObjects()) {
-                                if (o.containsObj(curr)) {
-                                    d.getObjects().addAll(o.getallobjects());
-                                    if (o.getClass() == Relationship.class) {
-                                        if (((Relationship) o).isBinary())
-                                            textLayer.removeView(o.getEditId());
-                                            for(Cardinality c: ((Relationship) o).getTextObjs()){
-                                                textLayer.removeView(c.getNum());
-                                            }
-                                            d.getObjects().remove(o);
-                                    }
-                                    o.removeObj(curr);
-                                    break;
-                                }
 
-                            }*/
-                          //  if (d.getObjects().contains(curr)) d.getObjects().remove(curr);
                             /////////////////////
                             curr = null;
                             invalidate();
@@ -246,9 +229,11 @@ public class DrawObjects extends View {
                             } else if (curr1.getClass() == Attribute.class && curr.getClass() == Relationship.class) { // Add Attributes to a relationship
                                 ((Relationship) curr).addAttribute((Attribute) curr1);
                                 d.deleteO(curr1);
+                                break;
                             } else if (curr1.getClass() == Relationship.class && curr.getClass() == Attribute.class) { // Add Attributes to a relationship
                                 ((Relationship) curr1).addAttribute((Attribute) curr);
                                 d.deleteO(curr);
+                                break;
                             } else if (curr1.getClass() == Entity.class && curr.getClass() == Relationship.class) {
                                 rCurr.setObj1(curr, c);
                                 ((Relationship) curr).addObj((Entity) curr1, c);

@@ -108,4 +108,5 @@ public abstract class ShapeObject implements Parcelable {
     }
 
 
+    public abstract void isValid();
 }

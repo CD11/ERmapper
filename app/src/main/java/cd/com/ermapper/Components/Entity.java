@@ -262,6 +262,17 @@ public class Entity extends ShapeObject {
     }
 
     @Override
+    public void isValid() {
+
+            if(this.getAttr().isEmpty() || this.getAttr()== null) throw new NullPointerException(this.getName() +" has an invalid attribute Set");
+            if(this.getAttr().getPrimary())
+            for (Entity e : this.weak) {
+                e.isValid();
+            }
+
+    }
+
+    @Override
     public void shapeToXML(XmlSerializer serializer) throws IOException {
         try {
             serializer.startTag(null, "Entity");

@@ -1,7 +1,5 @@
 package cd.com.ermapper.Components;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 
 /**
@@ -80,13 +78,15 @@ public class RelationSchema {
                 /////////////////// Step 4  //////////////////////////////////
                 //a. identify the relation S that represent the participating entity type at the N-side of the relationship type.
                 if (r.isOneToN()) {
-                    if(r.getTextObjs().get(0).getNum().getText().equals("N")) //  obj1 is S
+                    if(r.getTextObjs().get(0).getNum().getText().equals("N")) { //  obj1 is S
                         //b. Include as foreign key in S the primary key of the relation T that represents the 1 side of the relationship type
                         ((Entity) r.getObj1()).getAttr().addAll(((Entity) r.getObj2()).foreignAttrs());
-                    else// obj2 is s
+                        ((Entity) r.getObj1()).getAttr().addAll((r.getAttrs()));
+                    } else {// obj2 is s
                         //b. Include as foreign key in S the primary key of the relation T that represents the 1 side of the relationship type
                         ((Entity) r.getObj2()).getAttr().addAll(((Entity) r.getObj1()).foreignAttrs());
-
+                        ((Entity) r.getObj2()).getAttr().addAll((r.getAttrs()));
+                    }
 
                     ///////////////////  Step 5 //////////////////////////////////////////////
                     //a. For each regular binary M:N relationship type R, create a new relation S to represent R.
@@ -94,6 +94,7 @@ public class RelationSchema {
                     //b. Include as foreign key attributes in S the primary keys of the relations that represent the participating entity types; their combination will form the primary key of S.
                     //c. Also include any simple attributes of the M:N relationship type (or simple components of composite attributes) as attributes of S.
                     Relation newRelation = new Relation((Entity)r.getObj1(), (Entity)r.getObj2());
+                    newRelation.getAttributes().addAll(r.getAttrs());
                     relations.add(newRelation);
                 }
             }
@@ -155,6 +156,9 @@ public class RelationSchema {
                 attributes.clear();
                 if(!a.getValues().isEmpty()) {            // check if a is complex and create its own relation.
                     primarkey.add(a);
+                    if(a.isPrimary()){
+                        primarkey.addAll(a.getValuesSet());
+                    }
                     attributes.add(a);
                     attributes.addAll(a.getValuesSet());
                     tempR = new Relation(attributes, primarkey, a.getName());

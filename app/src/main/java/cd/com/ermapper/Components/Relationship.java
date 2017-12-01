@@ -72,6 +72,18 @@ public class Relationship extends ShapeObject {
         return 0;
     }
 
+    @Override
+    public void isValid() {
+        try {
+            for (Entity e : this.getObjs().getElements()) {
+                e.isValid();
+            }
+        }catch (NullPointerException e){
+            throw e;
+        }
+
+    }
+
     public static final Creator<Relationship> CREATOR = new Creator<Relationship>() {
         @Override
         public Relationship createFromParcel(Parcel in) {
@@ -92,7 +104,8 @@ public class Relationship extends ShapeObject {
         float y = c.centerY();  // center of diamond
 
         for(Attribute a: this.getAttrs().getElements()){
-            a.drawLines(canvas, paint);
+            canvas.drawLine(x,y,a.getCoordinates().centerX(), a.getCoordinates().centerY(),paint);
+
         }
         //
         if(this.getObjs().isEmpty()){
@@ -213,7 +226,10 @@ public class Relationship extends ShapeObject {
     }
     @Override
     public void removeObj(ShapeObject curr, RelativeLayout textLayer) {
-        if(objs.contains((Entity) curr)) objs.remove((Entity) curr);
+        for(Entity e: objs.getElements()) {
+            if(e.equals(curr)) this.getObjs().remove((Entity) curr);
+            if (e.containsObj(curr)) e.removeObj(curr,textLayer);
+        }
         for(Cardinality c : conns){
             if(c.getO().equals(curr))
                 textLayer.removeView(c.getNum());
@@ -306,8 +322,9 @@ public class Relationship extends ShapeObject {
 
         return cd.getNum();
     }
-    public void addAttribute(Attribute curr1) {
-        attrs.add(curr1);
+    public void addAttribute(Attribute curr) {
+        if(!this.attrs.contains(curr))
+            attrs.add(curr);
     }
     public AttributeSet getAttrs() { return attrs;  }
 

@@ -134,7 +134,9 @@ public class ERDraw extends AppCompatActivity {
        try {
            intent = new Intent(this, FDNormalization.class);
            intent.putExtra("diagram", diagram);
+           diagram.isValid();
            startActivity(intent);
+
        }catch (NullPointerException e){
             LinearLayout layout = (LinearLayout) v.findViewById(R.id.diagramLayout);
             AlertDialog ad = new AlertDialog.Builder(this).create();

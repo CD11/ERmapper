@@ -278,4 +278,14 @@ public class AttributeSet implements Parcelable {
     }
 
 
+    public void isValid() {}
+
+    public boolean getPrimary() {
+        for(Attribute a: this.elements){
+            if (a.isPrimary()){
+                return true;
+            }
+        }
+        return false;
+    }
 }

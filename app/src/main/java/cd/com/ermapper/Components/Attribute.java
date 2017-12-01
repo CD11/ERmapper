@@ -183,6 +183,9 @@ public class Attribute extends ShapeObject {
         parcel.writeTypedList(values);
     }
 
+    @Override
+    public void isValid() {}
+
     public void shapeToXML(XmlSerializer serializer) throws IOException {
         try {
             serializer.startTag("","Attribute");
