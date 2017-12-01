@@ -71,7 +71,6 @@ public class Attribute extends ShapeObject {
     @Override
     public ArrayList<ShapeObject> getallobjects() {
         ArrayList<ShapeObject>s = new ArrayList<>();
-        s.add(this);
         for(Attribute a: this.getValuesSet().getElements())
             s.add(a);
 
@@ -182,8 +181,6 @@ public class Attribute extends ShapeObject {
         parcel.writeByte((byte) (primary ? 1 : 0));
         parcel.writeTypedList(values);
     }
-
-
 
     public void shapeToXML(XmlSerializer serializer) throws IOException {
         try {

@@ -243,8 +243,9 @@ public class Relationship extends ShapeObject {
     public boolean containsObj(ShapeObject curr) {
         if(obj1.equals(curr)) return true;
         if(obj2.equals(curr)) return true;
-        if(objs.contains((Entity)curr))return  true;
-
+        for(Entity e :this.objs.getElements()){
+            if(e.containsObj(curr)) return true;
+        }
         return false;
 
     }

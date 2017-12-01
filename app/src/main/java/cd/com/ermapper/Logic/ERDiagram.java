@@ -206,6 +206,11 @@ public class ERDiagram implements Parcelable {
     public void removeO(ShapeObject curr, RelativeLayout textLayer) {
 
         for (ShapeObject o : this.objects) {
+            if(o.equals(curr)){
+                this.objects.addAll(curr.getallobjects());
+                this.objects.remove(o);
+                break;
+            }
             if (o.containsObj(curr)) {
                 this.objects.addAll(o.getallobjects());
                 if (o.getClass() == Relationship.class) {
@@ -220,10 +225,6 @@ public class ERDiagram implements Parcelable {
                 }
                 this.objects.remove(curr);
                 o.removeObj(curr, textLayer);
-                break;
-            }else  if(o.equals(curr)){
-                this.objects.addAll(curr.getallobjects());
-                this.objects.remove(o);
                 break;
             }
 

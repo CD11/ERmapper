@@ -43,20 +43,20 @@ public class FDNormalization extends AppCompatActivity {
         setContentView(R.layout.activity_fdnormalization);
 
         // list views
-        functionalDependenciesView= (ListView) findViewById(R.id.FDList);
-        attributesView = (ListView) findViewById(R.id.AttributeList);
         resultsView  = (TextView) findViewById(R.id.results);
         resultsView.setMovementMethod(new ScrollingMovementMethod());
         diagram = this.getIntent().getParcelableExtra("diagram");
 
         EntitySet entities = diagram.getBinaryEntities(); // simplifies all N-ary Relationships
         ArrayList<Relationship> relationships = diagram.getRelationshipsObjs();
+
         relationSchema = new RelationSchema(entities, relationships);
-        findDependencies(); // find all dependencies for the relationschema
         relationSchema.removalAllTemp();
+        findDependencies(); // find all dependencies for the relationschema
+
         performNormalization();  // Perform normalization
-        String closure = performAttributeClosure(relationSchema.getDependencies().getAllAttributes());
-        resultsView.setText(resultsView.getText() + closure);
+       // String closure = performAttributeClosure(relationSchema.getDependencies().getAllAttributes());
+      //  resultsView.setText(resultsView.getText());
     }
 
 
@@ -129,12 +129,7 @@ public class FDNormalization extends AppCompatActivity {
 
         //print all the attributes
         AttributeSet allAttributes = FDs.getAllAttributes();
-        fdListAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, FDs.getStringElements());
-        functionalDependenciesView.setAdapter(fdListAdapter);
-        attributesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, allAttributes.getElements());
-        attributesView.setAdapter(attributesAdapter);
 
-        /*  This is code provided, however it is redundent
         //print all the attributes
         returnstring += "ATTRIBUTES:\n";
         for(Attribute att : allAttributes.getElements())
@@ -145,7 +140,6 @@ public class FDNormalization extends AppCompatActivity {
         returnstring += "FUNCTIONAL DEPENDENCIES:\n";
         returnstring += (FDs.toString());
         returnstring += ("\n==================================================\n");
-        */
 
         DependencySet minCover = FDs.minCover();
         returnstring += ("Minimal Cover:");
@@ -214,7 +208,7 @@ public class FDNormalization extends AppCompatActivity {
 
             //Step 1: already done above
             //Step 2:
-            ArrayList<Relation> database_3nf_dep_preserving = new ArrayList<Relation>();
+           RelationSchema database_3nf_dep_preserving = new RelationSchema();
             for(FunctionalDependency fd : minCover.getElements()){
                 Relation table = new Relation(fd);
                 database_3nf_dep_preserving.add(table);
@@ -229,7 +223,7 @@ public class FDNormalization extends AppCompatActivity {
                 database_3nf_dep_preserving.add(tableOfLeftOverAttributes);
             }
 
-            for(Relation r : database_3nf_dep_preserving)
+            for(Relation r : database_3nf_dep_preserving.getRelations())
                 returnstring += (r.toString());
 
                 returnstring += ("\n=======================================================\n");
@@ -282,7 +276,7 @@ public class FDNormalization extends AppCompatActivity {
             //A table is redundant if all of its attributes appears in some other table.
 
             Relation redunantTable = null;
-            while((redunantTable = relationSchema.findRedunantTable()) != null){
+            while((redunantTable = database_3nf_lossless_join_dep_preserving.findRedunantTable()) != null){
                 database_3nf_lossless_join_dep_preserving.remove(redunantTable);
                 returnstring += ("\nRemoving Redundant table: " + redunantTable);
 
