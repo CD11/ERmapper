@@ -128,7 +128,7 @@ public class DependencySet implements Parcelable {
                 for(Attribute a: leftAttributesToCheck.getElements() ){
                     AttributeSet newLHS = fd.getLHS().copy();
                     newLHS.remove(a);
-                    FunctionalDependency newFD = new FunctionalDependency(newLHS,fd.getRHS());
+                    FunctionalDependency newFD = new FunctionalDependency(newLHS,fd.getRHS(), fd.getName());
                     DependencySet Fcopy = F.copy();
                     Fcopy.remove(fd);
                     Fcopy.add(newFD);
@@ -162,11 +162,11 @@ public class DependencySet implements Parcelable {
         DependencySet singleRightHandSides = new DependencySet();
         for(FunctionalDependency fd : elements){
             if(fd.isTrivial()) {/*don' add it*/}
-            else if(fd.getRHS().size() == 1) singleRightHandSides.add(new FunctionalDependency(fd.getLHS(), fd.getRHS()));
+            else if(fd.getRHS().size() == 1) singleRightHandSides.add(new FunctionalDependency(fd.getLHS(), fd.getRHS(), fd.getName()));
             else{
                 //create a separate FD for each right hand side attribute
                 for(Attribute a : fd.getRHS().getElements()){
-                    FunctionalDependency newFD = new FunctionalDependency(fd.getLHS(), new AttributeSet(a));
+                    FunctionalDependency newFD = new FunctionalDependency(fd.getLHS(), new AttributeSet(a), fd.getName());
                     if(!newFD.isTrivial()) singleRightHandSides.add(newFD);
                 }
             }

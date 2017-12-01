@@ -8,57 +8,184 @@
     tools:context=".Logic.FDNormalization"
     tools:showIn="@layout/activity_fdnormalization">
 
-    <LinearLayout
-        android:layout_width="935dp"
-        android:layout_height="match_parent"
-        android:layout_margin="4dp"
-        android:layout_marginBottom="8dp"
+    <Button
+        android:id="@+id/db"
+        style="@style/Widget.AppCompat.Button"
+        android:layout_width="1264dp"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:layout_weight=".5"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-
-        <TextView
-            android:id="@+id/ResultsHeader"
-            android:layout_width="1204dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:layout_weight="0"
-            android:ems="10"
-            android:text="@string/results"
-            android:textAlignment="center"
-            android:textSize="24sp" />
-
-
-        <TextView
-            android:id="@+id/results"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:scrollHorizontally="true"
-            android:scrollbars="vertical"
-            android:text="@string/textview"
-            android:textSize="18sp"
-
-            app:layout_constraintTop_toBottomOf="@+id/ResultsHeader" />
-
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/db"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
         android:onClick="createDB"
         android:text="@string/create_database"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:textAlignment="center"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <ScrollView
+        android:id="@+id/scroll"
+        android:layout_width="1256dp"
+        android:layout_height="wrap_content"
+        android:scrollbarAlwaysDrawVerticalTrack="true"
+        android:animateLayoutChanges="true"
+        android:scrollbarStyle="insideOverlay"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/db">
+
+        <LinearLayout
+            android:id="@+id/LinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_marginTop="8dp"
+            android:divider="?android:attr/dividerVertical"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <TextView
+                android:id="@+id/ResultsHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="@string/results"
+                android:textAlignment="center"
+                android:textAppearance="@android:style/TextAppearance.Holo.Large"
+                android:textSize="30sp" />
+
+
+            <TextView
+                android:id="@+id/AttributesHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:layout_weight="0"
+                android:text="@string/attribute_values"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+
+            <TextView
+                android:id="@+id/attributes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="2dp"
+                android:layout_weight="0"
+                android:text="@string/results"
+                android:textSize="18sp"
+                tools:text="Attributes" />
+
+            <TextView
+                android:id="@+id/CandidateKeysHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:text="@string/candidatekeys"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                tools:text="candidate" />
+
+            <TextView
+                android:id="@+id/CandidateKeys"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="2dp"
+                android:text="@string/candidatekeys"
+                android:textSize="18sp"
+                tools:text="candidatekeys" />
+
+            <TextView
+                android:id="@+id/AttributeClosureHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:text="@string/attribute_closure"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                tools:text="Attribute Closure" />
+
+            <TextView
+                android:id="@+id/AttributeClosure"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="2dp"
+                android:text="@string/results"
+                android:textSize="18sp"
+                tools:text="attributeClosure" />
+
+            <TextView
+                android:id="@+id/FDHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:text="@string/functionaldependencies"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                tools:text="FunctionalDependencies" />
+
+            <TextView
+                android:id="@+id/fds"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="2dp"
+                android:text="@string/results"
+                android:textSize="18sp"
+                tools:text="fds" />
+
+            <TextView
+                android:id="@+id/MinCoverHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+
+                android:text="@string/minimum_coverage"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                tools:text="MinCover" />
+
+            <TextView
+                android:id="@+id/minCover"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="2dp"
+                android:text="@string/results"
+                android:textSize="18sp"
+                tools:text="min" />
+
+            <TextView
+                android:id="@+id/DptablesHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:text="@string/dependency_perserving_3nf_tables"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                tools:text="Dependency Perserving 3NF Tables" />
+
+            <TextView
+                android:id="@+id/dptables"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="2dp"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/LJDPTablesHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:text="@string/lossless_join_dependency_perserving_3nf_tables"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                tools:text="Dependency Perserving 3NF Tables" />
+
+            <TextView
+                android:id="@+id/LJDPtables"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="2dp"
+                android:text="@string/dependency_perserving_3nf_tables"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+    </ScrollView>
 
 </android.support.constraint.ConstraintLayout>

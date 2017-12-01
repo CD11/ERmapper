@@ -16,5 +16,12 @@
     <string name="results">Results</string>
     <string name="textview">TextView</string>
     <string name="create_database">Create Database</string>
+    <string name="attribute_values">Attributes</string>
+    <string name="candidatekeys">Candidate Keys</string>
+    <string name="attribute_closure">Attribute Closure</string>
+    <string name="functionaldependencies">Functional Dependencies</string>
+    <string name="minimum_coverage">Minimal Cover</string>
+    <string name="dependency_perserving_3nf_tables">Dependency Perserving 3NF Tables</string>
+    <string name="lossless_join_dependency_perserving_3nf_tables">Lossless Join Dependency Perserving 3NF Tables</string>
 
 </resources>

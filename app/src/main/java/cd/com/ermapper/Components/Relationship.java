@@ -228,7 +228,9 @@ public class Relationship extends ShapeObject {
         }
         if(this.getObjs().isEmpty()){
             s.add(obj1);
+            s.addAll(obj1.getallobjects());
             s.add(obj2);
+            s.addAll(obj2.getallobjects());
         }else {
             for (Entity e : this.getObjs().getElements()) {
                 s.addAll(e.getallobjects());

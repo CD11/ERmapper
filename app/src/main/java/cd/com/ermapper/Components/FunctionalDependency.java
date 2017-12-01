@@ -15,9 +15,9 @@ public class FunctionalDependency implements Parcelable{
 
     private AttributeSet lhs; //left hand side
     private AttributeSet rhs; //right hand side
+    private String name;
 
-    public FunctionalDependency(AttributeSet aLHS, AttributeSet aRHS) {
-
+ /*   public FunctionalDependency(AttributeSet aLHS, AttributeSet aRHS) {
         if (aLHS == null || aRHS == null) {
             System.out.println("ERROR: NULL ATTRITBUTE SET");
         } else if (aLHS.isEmpty() || aRHS.isEmpty()){
@@ -28,12 +28,13 @@ public class FunctionalDependency implements Parcelable{
             lhs.addAll(aLHS);
             rhs.addAll(aRHS);
         }
-    }
+    }*/
     public FunctionalDependency(AttributeSet aLHS, AttributeSet aRHS, String name) {
+        this.name = name;
         if (aLHS == null || aRHS == null) {
-            System.out.println("ERROR: NULL ATTRITBUTE SET");
+            throw new NullPointerException("ERROR: NULL ATTRITBUTE SET");
         } else if (aLHS.isEmpty() || aRHS.isEmpty()){
-            System.out.println("ERROR: EMPTY ATTRITBUTE SET");
+            throw new NullPointerException("ERROR: EMPTY ATTRITBUTE SET");
         }else {
             lhs = new AttributeSet();
             rhs = new AttributeSet();
@@ -119,5 +120,9 @@ public class FunctionalDependency implements Parcelable{
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeTypedObject(this.lhs, i);
         parcel.writeTypedObject(this.rhs, i);
+    }
+
+    public String getName() {
+        return name;
     }
 }

@@ -4,7 +4,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -43,13 +42,13 @@ public class FDNormalization extends AppCompatActivity {
         setContentView(R.layout.activity_fdnormalization);
 
         // list views
-        resultsView  = (TextView) findViewById(R.id.results);
-        resultsView.setMovementMethod(new ScrollingMovementMethod());
+       // resultsView  = (TextView) findViewById(R.id.results);
+        //resultsView.setMovementMethod(new ScrollingMovementMethod());
         diagram = this.getIntent().getParcelableExtra("diagram");
 
         EntitySet entities = diagram.getBinaryEntities(); // simplifies all N-ary Relationships
         ArrayList<Relationship> relationships = diagram.getRelationshipsObjs();
-
+        try {
         relationSchema = new RelationSchema(entities, relationships);
         relationSchema.removalAllTemp();
         findDependencies(); // find all dependencies for the relationschema
@@ -57,6 +56,20 @@ public class FDNormalization extends AppCompatActivity {
         performNormalization();  // Perform normalization
        // String closure = performAttributeClosure(relationSchema.getDependencies().getAllAttributes());
       //  resultsView.setText(resultsView.getText());
+        }catch (NullPointerException e){
+            AlertDialog ad = new AlertDialog.Builder(this).create();
+            ad.setTitle("Error");
+            ad.setMessage(e.getMessage());
+            ad.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            ad.show();
+
+        }
+
     }
 
 
@@ -84,23 +97,17 @@ public class FDNormalization extends AppCompatActivity {
     }
     private String performAttributeClosure(AttributeSet leftAttributes){
         String returnString = "";
+        TextView ac = findViewById(R.id.CandidateKeys);
         DependencySet FDs = new DependencySet();
         //Gather all the functional dependencies
         for(FunctionalDependency fd : relationSchema.getDependencies().getElements()){FDs.add(fd);}
         //print all the attributes
         AttributeSet allAttributes = FDs.getAllAttributes();
         //print all the attributes
-        returnString += ("ATTRIBUTES:\n");
         for(Attribute att : allAttributes.getElements())
             returnString +=(att.toString());
-        returnString +=("\n==================================================\n");
-
 
         //print all the functional dependencies created from data file
-        returnString +=("FUNCTIONAL DEPENDENCIES:\n");
-        returnString +=("\n==================================================\n");
-
-        returnString +=("ATTRIBUTE CLOSURE:\n");
         returnString +=("CLOSURE {" + leftAttributes + "}+");
         AttributeSet closureSet = leftAttributes.closure(FDs);
         returnString +=(closureSet.toString());
@@ -118,12 +125,21 @@ public class FDNormalization extends AppCompatActivity {
             else
                 returnString +=("{" + leftAttributes + "} is NOT MINIMAL");
         }
+        ac.setText(returnString);
         return  returnString;
     }
 
     private void performNormalization(){
         String returnstring = " ";
         DependencySet FDs = new DependencySet();
+        TextView attributes = findViewById(R.id.attributes);
+        TextView ck = findViewById(R.id.CandidateKeys);
+
+        TextView fdr = findViewById(R.id.fds);
+        TextView mc = findViewById(R.id.minCover);
+        TextView dpT = findViewById(R.id.dptables);
+        TextView lj_dpT = findViewById(R.id.LJDPtables);
+
         //Gather all the functional dependencies
         for(FunctionalDependency fd : relationSchema.getDependencies().getElements()){FDs.add(fd);}
 
@@ -131,18 +147,20 @@ public class FDNormalization extends AppCompatActivity {
         AttributeSet allAttributes = FDs.getAllAttributes();
 
         //print all the attributes
-        returnstring += "ATTRIBUTES:\n";
         for(Attribute att : allAttributes.getElements())
             returnstring += att.toString();
-        returnstring += "\n==================================================\n";
+        attributes.setText(returnstring);
+        returnstring = " ";
+
 
         //print all the functional dependencies created from ER diagram
-        returnstring += "FUNCTIONAL DEPENDENCIES:\n";
-        returnstring += (FDs.toString());
-        returnstring += ("\n==================================================\n");
+        returnstring += (FDs.toString()+"\n");
+        fdr.setText(returnstring);
+        returnstring = " ";
 
+
+        /***********************************************************/
         DependencySet minCover = FDs.minCover();
-        returnstring += ("Minimal Cover:");
         returnstring += ( minCover.toString());
 
         DependencySet toMerge = minCover.copy();
@@ -165,8 +183,6 @@ public class FDNormalization extends AppCompatActivity {
         minCover = newMinCover;
 
         //Minimal Cover with LHS's merged
-        returnstring += ("\n============================\n");
-        returnstring += ("MINIMAL COVER: MERGED LHS");
 
         returnstring += (minCover.toString());
         //check that minimal cover and original FD's are in fact equivalent
@@ -176,14 +192,15 @@ public class FDNormalization extends AppCompatActivity {
         else
             returnstring += ("FD Sets are NOT Equivalent");
 
-
+        mc.setText(returnstring);
+        returnstring=" ";
+        /*****************************************************/
             //find all the candidate keys of a table consisting of all
             //the attributes with respect to the functional dependencies
-        returnstring += ("\n-------------------------------------------------------------\n");
-        returnstring += ("CANDIDATE KEY FOR ALL ATTRIBUTES:\n");
         AttributeSet candidateKey = allAttributes.findCandidateKey(minCover);
         returnstring += (candidateKey.toString());
-
+        ck.setText(returnstring);
+        returnstring =" ";
         //Create Dependency Preserving 3NF tables
 		/*
 		 * This is the 3 step algorithm 16.4 presented in
@@ -203,8 +220,6 @@ public class FDNormalization extends AppCompatActivity {
 		 */
 
 
-            returnstring +=("\n=======================================================\n");
-            returnstring += ("Dependency Preserving, 3NF tables\n");
 
             //Step 1: already done above
             //Step 2:
@@ -223,12 +238,16 @@ public class FDNormalization extends AppCompatActivity {
                 database_3nf_dep_preserving.add(tableOfLeftOverAttributes);
             }
 
+        returnstring+=database_3nf_dep_preserving.toString();
+        dpT.setText(returnstring);
+        returnstring ="";
+
+
             for(Relation r : database_3nf_dep_preserving.getRelations())
-                returnstring += (r.toString());
+                returnstring += (r.toString() + "\n");
 
-                returnstring += ("\n=======================================================\n");
-                returnstring += ("Lossless-Join, Dependency Preserving, 3NF tables\n");
-
+        dpT.setText(returnstring);
+        returnstring= " ";
         //Create Lossless-Join, Dependency Preserving 3NF tables
 		/*
 		 * This is based on the 4 step algorithm 16.6 presented in
@@ -283,9 +302,10 @@ public class FDNormalization extends AppCompatActivity {
             }
 
             for(Relation r : database_3nf_lossless_join_dep_preserving.getRelations())
-                returnstring += (r.toString());
+                returnstring += (r.toString()+"\n");
 
-            resultsView.setText(returnstring);
+        lj_dpT.setText(returnstring);
+        returnstring = " ";
         }
 
 

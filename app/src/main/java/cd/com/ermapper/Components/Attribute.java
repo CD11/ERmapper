@@ -71,6 +71,7 @@ public class Attribute extends ShapeObject {
     @Override
     public ArrayList<ShapeObject> getallobjects() {
         ArrayList<ShapeObject>s = new ArrayList<>();
+        s.add(this);
         for(Attribute a: this.getValuesSet().getElements())
             s.add(a);
 

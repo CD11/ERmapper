@@ -131,7 +131,7 @@ public class Entity extends ShapeObject {
     @Override
     public ArrayList<ShapeObject> getallobjects() {
         ArrayList<ShapeObject>s = new ArrayList<>();
-       // s.add(this);
+        s.add(this);
         for(Attribute a: this.getAttr().getElements())
             s.addAll(a.getallobjects());
         s.addAll(this.getWeak());
