@@ -102,7 +102,7 @@ public class Attribute extends ShapeObject {
         // draw a solid line
         if(this.primary){
             EditText e = this.getEditId();
-            canvas.drawLine(e.getX(),e.getY() +e.getHeight()+5, e.getX() + e.getWidth(), e.getY()+e.getHeight()+5, paint);
+            canvas.drawLine(e.getX(),e.getY() +e.getHeight()+3, e.getX() + e.getWidth(), e.getY()+e.getHeight()+3, paint);
         }
 
         // raw a dash effect
@@ -148,7 +148,7 @@ public class Attribute extends ShapeObject {
     }
     public void setCoordinateY(float coordinateY) {
         this.getCoordinates().setY(coordinateY);
-        this.getCoordinates().setHeight(coordinateY + 150);
+        this.getCoordinates().setHeight(coordinateY + 200);
 
     }
 

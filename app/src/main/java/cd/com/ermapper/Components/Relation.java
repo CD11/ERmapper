@@ -53,7 +53,7 @@ public class Relation implements Parcelable{
 			/* create a relation out of the functional dependency FD
 			 * The left hand side becomes the primary key
 			 */
-
+        this.name = FD.getName();
         if (FD == null) {
             System.out.println("ERROR: Cannot create table out of null dependency");
             throw new NullPointerException("FD ERROR: Cannot create table out of null dependency");

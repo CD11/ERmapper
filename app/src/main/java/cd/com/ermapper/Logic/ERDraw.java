@@ -7,9 +7,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.*;
-
-
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
@@ -18,11 +16,11 @@ import android.widget.RelativeLayout;
 
 import java.io.IOException;
 
-import cd.com.ermapper.R;
 import cd.com.ermapper.Components.Attribute;
 import cd.com.ermapper.Components.Entity;
 import cd.com.ermapper.Components.Relationship;
 import cd.com.ermapper.Components.ShapeObject;
+import cd.com.ermapper.R;
 
 import static android.graphics.Color.BLACK;
 
@@ -30,7 +28,7 @@ import static android.graphics.Color.BLACK;
 public class ERDraw extends AppCompatActivity {
     public ERDiagram diagram;
     public DrawObjects object;
-    public LinearLayout layout;
+    public RelativeLayout layout;
     public RelativeLayout textLayer;
     public int count =0;
 
@@ -42,7 +40,7 @@ public class ERDraw extends AppCompatActivity {
         setContentView(R.layout.activity_erdraw);
         diagram = this.getIntent().getParcelableExtra("diagram");
 
-        layout = (LinearLayout) findViewById(R.id.diagramLayout);
+        layout = (RelativeLayout) findViewById(R.id.diagramLayout);
         textLayer = (RelativeLayout) findViewById(R.id.textLayout);
         object = new DrawObjects(this, diagram, 0, textLayer);
         layout.addView(object);
@@ -186,6 +184,7 @@ public class ERDraw extends AppCompatActivity {
         et.setHint("Name");
         et.setImeOptions(EditorInfo.IME_ACTION_DONE);
         et.setSingleLine();
+
         et.setBackgroundTintList(ColorStateList.valueOf(Color.TRANSPARENT));
         et.setTextColor(BLACK);
         et.setOnFocusChangeListener(new View.OnFocusChangeListener() {

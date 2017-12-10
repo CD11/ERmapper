@@ -149,6 +149,79 @@ public class NormalizationTest {
     }
 
 
+    @Test
+    public void MinCover(){
+        DependencySet d = new DependencySet();
+        r = new RelationSchema(diagram.getAllEntities(), diagram.getRelationshipsObjs());
+        r.removalAllTemp();
+        fd.setDiagram(diagram);
+        fd.setSchema(r);
+        fd.findDependencies();
+        d.addAll( r.getDependencies());
+        assertThat(4, is(d.size()));
+
+        assertThat(" id  -> dob  ", is(d.getElements().get(0).toString()));
+        assertThat(" code  -> room  ", is(d.getElements().get(1).toString()));
+        assertThat(" tId  -> name  ", is(d.getElements().get(2).toString()));
+        assertThat(" dob  -> year ,month ,day  ", is(d.getElements().get(3).toString()));
+    }
+
+
+    @Test
+    public void CandidateKey(){
+        DependencySet d = new DependencySet();
+        r = new RelationSchema(diagram.getAllEntities(), diagram.getRelationshipsObjs());
+        r.removalAllTemp();
+        fd.setDiagram(diagram);
+        fd.setSchema(r);
+        fd.findDependencies();
+        d.addAll( r.getDependencies());
+        assertThat(4, is(d.size()));
+
+        assertThat(" id  -> dob  ", is(d.getElements().get(0).toString()));
+        assertThat(" code  -> room  ", is(d.getElements().get(1).toString()));
+        assertThat(" tId  -> name  ", is(d.getElements().get(2).toString()));
+        assertThat(" dob  -> year ,month ,day  ", is(d.getElements().get(3).toString()));
+    }
+
+
+    @Test
+    public void thirdNF(){
+        DependencySet d = new DependencySet();
+        r = new RelationSchema(diagram.getAllEntities(), diagram.getRelationshipsObjs());
+        r.removalAllTemp();
+        fd.setDiagram(diagram);
+        fd.setSchema(r);
+        fd.findDependencies();
+        d.addAll( r.getDependencies());
+        assertThat(4, is(d.size()));
+
+        assertThat(" id  -> dob  ", is(d.getElements().get(0).toString()));
+        assertThat(" code  -> room  ", is(d.getElements().get(1).toString()));
+        assertThat(" tId  -> name  ", is(d.getElements().get(2).toString()));
+        assertThat(" dob  -> year ,month ,day  ", is(d.getElements().get(3).toString()));
+    }
+
+
+    @Test
+    public void dp_lj(){
+        DependencySet d = new DependencySet();
+        r = new RelationSchema(diagram.getAllEntities(), diagram.getRelationshipsObjs());
+        r.removalAllTemp();
+        fd.setDiagram(diagram);
+        fd.setSchema(r);
+        fd.findDependencies();
+        d.addAll( r.getDependencies());
+        assertThat(4, is(d.size()));
+
+        assertThat(" id  -> dob  ", is(d.getElements().get(0).toString()));
+        assertThat(" code  -> room  ", is(d.getElements().get(1).toString()));
+        assertThat(" tId  -> name  ", is(d.getElements().get(2).toString()));
+        assertThat(" dob  -> year ,month ,day  ", is(d.getElements().get(3).toString()));
+    }
+
+
+
 
 
 

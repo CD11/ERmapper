@@ -23,5 +23,7 @@
     <string name="minimum_coverage">Minimal Cover</string>
     <string name="dependency_perserving_3nf_tables">Dependency Perserving 3NF Tables</string>
     <string name="lossless_join_dependency_perserving_3nf_tables">Lossless Join Dependency Perserving 3NF Tables</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
 
 </resources>

@@ -263,7 +263,9 @@ public class Entity extends ShapeObject {
 
     @Override
     public void isValid() {
-
+            if(this.isWeak && !this.weak.isEmpty()){
+                throw new NullPointerException(this.getName() +" invalid weak entity");
+            }
             if(this.getAttr().isEmpty() || this.getAttr()== null) throw new NullPointerException(this.getName() +" has an invalid attribute Set");
             if(this.getAttr().getPrimary())
             for (Entity e : this.weak) {

@@ -137,7 +137,7 @@ public class ERDiagram implements Parcelable {
     public EntitySet getBinaryEntities() {
         EntitySet es = new EntitySet();
         ArrayList<Relationship> tempR = new ArrayList<>();
-        for(Relationship r: relationshipsobjs){
+        for(Relationship r: relationshipsobjs) {
              /* If Relationship is ternary
                 1. replace the relationship between the 3 entities with a new entity E and
                 create relationships E -> E1, E->E2, E->E3
@@ -145,12 +145,30 @@ public class ERDiagram implements Parcelable {
                 3. add any attributes of R to E
             */
 
+            if (!r.isBinary()) {
+                Entity newE = new Entity("placeholder");
+                Attribute temp = new Attribute("-1");
+                Attribute temp2 = new Attribute("-1");
+                temp.setPrimary(true);
+                newE.addAttribute(temp2);
+                newE.addAttribute(temp);
+                for (Entity e : r.getObjs().getElements()) {
+                    Relationship EA = new Relationship("EA", newE, e);
+                    newE.getAttr().addAll(e.foreignAttrs());
+                    this.addObject(EA);
+                    tempR.add(EA);
+                }
+                es.add(newE);
+                relationshipsobjs.addAll(tempR);
+            }
+        }
+
              /////////////////////// Converts all N-ary relationships to Binary
-            if(r.isTernary()){
-                Entity newE = new Entity("-1");
-                Relationship EA = new Relationship("-1", newE, (Entity)r.getObjs().getElements().get(0));
-                Relationship EB = new Relationship("-1", newE, (Entity)r.getObjs().getElements().get(1));
-                Relationship EC = new Relationship("-1", newE, (Entity)r.getObjs().getElements().get(2));
+        /*    if(r.isTernary()){
+                Entity newE = new Entity("placeholder");
+                Relationship EA = new Relationship("EA", newE, (Entity)r.getObjs().getElements().get(0));
+                Relationship EB = new Relationship("EB", newE, (Entity)r.getObjs().getElements().get(1));
+                Relationship EC = new Relationship("EC", newE, (Entity)r.getObjs().getElements().get(2));
                 Attribute temp = new Attribute("-1");
                 Attribute temp2 = new Attribute("-1");
                 temp.setPrimary(true);
@@ -173,7 +191,7 @@ public class ERDiagram implements Parcelable {
         }
         relationshipsobjs.addAll(tempR);
 
-
+*/
         for(Relationship r: getRelationships()){
             // If Relationship is binary add both entity objects
             if(r.isBinary()){
