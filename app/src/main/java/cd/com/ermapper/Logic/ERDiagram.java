@@ -93,13 +93,12 @@ public class ERDiagram implements Parcelable {
             // If entity then add the entity along with any weak entites
             if(o.getClass() == Entity.class){
                 e.add((Entity)o);
-                e.addAll(((Entity) o).getWeak());
             }
             // If Relationship, check for any entities in the relationship
             if(o.getClass() == Relationship.class){
                 for(Entity sub: ((Relationship)o).getObjs().getElements()){
                     e.add(sub);
-                    e.addAll(sub.getWeak());
+                  //  e.addAll(sub.getWeak());
                 }
             }
         }
@@ -129,70 +128,44 @@ public class ERDiagram implements Parcelable {
     }
 
 
-    /* Funciton: getBinaryEntities()
+    /* Funciton: relationshipDecomposition()
        Purpose:
             -> Searches all Diagram relationships, if they are not Binary converts them to binary
             -> Also removes any  redundant entites ( weak entites are stored in 2 places
      */
-    public EntitySet getBinaryEntities() {
+    public EntitySet relationshipDecomposition() {
         EntitySet es = new EntitySet();
+        ArrayList<Relationship> del = new ArrayList<>();
         ArrayList<Relationship> tempR = new ArrayList<>();
         for(Relationship r: relationshipsobjs) {
-             /* If Relationship is ternary
-                1. replace the relationship between the 3 entities with a new entity E and
+             /* If Relationship is > binary
+                1. replace the relationship between entities with a new Relationship R and
                 create relationships E -> E1, E->E2, E->E3
                 2. Give E a temporary primary key
                 3. add any attributes of R to E
             */
-
             if (!r.isBinary()) {
+                ////////////////////// Step 1 /////////////////////////////
                 Entity newE = new Entity("placeholder");
                 Attribute temp = new Attribute("-1");
-                Attribute temp2 = new Attribute("-1");
                 temp.setPrimary(true);
-                newE.addAttribute(temp2);
                 newE.addAttribute(temp);
+
                 for (Entity e : r.getObjs().getElements()) {
-                    Relationship EA = new Relationship("EA", newE, e);
+                    Relationship EA = new Relationship("new"+e.getName(), newE, e);
                     newE.getAttr().addAll(e.foreignAttrs());
                     this.addObject(EA);
                     tempR.add(EA);
+                    es.add(e);
                 }
                 es.add(newE);
-                relationshipsobjs.addAll(tempR);
-            }
-        }
+                del.add(r);
 
-             /////////////////////// Converts all N-ary relationships to Binary
-        /*    if(r.isTernary()){
-                Entity newE = new Entity("placeholder");
-                Relationship EA = new Relationship("EA", newE, (Entity)r.getObjs().getElements().get(0));
-                Relationship EB = new Relationship("EB", newE, (Entity)r.getObjs().getElements().get(1));
-                Relationship EC = new Relationship("EC", newE, (Entity)r.getObjs().getElements().get(2));
-                Attribute temp = new Attribute("-1");
-                Attribute temp2 = new Attribute("-1");
-                temp.setPrimary(true);
-                newE.addAttribute(temp2);
-                newE.addAttribute(temp);
-                newE.getAttr().addAll(((Entity)r.getObjs().getElements().get(0)).foreignAttrs());
-                newE.getAttr().addAll(((Entity)r.getObjs().getElements().get(1)).foreignAttrs());
-                newE.getAttr().addAll(((Entity)r.getObjs().getElements().get(2)).foreignAttrs());
-                newE.getAttr().addAll(r.getAttrs());
-                es.add(newE);
-                addObject(EA);
-                addObject(EB);
-                addObject(EC);
-                tempR.add(EA);
-                tempR.add(EB);
-                tempR.add(EC);
-                r = null;  // this relaitonship isn't needed
             }
-
         }
         relationshipsobjs.addAll(tempR);
 
-*/
-        for(Relationship r: getRelationships()){
+        for(Relationship r: getRelationshipsObjs()){
             // If Relationship is binary add both entity objects
             if(r.isBinary()){
                 es.add(((Entity)r.getObj1()));
@@ -200,14 +173,14 @@ public class ERDiagram implements Parcelable {
             }
         }
 
-
-        ////////////////////////// Step 2 in normalization
         for(Entity e: entityObjs.getElements()) {
             if(!e.isWeak()){
                 es.add(e);
             }
 
         }
+
+
         return es;
     }
 
@@ -232,12 +205,12 @@ public class ERDiagram implements Parcelable {
                 this.objects.addAll(o.getallobjects());
                 if (o.getClass() == Relationship.class) {
                     if (((Relationship) o).isBinary() ) {
-
-                       for(Cardinality c: ((Relationship) o).getTextObjs()){
-                          if(textLayer!=null) textLayer.removeView(c.getNum());
-                           c = null;
-                       }
                         if(curr.getClass() != Attribute.class) {// check that it is the entity being removed
+                            for(Cardinality c: ((Relationship) o).getTextObjs()){
+                                if(textLayer!=null) textLayer.removeView(c.getNum());
+                                c = null;
+                            }
+
                             this.objects.remove(o);
                             if (o.getEditId()!=null && textLayer !=null) textLayer.removeView(o.getEditId());
                        }

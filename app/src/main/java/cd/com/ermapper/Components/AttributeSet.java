@@ -63,8 +63,7 @@ public class AttributeSet implements Parcelable {
     }
     public void addAll(AttributeSet anAttributeSet) {
         for(Attribute a : anAttributeSet.elements)
-            if(a.getName() != "-1")
-                 this.add(a);
+          this.add(a);
     }
     public void remove(Attribute anAttribute) {
         //remove all equal to anAttribute

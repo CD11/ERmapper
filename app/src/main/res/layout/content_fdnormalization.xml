@@ -11,7 +11,7 @@
     <Button
         android:id="@+id/db"
         style="@style/Widget.AppCompat.Button"
-        android:layout_width="1264dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="createDB"
         android:text="@string/create_database"

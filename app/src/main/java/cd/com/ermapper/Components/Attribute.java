@@ -71,7 +71,7 @@ public class Attribute extends ShapeObject {
     @Override
     public ArrayList<ShapeObject> getallobjects() {
         ArrayList<ShapeObject>s = new ArrayList<>();
-        s.add(this);
+      //  s.add(this);
         for(Attribute a: this.getValuesSet().getElements())
             s.add(a);
 
@@ -148,7 +148,7 @@ public class Attribute extends ShapeObject {
     }
     public void setCoordinateY(float coordinateY) {
         this.getCoordinates().setY(coordinateY);
-        this.getCoordinates().setHeight(coordinateY + 200);
+        this.getCoordinates().setHeight(coordinateY + 175);
 
     }
 

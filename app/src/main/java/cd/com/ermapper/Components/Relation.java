@@ -23,7 +23,7 @@ public class Relation implements Parcelable{
         if (theAttributes == null)
             throw new NullPointerException(name + " attribute set is null");
         if (theAttributes.isEmpty())
-            throw new NullPointerException(name + " attribute set is empty");
+            throw new NullPointerException(name + " primmary set is empty");
         if (key != null && !theAttributes.containsAll(key))
             throw new NullPointerException(name +(" ERROR: PRIMARY KEY MUST BE A SUBSET OF THE ATTRIBUTES"));
 

@@ -35,7 +35,7 @@ public class FDNormalization extends AppCompatActivity {
 
         diagram = this.getIntent().getParcelableExtra("diagram");
 
-        EntitySet entities = diagram.getBinaryEntities(); // simplifies all N-ary Relationships
+        EntitySet entities = diagram.relationshipDecomposition(); // simplifies all N-ary Relationships
         ArrayList<Relationship> relationships = diagram.getRelationshipsObjs();
         try {
         relationSchema = new RelationSchema(entities, relationships);
@@ -72,7 +72,7 @@ public class FDNormalization extends AppCompatActivity {
     }
 
 
-    private String performAttributeClosure(AttributeSet leftAttributes){
+    public String performAttributeClosure(AttributeSet leftAttributes){
         String returnString = "";
         DependencySet FDs = new DependencySet();
         //Gather all the functional dependencies
@@ -106,7 +106,7 @@ public class FDNormalization extends AppCompatActivity {
     }
 
 
-    private DependencySet minCover(DependencySet FDs) {
+    public DependencySet minCover(DependencySet FDs) {
         /*
          *  minimal cover of  a set of fuctional dependencies, is a set of fuctional dependencies that
          *   satisfies the property that every dependency is in its closure
@@ -144,7 +144,7 @@ public class FDNormalization extends AppCompatActivity {
 
 
 
-    private RelationSchema DP3NF(DependencySet minCover, AttributeSet allAttributes) {
+    public RelationSchema DP3NF(DependencySet minCover, AttributeSet allAttributes) {
         //Create Dependency Preserving 3NF tables
 		/*
 		 * This is the 3 step algorithm 16.4 presented in
@@ -186,7 +186,7 @@ public class FDNormalization extends AppCompatActivity {
 
     }
 
-    private RelationSchema dp_lj(RelationSchema database_3nf_dep_preserving, DependencySet minCover, AttributeSet candidateKey){
+    public RelationSchema dp_lj(RelationSchema database_3nf_dep_preserving, DependencySet minCover, AttributeSet candidateKey){
         //Create Lossless-Join, Dependency Preserving 3NF tables
 		/*
 		 * This is based on the 4 step algorithm 16.6 presented in
@@ -242,7 +242,7 @@ public class FDNormalization extends AppCompatActivity {
     }
 
 
-    private void performNormalization(){
+    public void performNormalization(){
         DependencySet FDs = new DependencySet();
         String returnString = "";
         TextView attributes = findViewById(R.id.attributes);

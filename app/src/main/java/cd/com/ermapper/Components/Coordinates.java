@@ -48,7 +48,7 @@ public class Coordinates implements Parcelable {
 
     // check if x and y are contained in teh objects coordinates
     public boolean contains(float x, float y) {
-        return this.x < x && this.width > x && this.y < y && this.height > y;
+        return this.x+5 < x && this.width+5 > x && this.y+5 < y && this.height+5 > y;
     }
 
     // Get center on X axis

@@ -32,9 +32,9 @@ public class FunctionalDependency implements Parcelable{
     public FunctionalDependency(AttributeSet aLHS, AttributeSet aRHS, String name) {
         this.name = name;
         if (aLHS == null || aRHS == null) {
-            throw new NullPointerException("ERROR: NULL ATTRITBUTE SET");
+            throw new NullPointerException("ERROR:"+ name+" NULL ATTRITBUTE SET");
         } else if (aLHS.isEmpty() || aRHS.isEmpty()){
-            throw new NullPointerException("ERROR: EMPTY ATTRITBUTE SET");
+            throw new NullPointerException("ERROR:" + name +" EMPTY ATTRITBUTE SET");
         }else {
             lhs = new AttributeSet();
             rhs = new AttributeSet();
@@ -105,7 +105,7 @@ public class FunctionalDependency implements Parcelable{
             if (!lhs.contains(a)) returnString = returnString + a + ",";
         }
         returnString = returnString.substring(0, returnString.length() - 1);  //strip off last ","
-        returnString = returnString + " ";
+        returnString = returnString + " \n";
 
         return returnString;
     }

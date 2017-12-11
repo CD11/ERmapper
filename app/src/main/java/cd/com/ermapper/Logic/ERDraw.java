@@ -168,8 +168,6 @@ public class ERDraw extends AppCompatActivity {
             ad.setMessage("Error Saving File "+ e);
 
         }
-
-
         ad.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
