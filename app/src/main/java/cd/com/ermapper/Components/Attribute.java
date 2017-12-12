@@ -52,6 +52,7 @@ public class Attribute extends ShapeObject {
     public Attribute(Parcel in) {
         super(in);
         primary = in.readByte() != 0;
+        foreign= in.readByte() != 0;
         values = in.createTypedArrayList(Attribute.CREATOR);
     }
 
@@ -180,6 +181,7 @@ public class Attribute extends ShapeObject {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(this.getName());
         parcel.writeByte((byte) (primary ? 1 : 0));
+        parcel.writeByte((byte) (foreign ? 1 : 0));
         parcel.writeTypedList(values);
     }
 

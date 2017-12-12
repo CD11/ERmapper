@@ -35,7 +35,10 @@ public class Relation implements Parcelable{
         }
     }
 
-    public Relation(Entity obj1, Entity obj2) {
+
+    //Include as foreign key attributes in S the primary keys of the relations that represent the participating entity types; their combination will form the primary key of S.
+    public Relation(Entity obj1, Entity obj2, String name) {
+        this.name = name;
         AttributeSet temp = new AttributeSet();
         temp.addAll(obj1.foreignAttrs());
         temp.addAll(obj2.foreignAttrs());

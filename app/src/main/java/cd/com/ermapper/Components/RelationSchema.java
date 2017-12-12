@@ -1,7 +1,5 @@
 package cd.com.ermapper.Components;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 
 /**
@@ -47,7 +45,7 @@ public class RelationSchema {
     /*
     takes the ERDiagram  and creates the relational Schema
      */
-    public RelationSchema(EntitySet entities, ArrayList<Relationship> relationships) {
+    public RelationSchema(EntitySet entities, ArrayList<Relationship> relationships) throws Exception {
         this.relations = new ArrayList<>();
         dependencies = new DependencySet();
         Relation tempR;
@@ -58,7 +56,10 @@ public class RelationSchema {
             a. assign a Relation, pick a primary key
                 if the primary key is a complex attribute: all attributes will be included
            b. if  an attribute is complex, create a new relation
-        2. For all Weak Entities, create a foreign key that references all Primary keys of its Strong relation
+        2. For each weak entity
+            a. create a relation R that include all simple attributes as attributes of R.
+            b. include as foreign key attributes of R the primary key attributes of the Strong entity.
+
         3. For all 1:1 relationships do
             a. Choose one of the relations-say S-and include a foreign key in S the primary key of T.
             b. It is better to choose an entity type with total participation in R in the role of S.
@@ -76,53 +77,54 @@ public class RelationSchema {
             c. The primary key of R is the combination of A and K. If the multivalued attribute is composite, we include its simple components.
 
 */
-        if (relationships.isEmpty()) {
-            for (Entity e : entities.getElements()) {
+        //////////////////////// Step 1
+        // Create a relation with all its Attributes and the the primary key to all strong Entities
+        for (Entity e : entities.getElements()) {
+            if (!e.isWeak()) {
                 primarkey.addAll(e.getPrimary());
                 attributes.addAll(e.getAttr());
-                Relation r = new Relation(attributes, primarkey, e.getName());
-            }
-            return;
-        }
 
-        for (Relationship r : relationships) {
-            for (Entity e : r.getStrong().getElements()) {
 
-                //////////////////////// Step 1
-                // get attributes for Strong Entities;  strong -> FD
-                if (!e.isWeak()) {
-                    primarkey.addAll(e.getPrimary());
-                    attributes.addAll(e.getAttr());
-                    tempR = new Relation(attributes, primarkey, e.getName());
-                    relations.add(tempR);
-                }
-
-                primarkey.clear();
-                attributes.clear();
+            tempR = new Relation(attributes, primarkey, e.getName());
+            relations.add(tempR);
+            primarkey.clear();
+            attributes.clear();
             }
         }
 
-        for (Relationship r : relationships) {
-            for (Entity e : entities.getElements()) {
-                /////////////////// Step 2
+        for(Entity e: entities.getElements()){
+            if (e.isWeak()) {
                 // Check weak Entities
-                if (e.isWeak()) {
-                    /* if entity has weak Entities add the primary key of its strong relation to it */
-                    primarkey.addAll(e.getPrimary());
-                    attributes.addAll(e.getAttr());
-                    for (Entity strong : r.getStrong().getElements()) {
-                        e.getAttr().addAll(strong.getPrimary());
-                        primarkey.addAll(strong.getPrimary());
-                        attributes.addAll(e.getAttr());
-                    }
+                /* if entity has weak Entities, the foriegn key references the primmary key of its identifying relationship
+                *   When the user creates a diagram they must add a foreign key attribute with the same name as the identifying primary key
+                *   this means we do not have to add the attribute here.
+                * */
+                primarkey.addAll(e.getPrimary());
+                attributes.addAll(e.getAttr());
+                // this is where some kind of check for attributes names could be added.
 
-                    /* relation r that includes all simple attributes */
-                    tempR = new Relation(attributes, primarkey, e.getName());
-                    relations.add(tempR);
-                    Log.d("weak Entites", e.getName());
-                }
+            tempR = new Relation(attributes, primarkey, e.getName());
+            relations.add(tempR);
+            primarkey.clear();
+            attributes.clear();
             }
+
         }
+
+        /////////////////// Step 2 ////////////////////////////////////////
+       /* for (Relationship r : relationships) {
+            for (Entity e : entities.getElements()) {
+                    // Check weak Entities
+                    if (e.isWeak()) {
+                    // if entity has weak Entities, the foriegn key references the primmary key of its identifying relationship
+                        primarkey.addAll(e.getPrimary());
+                        attributes.addAll(e.getAttr());
+
+
+
+
+            }
+        }*/
 
 
         for (Relationship r : relationships) {
@@ -149,7 +151,7 @@ public class RelationSchema {
             } else if (r.isMToN()) {
                 //b. Include as foreign key attributes in S the primary keys of the relations that represent the participating entity types; their combination will form the primary key of S.
                 //c. Also include any simple attributes of the M:N relationship type (or simple components of composite attributes) as attributes of S.
-                Relation newRelation = new Relation((Entity) r.getObj1(), (Entity) r.getObj2());
+                Relation newRelation = new Relation((Entity) r.getObj1(), (Entity) r.getObj2(), r.getName());
                 newRelation.getAttributes().addAll(r.getAttrs());
                 relations.add(newRelation);
             }
@@ -181,120 +183,21 @@ public class RelationSchema {
 
     }
 
-
-
-
-
-
-/*
-        // Steps 3 -> 5 require modifying an existing relation based on the diagram entity
-        // we will update the entity and then create the Relation per steps 1 and 2.
-
-            if(r!= null && r.getObj1().getClass() == Entity.class && r.getObj2().getClass() == Entity.class) {
-                Entity e1 = (Entity) r.getObj1();
-                Entity e2 = (Entity) r.getObj2();
-
-                ////////////////////// Step 3 //////////////////////////////////////
-                //Choose one of the relations-say S-and include a foreign key in S the primary key of T.
-                if(r.isOneToOne()) {
-                    ((Entity) r.getObj1()).getAttr().addAll(((Entity) r.getObj2()).foreignAttrs());
-                }
-                /////////////////// Step 4  //////////////////////////////////
-                //a. identify the relation S that represent the participating entity type at the N-side of the relationship type.
-                if (r.isOneToN()) {
-                    if(r.getTextObjs().get(0).getNum().getText().equals("N")) { //  obj1 is S
-                        //b. Include as foreign key in S the primary key of the relation T that represents the 1 side of the relationship type
-                        ((Entity) r.getObj1()).getAttr().addAll(((Entity) r.getObj2()).foreignAttrs());
-                        ((Entity) r.getObj1()).getAttr().addAll((r.getAttrs()));
-                    } else {// obj2 is s
-                        //b. Include as foreign key in S the primary key of the relation T that represents the 1 side of the relationship type
-                        ((Entity) r.getObj2()).getAttr().addAll(((Entity) r.getObj1()).foreignAttrs());
-                        ((Entity) r.getObj2()).getAttr().addAll((r.getAttrs()));
-                    }
-
-                    ///////////////////  Step 5 //////////////////////////////////////////////
-                    //a. For each regular binary M:N relationship type R, create a new relation S to represent R.
-                }else if(r.isMToN()){
-                    //b. Include as foreign key attributes in S the primary keys of the relations that represent the participating entity types; their combination will form the primary key of S.
-                    //c. Also include any simple attributes of the M:N relationship type (or simple components of composite attributes) as attributes of S.
-                    Relation newRelation = new Relation((Entity)r.getObj1(), (Entity)r.getObj2());
-                    newRelation.getAttributes().addAll(r.getAttrs());
-                    relations.add(newRelation);
+    public String getForeignString(Attribute a){
+        // called by the database handler, this checks all relations, if
+        String result = "";
+        for(Relation r: this.getRelations()){
+            for(Attribute temp: r.getPrimaryKey().getElements()){
+                if(temp.getName().equals(a.getName())){ // make sure it is not foreign
+                    result +=  r.getName() +"("+a.getName()+") ";
+                    System.out.print(result);
+                    return result;
                 }
             }
         }
-
-
-        for( Entity e: entities.getElements()) {
-
-            //////////////////////// Step 1
-            // get attributes for Strong Entities;  strong -> FD
-            if (!e.isWeak()) {
-                for (Attribute a : e.getAttr().getElements()) {
-                    if (a.isPrimary() ||a.isForeign() && a.getName() != "-1") {
-                        primarkey.add(a);
-                    }
-                    attributes.add(a);
-                }
-                tempR = new Relation(attributes, primarkey, e.getName());
-                relations.add(tempR);
-            }
-
-            primarkey.clear();
-            attributes.clear();
-
-            /////////////////// Step 2
-            // Check weak Entities
-            if (!e.equals(null) || !e.getWeak().isEmpty()) {
-                *//* if entity has weak Entities add the primary key of its strong relation to it *//*
-                for (Entity eW : e.getWeak()) {
-                    // add Strong entity primary key as key to weak entity
-                    for (Attribute a : e.getAttr().getElements()) {
-                        if (a.isPrimary() || a.isForeign() && a.getName() != "-1")
-                            eW.getAttr().add(a);
-                    }
-                    // add attributes of weak entites;   weak -> FD
-                    for (Attribute a : eW.getAttr().getElements()) {
-                        if (a.isPrimary() || a.isForeign() && a.getName() != "-1") {
-                            primarkey.add(a);
-                        }
-                        attributes.add(a);
-                    }
-                      tempR = new Relation(attributes, primarkey, e.getName());
-                    relations.add(tempR);
-                }
-            }
-        }
-
-
-        ////////////// Step 6 ///////////////////////////
-        // check for multiple attributes.
-        // For each multivalued attribute A, create a new relation R.
-        // This relation R will include an attribute corresponding to A,
-        // plus the primary key attribute K-as a foreign key in R-of the relation that represents the entity type of relationship type that has A as an attribute.
-        // The primary key of R is the combination of A and K. If the multivalued attribute is composite, we include its simple components.
-
-        for(Entity e: entities.getElements()){
-            for(Attribute a: e.getAttr().getElements()){ // for each attribute a in e
-                primarkey.clear();
-                attributes.clear();
-
-
-                if(!a.getValues().isEmpty()) {            // check if a is complex and create its own relation.
-                    primarkey.add(a);
-                    if(a.isPrimary()){
-                        primarkey.addAll(a.getValuesSet());
-                    }
-                    attributes.add(a);
-                    attributes.addAll(a.getValuesSet());
-                    tempR = new Relation(attributes, primarkey, a.getName());
-                    relations.add(tempR);
-                }
-
-            }
-        }
-    }*/
-
+        if(result.equals("")) throw  new NullPointerException(a.getName() +"is missing an Identifying relation ");
+        return result;
+    }
 
     public Relation findRedunantTable() {
         //Find and return any relation within database whose attributes are all contained within another
@@ -313,6 +216,15 @@ public class RelationSchema {
             r.getPrimaryKey().removeTemp();
             r.getAttributes().removeTemp();
         }
+        DependencySet temp = new DependencySet();
+        for(FunctionalDependency d :this.dependencies.getElements()){
+            d.getLHS().removeTemp();
+            d.getRHS().removeTemp();
+            if(d.isTrivial()){
+                temp.add(d);
+            }
+        }
+        dependencies.getElements().removeAll(temp.getElements());
     }
 
     public void remove(Relation redunantTable) {

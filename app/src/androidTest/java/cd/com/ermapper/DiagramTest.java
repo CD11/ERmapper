@@ -104,8 +104,8 @@ public class DiagramTest {
         // It is ready for you to to Select an object
         File file  = new File("files/"+ diagram.getName() +".xml");
         assertTrue(!file.equals(null));
-        //TODO : add more test to check the XML file is a valid demonstration of the ER Diagram
 
+        
 
     }
 }

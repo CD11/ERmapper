@@ -61,7 +61,6 @@ public class SetOfAttributeSets implements Parcelable
             this.add(s);
     }
 
-
     public void remove(AttributeSet anAttributeSet) {
         //remove all items equal to anFD
 

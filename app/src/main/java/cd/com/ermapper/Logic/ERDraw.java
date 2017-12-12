@@ -39,7 +39,6 @@ public class ERDraw extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_erdraw);
         diagram = this.getIntent().getParcelableExtra("diagram");
-
         layout = (RelativeLayout) findViewById(R.id.diagramLayout);
         textLayer = (RelativeLayout) findViewById(R.id.textLayout);
         object = new DrawObjects(this, diagram, 0, textLayer);

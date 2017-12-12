@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/baseLayout"
-    android:layout_width="fill_parent"
-    android:layout_weight="1"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
     app:layout_constraintEnd_toEndOf="parent"
@@ -15,7 +14,7 @@
     <Button
         android:id="@+id/db"
         style="@style/Widget.AppCompat.Button"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
@@ -25,7 +24,11 @@
         android:onClick="createDB"
         android:text="@string/create_database"
         android:textAlignment="center"
-        android:textSize="30sp" />
+        android:textSize="30sp"
+        app:layout_constraintBottom_toTopOf="@id/scroll"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <ScrollView
@@ -36,9 +39,13 @@
         android:layout_alignParentStart="true"
         android:layout_below="@+id/db"
         android:animateLayoutChanges="true"
-        android:fillViewport="true"
         android:scrollbarAlwaysDrawVerticalTrack="true"
-        android:scrollbarStyle="insideOverlay">
+        android:scrollbarStyle="insideOverlay"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/db">
 
         <LinearLayout
             android:id="@+id/LinearLayout"
@@ -48,7 +55,10 @@
             android:layout_marginTop="8dp"
             android:divider="?android:attr/dividerVertical"
             android:fillViewport="true"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="@id/db"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
 
             <TextView

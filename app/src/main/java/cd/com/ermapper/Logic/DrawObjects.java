@@ -155,6 +155,7 @@ public class DrawObjects extends View {
                             ((Attribute) curr).setPrimary(!((Attribute) curr).isPrimary());
                             invalidate();
                         }
+                        invalidate();
                         clickCount = 0;
                         duration = 0;
                     }

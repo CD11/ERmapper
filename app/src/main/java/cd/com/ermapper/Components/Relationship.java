@@ -515,4 +515,14 @@ public class Relationship extends ShapeObject {
         attrs.addAll(this.attrs);
         return  attrs;
     }
+
+    public boolean validForeignKey(String name){
+        for(Entity e: this.getStrong().getElements()){
+            if(e.getPrimary().hasName(name)){
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

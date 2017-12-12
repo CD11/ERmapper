@@ -26,26 +26,25 @@ public class FDNormalization extends AppCompatActivity {
 
     //to display lists to screen
     private ERDiagram diagram;
+    private DatabaseHandler db;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fdnormalization);
-
+        AlertDialog ad = new AlertDialog.Builder(this).create();
+        ad.setTitle("Error");
         diagram = this.getIntent().getParcelableExtra("diagram");
-
+        try {
         EntitySet entities = diagram.relationshipDecomposition(); // simplifies all N-ary Relationships
         ArrayList<Relationship> relationships = diagram.getRelationshipsObjs();
-        try {
         relationSchema = new RelationSchema(entities, relationships);
-        relationSchema.removalAllTemp();
         findDependencies(); // find all dependencies for the relationschema
+        relationSchema.removalAllTemp();
         performNormalization();  // Perform normalization
-        performAttributeClosure(relationSchema.getDependencies().getAllAttributes());
         }catch (NullPointerException e){
-            AlertDialog ad = new AlertDialog.Builder(this).create();
-            ad.setTitle("Error");
+
             ad.setMessage(e.getMessage());
             ad.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
                     new DialogInterface.OnClickListener() {
@@ -54,7 +53,15 @@ public class FDNormalization extends AppCompatActivity {
                         }
                     });
             ad.show();
-
+        }catch (Exception e){
+            ad.setMessage(e.getMessage());
+            ad.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            ad.show();
         }
 
     }
@@ -232,7 +239,6 @@ public class FDNormalization extends AppCompatActivity {
 
         //Step 4: Remove any redundant tables
         //A table is redundant if all of its attributes appears in some other table.
-
         Relation redunantTable = null;
         while((redunantTable = database_3nf_lossless_join_dep_preserving.findRedunantTable()) != null){
             database_3nf_lossless_join_dep_preserving.remove(redunantTable);
@@ -301,24 +307,37 @@ public class FDNormalization extends AppCompatActivity {
     }
 
     public void createDB(View v){
-            DatabaseHandler db = new DatabaseHandler(this.getBaseContext(), diagram.getName(), null, 1, relationSchema);
-            AlertDialog ad = new AlertDialog.Builder(this).create();
-            ad.setTitle("DB Creation");
-            ad.setMessage(db.getDatabaseName() +" Successfully created");
+
+        AlertDialog ad = new AlertDialog.Builder(this).create();
+        ad.setTitle("DB Creation");
+        try {
+            db = new DatabaseHandler(this.getBaseContext(), diagram.getName(), null, 1, relationSchema);
+            db.onCreate(db.getWritableDatabase());
+            ad.setMessage(db.getDatabaseName() + " Successfully created");
             ad.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();
                         }
                     });
-            ad.show();
+
+        }catch(NullPointerException e){
+            ad.setMessage("Database Creation Error :"+e.getMessage());
+            ad.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+        }
+        ad.show();
     }
 
     public void setDiagram(ERDiagram d){
             this.diagram = d;
     }
 
-
+    public DatabaseHandler getDB(){return this.db;}
     public void setSchema(RelationSchema schema) {
         this.relationSchema = schema;
     }

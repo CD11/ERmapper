@@ -98,7 +98,6 @@ public class ERDiagram implements Parcelable {
             if(o.getClass() == Relationship.class){
                 for(Entity sub: ((Relationship)o).getObjs().getElements()){
                     e.add(sub);
-                  //  e.addAll(sub.getWeak());
                 }
             }
         }
@@ -139,46 +138,37 @@ public class ERDiagram implements Parcelable {
         ArrayList<Relationship> tempR = new ArrayList<>();
         for(Relationship r: relationshipsobjs) {
              /* If Relationship is > binary
-                1. replace the relationship between entities with a new Relationship R and
+                1. replace the relationship between entities with a new Relationship R  and a new weak entity E
                 create relationships E -> E1, E->E2, E->E3
                 2. Give E a temporary primary key
                 3. add any attributes of R to E
             */
             if (!r.isBinary()) {
                 ////////////////////// Step 1 /////////////////////////////
-                Entity newE = new Entity("placeholder");
+                Entity newE = new Entity(r.getName());
                 Attribute temp = new Attribute("-1");
                 temp.setPrimary(true);
                 newE.addAttribute(temp);
-
                 for (Entity e : r.getObjs().getElements()) {
-                    Relationship EA = new Relationship("new"+e.getName(), newE, e);
-                    newE.getAttr().addAll(e.foreignAttrs());
-                    this.addObject(EA);
-                    tempR.add(EA);
+                    Relationship EA = new Relationship("new" + e.getName(), newE, e); // new relation
+                    newE.getAttr().addAll(r.getAttrs()); // add attr of old relation
+                    if(!tempR.contains(EA))
+                        tempR.add(EA);
                     es.add(e);
                 }
                 es.add(newE);
                 del.add(r);
 
             }
-        }
-        relationshipsobjs.addAll(tempR);
-
-        for(Relationship r: getRelationshipsObjs()){
-            // If Relationship is binary add both entity objects
-            if(r.isBinary()){
+              else{
+                // add binary relationships are already in relationshipObjs
+                // add the entities to the entity set
                 es.add(((Entity)r.getObj1()));
                 es.add(((Entity)r.getObj2()));
             }
         }
-
-        for(Entity e: entityObjs.getElements()) {
-            if(!e.isWeak()){
-                es.add(e);
-            }
-
-        }
+        relationshipsobjs.addAll(tempR);
+        relationshipsobjs.removeAll(del);
 
 
         return es;

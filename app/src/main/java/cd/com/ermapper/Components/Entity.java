@@ -193,16 +193,17 @@ public class Entity extends ShapeObject {
      */
     public void setWeak(Boolean weak) {
         isWeak = weak;
-
-        if(isWeak == true) {
-            for (Attribute a : getAttr().getElements()) {
-                if (a.isPrimary()) {
-                    a.setPrimary(false);
-                    a.setForeign(true);
-
-                }
+        for (Attribute a : getAttr().getElements()) {
+            if (a.isPrimary() && isWeak == true) {
+                a.setPrimary(false);
+                a.setForeign(true);
+            }
+            else if(a.isForeign() && isWeak ==false){
+                a.setPrimary(true);
+                a.setForeign(false);
             }
         }
+
     }
 
     // This function takes an the AttributesSet of an Entity
@@ -214,8 +215,8 @@ public class Entity extends ShapeObject {
             if( a.isPrimary()){
                 a.setPrimary(false);
                 a.setForeign(true);
+                newA.add(a);
             }
-            newA.add(a);
         }
         return newA;
     }

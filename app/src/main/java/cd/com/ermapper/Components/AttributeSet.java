@@ -5,9 +5,9 @@ package cd.com.ermapper.Components;
  * Created by ldnel_000 on 2015-11-04.
  */
         import android.os.Parcel;
-        import android.os.Parcelable;
+import android.os.Parcelable;
 
-        import java.util.ArrayList;
+import java.util.ArrayList;
 
 public class AttributeSet implements Parcelable {
 	/*
@@ -58,7 +58,13 @@ public class AttributeSet implements Parcelable {
     public void add(Attribute anAttribute) {
         //Add anAttribute without duplication
         if(anAttribute == null) return;
-        for(Attribute a : elements) if(a.getName().equals(anAttribute.getName()) || a.equals(anAttribute)) return; //don't add duplicates
+
+        for(Attribute a : elements) {
+            String n1 = a.getName().toLowerCase();
+            String n2 = anAttribute.getName().toLowerCase();
+            if (n1.trim().equals(n2.trim()) || a.equals(anAttribute))
+                return; //don't add duplicates
+        }
         elements.add(anAttribute);
     }
     public void addAll(AttributeSet anAttributeSet) {
@@ -286,5 +292,22 @@ public class AttributeSet implements Parcelable {
             }
         }
         return false;
+    }
+
+    public boolean hasName(String name){
+        for(Attribute a: this.getElements()){
+            String aname = a.getName().toLowerCase();
+            String n = name.toLowerCase();
+            if(aname.trim().equals(n.trim()) || a.getName().equals("-1"))
+                return true;
+        }
+        return false;
+    }
+
+    public boolean hasNames(AttributeSet primary) {
+        for(Attribute a:primary.elements){
+            if(!this.hasName(a.getName()) && !a.getName().equals("-1") ) return false;
+        }
+        return true;
     }
 }

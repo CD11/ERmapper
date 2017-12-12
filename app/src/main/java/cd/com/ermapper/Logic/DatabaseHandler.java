@@ -5,6 +5,7 @@ package cd.com.ermapper.Logic;
  */
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -41,44 +42,41 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         for(Relation r : this.relations.getRelations()) {
             String tablename = r.getName();
-            String type = "Text";
-            String columns = toString(r);
+            String columns = toString(r, this.relations);
+
             String createtable = "CREATE TABLE " + tablename + " " + columns;
             db.execSQL(createtable);
+
+            try{
+                String query = "SELECT * FROM "+tablename;
+                Cursor c = db.rawQuery(query, null);
+            }catch(NullPointerException e){
+                throw new NullPointerException(tablename+" Was not created");
+            }
         }
-           /* "( ";
-
-            for (Attribute a : r.getPrimaryKey().getElements()) {
-                columns +=   a.getName() +" "  + type + " PRIMARY KEY , ";
-            }
-            for (Attribute a : r.getAttributes().getElements()) {
-                if(!a.isPrimary()&& !r.getPrimaryKey().contains(a))
-                   columns +=  a.getName()+ " "+ type + " , ";
-            }
-            columns = columns.substring(0, columns.length() - 2); // strip off last comma
-
-            columns += " )";
-
-            */
-            ;
     }
+
 
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
     }
 
-    public String toString(Relation r) {
+    public String toString(Relation r, RelationSchema schema) {
 
-            String tablename = r.getName();
             String type = "Text";
 
             String columns = "( ";
-
             for (Attribute a : r.getPrimaryKey().getElements()) {
                 columns += a.getName() + " " + type + " PRIMARY KEY , ";
             }
             for (Attribute a : r.getAttributes().getElements()) {
+                if(a.isPrimary()){
+                    columns += a.getName() + " " + type + " PRIMARY KEY , ";
+                }
+                if(a.isForeign()){
+                    columns += a.getName() + " " + type + " REFERENCES " + schema.getForeignString(a)+",";
+                }
                 if (!a.isPrimary() && !r.getPrimaryKey().contains(a))
                     columns += a.getName() + " " + type + " , ";
             }
@@ -88,6 +86,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         return columns;
     }
+
+
 
 
 
