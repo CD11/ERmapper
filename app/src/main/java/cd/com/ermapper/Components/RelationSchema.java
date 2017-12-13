@@ -189,7 +189,7 @@ public class RelationSchema {
         for(Relation r: this.getRelations()){
             for(Attribute temp: r.getPrimaryKey().getElements()){
                 if(temp.getName().equals(a.getName())){ // make sure it is not foreign
-                    result +=  r.getName() +"("+a.getName()+") ";
+                    result +=  r.getName() +"("+a.getName()+")";
                     System.out.print(result);
                     return result;
                 }

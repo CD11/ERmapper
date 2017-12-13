@@ -7,6 +7,7 @@ package cd.com.ermapper.Logic;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import cd.com.ermapper.Components.Attribute;
@@ -40,6 +41,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        try {
+            this.clean(db);// remove old database
+        }catch (SQLiteException e){}
         for(Relation r : this.relations.getRelations()) {
             String tablename = r.getName();
             String columns = toString(r, this.relations);
@@ -68,15 +72,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             String columns = "( ";
             for (Attribute a : r.getPrimaryKey().getElements()) {
-                columns += a.getName() + " " + type + " PRIMARY KEY , ";
-            }
-            for (Attribute a : r.getAttributes().getElements()) {
-                if(a.isPrimary()){
-                    columns += a.getName() + " " + type + " PRIMARY KEY , ";
-                }
-                if(a.isForeign()){
+               if(a.isPrimary()) {
+                   columns += a.getName() + " " + type + " PRIMARY KEY, ";
+               }
+               else if(a.isForeign()){
                     columns += a.getName() + " " + type + " REFERENCES " + schema.getForeignString(a)+",";
                 }
+            }
+            for (Attribute a : r.getAttributes().getElements()) {
                 if (!a.isPrimary() && !r.getPrimaryKey().contains(a))
                     columns += a.getName() + " " + type + " , ";
             }
@@ -96,4 +99,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         this.relations = relations;
     }
 
+    public void clean(SQLiteDatabase db) {
+       for (Relation r: this.relations.getRelations()) {
+           String s = "DROP TABLE " + r.getName() + ";";
+           db.execSQL(s);
+       }
+       }
 }
