@@ -34,9 +34,15 @@ From the initial screen select new ER Diagram, this will launch a new activity w
 ### Creating Objects
  Press either the Entity or Attribute button to create either object. They will appear in the Top left side of the canvas; an Entity will be square and an Attribute will be oval. Both can be moved around by clicking and dragging them around the screen.
 
-  * Note: By double clicking an Entity you can set it to weak, and by double clicking and Attribute you can set it to primary
+ Press the Relationship object to create a relationship. Once the button is selected, click on the first object you want to connect, you will notice a line has been drawn from that object to your mouse, you may then move your mouse and click the second object to create the connection.    If for some reason your relationship is not created on the first try or the line is no longer available, click on the relationship button again. 
 
-Press the Relationship object to create a relationship. Once the button is selected, click on the first object you want to connect, you will notice a line has been drawn from that object to your mouse, you may then move your mouse and click the second object to create the connection.    If for some reason your relationship is not created on the first try or the line is no longer available, click on the relationship button again. 
+  * Note:
+    1.  Double clicking an Entity can set it to weak, 
+    2.  Every Foreign key must have an identifying primary key with the same name
+    3.  Double clicking and Attribute can set it to primary
+    4.  All objects have a name that can be edited by clicking it, however it uses an onFocusChange listener, so after you edit the name you must click something else on the screen, or press tab or enter.
+
+
 
   
 ### Saving the Diagram 
@@ -47,6 +53,16 @@ Pressing Normalize will launch a new Activity that automatically converts all en
   
 ### Create a Database
 By pressing the create database button the activity will open a connection to an SQLite database and create each a new database inserting each relation from the schema as a table in the database.
+
+# Running the Tests
+The following tests check the functionality and usability of the program by running unit tests that compares the expected vs actual results of emulated tests which emulate the system and allows for user interaction, and java tests which test the diagram and normalization functions.
+  1. To run jUnit Emulated tests go to src->androidTests. Right click and press run
+  2. To run jUnit java tests go to src->tests. Right click and press run.
   
+  *NOTE: Emulated tests sometimes fail do to sequence of events when run as a test suite.  If this occurs you can successfully run each test individually. 
+  
+  
+# Accessing Files
+When saving XML files or a Database the files are saved to the android devices internal storage which can be accessed through android studio using view->tools window -> device file explorer.  Then in the resulting pop up going to data -> data -> ERMapper and then either files or database for the respectful file types. 
   
   
