@@ -59,7 +59,7 @@ The following tests check the functionality and usability of the program by runn
   1. To run jUnit Emulated tests go to src->androidTests. Right click and press run
   2. To run jUnit java tests go to src->tests. Right click and press run.
   
-  *NOTE: Emulated tests sometimes fail do to sequence of events when run as a test suite.  If this occurs you can successfully run each test individually. 
+  * Note: Emulated tests sometimes fail do to sequence of events when run as a test suite.  If this occurs you can successfully run each test individually. 
   
   
 # Accessing Files
