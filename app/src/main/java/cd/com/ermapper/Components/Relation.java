@@ -23,7 +23,7 @@ public class Relation implements Parcelable{
         if (theAttributes == null)
             throw new NullPointerException(name + " attribute set is null");
         if (theAttributes.isEmpty())
-            throw new NullPointerException(name + " attribute set is empty");
+            throw new NullPointerException(name + " primmary set is empty");
         if (key != null && !theAttributes.containsAll(key))
             throw new NullPointerException(name +(" ERROR: PRIMARY KEY MUST BE A SUBSET OF THE ATTRIBUTES"));
 
@@ -35,7 +35,10 @@ public class Relation implements Parcelable{
         }
     }
 
-    public Relation(Entity obj1, Entity obj2) {
+
+    //Include as foreign key attributes in S the primary keys of the relations that represent the participating entity types; their combination will form the primary key of S.
+    public Relation(Entity obj1, Entity obj2, String name) {
+        this.name = name;
         AttributeSet temp = new AttributeSet();
         temp.addAll(obj1.foreignAttrs());
         temp.addAll(obj2.foreignAttrs());

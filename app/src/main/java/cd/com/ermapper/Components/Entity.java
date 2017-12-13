@@ -27,7 +27,6 @@ public class Entity extends ShapeObject {
      */
     public static final float offset  =  80;
     private AttributeSet attr;
-    private ArrayList<Entity> weak;
     private boolean isWeak;
 
 
@@ -35,7 +34,6 @@ public class Entity extends ShapeObject {
     public Entity(EditText eName, String name, float x, float y) {
         super(eName, name, x, y);
         attr = new AttributeSet();
-        weak = new ArrayList<>();
         isWeak =false;
         setCoordinateX(x);
         setCoordinateY(y);
@@ -44,16 +42,13 @@ public class Entity extends ShapeObject {
     public Entity(String name) {
         super(null, name, 0, 0);
         attr = new AttributeSet();
-        weak = new ArrayList<>();
     }
 
     protected Entity(Parcel in) {
         super(in);
         attr = new AttributeSet();
-        weak = new ArrayList<>();
         attr = in.readTypedObject(AttributeSet.CREATOR);
         isWeak = in.readByte() != 0;
-        weak = in.createTypedArrayList(Entity.CREATOR);
 
     }
 
@@ -107,8 +102,6 @@ public class Entity extends ShapeObject {
     public boolean containsObj(ShapeObject curr) {
         for(Attribute a: attr.getElements())
             if(a.equals(curr)) return true;
-        for(Entity e :weak)
-            if(e.equals(curr))return true;
         return false;
 
     }
@@ -117,33 +110,31 @@ public class Entity extends ShapeObject {
     public void removeObj(ShapeObject curr, RelativeLayout textLayer) {
         if(curr.getClass() == Attribute.class)
             if(attr.contains((Attribute) curr)) attr.remove((Attribute) curr);
-        if(curr.getClass() == Entity.class)
+      /*  if(curr.getClass() == Entity.class)
             if(weak.contains(curr)) weak.remove(curr);
-
+*/
     }
 
     @Override
     public void remove() {
         this.attr.getElements().clear();
-        this.weak.clear();
     }
 
     @Override
     public ArrayList<ShapeObject> getallobjects() {
         ArrayList<ShapeObject>s = new ArrayList<>();
        // s.add(this);
-        for(Attribute a: this.getAttr().getElements())
+        for(Attribute a: this.getAttr().getElements()) {
             s.addAll(a.getallobjects());
-        s.addAll(this.getWeak());
+            s.add(a);
+        }
+        //s.addAll(this.getWeak());
         return s;
     }
 
     /////////////////////  Setters and getters
     public AttributeSet getAttr() {
             return attr;
-        }
-    public ArrayList<Entity> getWeak() {
-            return  weak;
         }
     public boolean isWeak() {
         return isWeak;
@@ -189,10 +180,6 @@ public class Entity extends ShapeObject {
         If an entity is Strong, then it has weak entities that rely on it,
         the Relying entities get added to a list
     */
-    public void addEntity(ShapeObject curr1) {
-        if(!weak.contains(curr1))
-            this.weak.add((Entity) curr1);
-    }
 
     /* Function: setWeak()
        Purpose:  When an Entity is set to weak,  it cannot be identified  by itself, and its primary
@@ -204,38 +191,20 @@ public class Entity extends ShapeObject {
                     // to avoid duplication we will not store the primary keys of the strong relationships
                     in the attribute set of the weak entities;
      */
-    public void setWeak(ArrayList<Relationship> relationships) {
-        if(isWeak == false){
-            isWeak = true;
-            for(Attribute a:getAttr().getElements()) {
-                if (a.isPrimary()) {
-                    a.setPrimary(false);
-                    a.setForeign(true);
-
-                }
+    public void setWeak(Boolean weak) {
+        isWeak = weak;
+        for (Attribute a : getAttr().getElements()) {
+            if (a.isPrimary() && isWeak == true) {
+                a.setPrimary(false);
+                a.setForeign(true);
             }
-        }else{
-            isWeak = false;
-
-        }
-
-        // Search for strong entities and weak to strong list
-        for(Relationship r: relationships) {
-            if (r.getObj2().getClass() == Entity.class && r.getObj1().getClass() == Entity.class) {
-                if (r.getObj1() == this) { // obj1 is weak, Obj2 is strong
-                    if(!((Entity) (r.getObj2())).getWeak().contains(this))
-                        ((Entity) (r.getObj2())).addEntity(this);
-                    break;
-                } else if (r.getObj2() == this) { // obj2 is weak, obj1 is strong
-                    if(!((Entity)(r.getObj1())).getWeak().contains(this))
-                        ((Entity) (r.getObj1())).addEntity(this);
-                    break;
-                }
+            else if(a.isForeign() && isWeak ==false){
+                a.setPrimary(true);
+                a.setForeign(false);
             }
         }
 
     }
-
 
     // This function takes an the AttributesSet of an Entity
     // and sets any primary keys to foreign keys
@@ -246,8 +215,8 @@ public class Entity extends ShapeObject {
             if( a.isPrimary()){
                 a.setPrimary(false);
                 a.setForeign(true);
+                newA.add(a);
             }
-            newA.add(a);
         }
         return newA;
     }
@@ -258,20 +227,16 @@ public class Entity extends ShapeObject {
         super.writeToParcel(parcel, i);
         parcel.writeTypedObject(attr, i);
         parcel.writeByte((byte) (isWeak() ? 1 : 0));
-        parcel.writeTypedList(weak);
     }
 
     @Override
     public void isValid() {
-            if(this.isWeak && !this.weak.isEmpty()){
-                throw new NullPointerException(this.getName() +" invalid weak entity");
-            }
-            if(this.getAttr().isEmpty() || this.getAttr()== null) throw new NullPointerException(this.getName() +" has an invalid attribute Set");
-            if(this.getAttr().getPrimary())
-            for (Entity e : this.weak) {
-                e.isValid();
-            }
-
+        if (this.getAttr() == null)
+            throw new NullPointerException(this.getName() + " attribute set is null");
+        if (this.getAttr().isEmpty())
+            throw new NullPointerException(this.getName() + " primmary set is empty");
+        if (this.getPrimary() != null && !this.getAttr().containsAll(this.getPrimary()))
+            throw new NullPointerException(this.getName() +(" ERROR: PRIMARY KEY MUST BE A SUBSET OF THE ATTRIBUTES"));
     }
 
     @Override
@@ -289,7 +254,7 @@ public class Entity extends ShapeObject {
                 }
                 //serializer.endTag(" ", "Attributes");
             }
-            if(!this.getWeak().isEmpty()) {
+            /*if(!this.getWeak().isEmpty()) {
                 serializer.startTag(" ", "weakEntites");
                 for (Entity subE : this.getWeak()) {
                    this.shapeToXML(serializer);
@@ -297,7 +262,7 @@ public class Entity extends ShapeObject {
                 serializer.endTag("","weakEntities");
             }
             serializer.endTag(null,"Entity");
-
+        */
         }catch (IOException exception){
             Log.d("Entity XML Exception", String.valueOf(exception));
             throw exception;
@@ -307,6 +272,13 @@ public class Entity extends ShapeObject {
     }
 
 
-
-
+    public AttributeSet getPrimary() {
+        AttributeSet primary = new AttributeSet();
+        for(Attribute a: this.attr.getElements()){
+            if(a.isPrimary()||a.isForeign()){
+                primary.add(a);
+            }
+        }
+        return primary;
+    }
 }

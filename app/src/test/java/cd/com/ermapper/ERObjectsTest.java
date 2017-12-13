@@ -151,11 +151,16 @@ public class ERObjectsTest {
         // can create a weak entity
         ShapeObject e = new Entity("Enitty4");
         ShapeObject e1 = new Entity("Enitty5");
-        ((Entity)e).addEntity(e1);
-        diagram.addObject(e);
-        assertThat(true, is(diagram.getObjects().contains(e)));
-        assertThat(true, is(((Entity)e).getWeak().contains(e1)));
+        ((Entity)e1).setWeak(true);
+        Relationship r = new Relationship("has a", (Entity)e, (Entity)e1);
+        diagram.addObject(r);
+        assertThat(true, is(diagram.getObjects().contains(r)));
+        assertThat(true, is(r.containsObj(e)));
+        assertThat(true, is(r.containsObj(e1)));
+        assertThat(true, is(r.isWeak()));
         assertThat(false,is(diagram.getObjects().contains(e1)));
+        assertThat(true, is(diagram.getDrawnObjects().contains(e)));
+        assertThat(true, is(diagram.getDrawnObjects().contains(e1)));
     }
 
     @Test
@@ -163,12 +168,19 @@ public class ERObjectsTest {
         // can create a weak entity
         ShapeObject e = new Entity("Enitty4");
         ShapeObject e1 = new Entity("Enitty5");
-        ((Entity)e).addEntity(e1);
-        diagram.addObject(e);
+        ((Entity)e1).setWeak(true);
+        Relationship r = new Relationship("has a", (Entity)e, (Entity)e1);
+        // addds cardinality
+        r.getTextObjs().get(0).setNum(et);
+        r.getTextObjs().get(0).setO(e);
+        r.getTextObjs().get(1).setNum(et);
+        r.getTextObjs().get(1).setO(e1);
+        diagram.addObject(r);
         diagram.removeO((Entity)e1, textLayer);
         assertThat(true, is(diagram.getObjects().contains(e)));
-        assertThat(false, is(((Entity)e).getWeak().contains(e1)));
         assertThat(false, is(diagram.getObjects().contains(e1)));
+        assertThat(true, is(diagram.getDrawnObjects().contains(e)));
+        assertThat(false, is(diagram.getDrawnObjects().contains(e1)));
     }
 
     @Test

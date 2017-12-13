@@ -20,7 +20,7 @@ import cd.com.ermapper.Components.ShapeObject;
 import cd.com.ermapper.Logic.DatabaseHandler;
 import cd.com.ermapper.Logic.ERDiagram;
 
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by CD on 11/30/2017.
@@ -31,7 +31,7 @@ public class DatabaseTest {
 
     private DatabaseHandler database;
     ERDiagram diagram;
-    ShapeObject student, teacher, course;
+    ShapeObject student, grade, course;
     RelationSchema r;
     Context appContext = InstrumentationRegistry.getTargetContext();
     EditText et;
@@ -39,16 +39,13 @@ public class DatabaseTest {
     @Before
     public void setUp() throws Exception {
        // appContext.deleteDatabase(database.getName());
-        database = new DatabaseHandler(appContext, "erDiagram", null,1, null);
 
-     /* This sets up an ERDiagram with 3 Entities Student, Teacher and Course
-           - Student :  primary key : id,  candidate keys : dob (multivalued, year, month day)
-           - Teacher:   primary key : tId, candidate keys : name
+     /* This sets up an ERDiagram with 3 Entities Student, grade and Course
+           - Student :  primary key : id,  attributes : dob (multivalued, year, month day)
+           - Grade:   primary key : id, code, attributes : mark
              - will be a weak entity
-           - Course :   primary key : code, candidate keys : room
+           - Course :   primary key : code, attributes : room
            - all three will be part of the same relationship
-
-
            */
         et = new EditText(appContext);
 
@@ -66,13 +63,16 @@ public class DatabaseTest {
         ((Entity)student).addAttribute((Attribute) id);
         ((Entity)student).addAttribute((Attribute) dob);
 
-        teacher = new Entity("Teacher");
-        ShapeObject tId = new Attribute("tId");
-        ShapeObject name = new Attribute("name");
-        ((Attribute)tId).setPrimary(true);
-        ((Entity)teacher).addAttribute((Attribute) tId);
-        ((Entity)teacher).addAttribute((Attribute) name);
-
+        grade = new Entity("Grade");
+        ShapeObject gId = new Attribute("id");
+        ShapeObject gCode = new Attribute("code");
+        ShapeObject mark = new Attribute("mark");
+        ((Attribute)gId).setPrimary(true);
+        ((Attribute)gCode).setPrimary(true);
+        ((Entity)grade).addAttribute((Attribute) gId);
+        ((Entity)grade).addAttribute((Attribute) gCode);
+        ((Entity)grade).addAttribute((Attribute) mark);
+        ((Entity)grade).setWeak(true);
 
 
         course = new Entity("Course");
@@ -86,11 +86,11 @@ public class DatabaseTest {
 
         // Sets cardinality so not null, values do not matter for this test
         hasA.getTextObjs().get(0).setNum(et);
-        hasA.getTextObjs().get(0).setO(teacher);
+        hasA.getTextObjs().get(0).setO(grade);
         hasA.getTextObjs().get(1).setNum(et);
         hasA.getTextObjs().get(1).setO(student);
         diagram.addObject(hasA);
-        hasA.addObj((Entity) teacher,null);
+        hasA.addObj((Entity) grade,null);
 
         // these are called when passed to parcel
         diagram.getRelationships();
@@ -104,17 +104,26 @@ public class DatabaseTest {
     public void createDB() throws Exception {
         RelationSchema r = new RelationSchema(diagram.getAllEntities(), diagram.getRelationshipsObjs());
         r.removalAllTemp();
+        database = new DatabaseHandler(appContext, "erDiagram", null,1, null);
         database.setRelations(r);
-        database.getWritableDatabase();
-        SQLiteDatabase db = database.getWritableDatabase();
+       // database.clean(database.getWritableDatabase());
+        database.onCreate(database.getWritableDatabase());
+        SQLiteDatabase db = database.getReadableDatabase();
+
         for (Relation t : r.getRelations()) {
             String query = "SELECT * FROM "+t.getName();
             Cursor c = db.rawQuery(query, null);
-            for(int i = 0; i < c.getCount(); i++){
+
+            System.out.print(c.getColumnCount());
+            for(int i = 0; i < t.getAttributes().size()-1; i++){
                 String actual = c.getColumnName(i);
-                assertTrue(t.getAttributes().getElements().get(i).getName(), equals(actual));
+                assertTrue(t.getAttributes().hasName(actual));
+                c.moveToNext();
             }
         }
+        database.clean(database.getWritableDatabase());
     }
+
+
 
 }

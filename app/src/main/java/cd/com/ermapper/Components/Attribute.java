@@ -52,6 +52,7 @@ public class Attribute extends ShapeObject {
     public Attribute(Parcel in) {
         super(in);
         primary = in.readByte() != 0;
+        foreign= in.readByte() != 0;
         values = in.createTypedArrayList(Attribute.CREATOR);
     }
 
@@ -71,7 +72,7 @@ public class Attribute extends ShapeObject {
     @Override
     public ArrayList<ShapeObject> getallobjects() {
         ArrayList<ShapeObject>s = new ArrayList<>();
-        s.add(this);
+      //  s.add(this);
         for(Attribute a: this.getValuesSet().getElements())
             s.add(a);
 
@@ -148,7 +149,7 @@ public class Attribute extends ShapeObject {
     }
     public void setCoordinateY(float coordinateY) {
         this.getCoordinates().setY(coordinateY);
-        this.getCoordinates().setHeight(coordinateY + 200);
+        this.getCoordinates().setHeight(coordinateY + 175);
 
     }
 
@@ -180,6 +181,7 @@ public class Attribute extends ShapeObject {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(this.getName());
         parcel.writeByte((byte) (primary ? 1 : 0));
+        parcel.writeByte((byte) (foreign ? 1 : 0));
         parcel.writeTypedList(values);
     }
 

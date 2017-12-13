@@ -88,7 +88,7 @@ public class DrawObjects extends View {
          */
 
         int eventaction = event.getAction();
-        boolean doublepress = false;
+        long time = 0;
         switch (eventaction) {
             case MotionEvent.ACTION_DOWN: {
                 /* check for double click */
@@ -102,7 +102,7 @@ public class DrawObjects extends View {
                 if (clickCount == 1) {
                     startTime = System.currentTimeMillis(); // only start if  first click
                 }
-                long time = System.currentTimeMillis() - startTime;
+                time = System.currentTimeMillis() - startTime;
                 duration = duration + time;
                 // check for clicks that cannot be double clicks
                 if (duration > MAX_DURATION || clickCount > 2) {
@@ -147,7 +147,7 @@ public class DrawObjects extends View {
                     if (clickCount == 2 && state != 3 && curr != null && duration <= MAX_DURATION) {
                         // if the curr object is an entity set it to weak
                         if (curr.getClass() == Entity.class) {
-                            ((Entity) curr).setWeak(d.getRelationships());
+                            ((Entity) curr).setWeak(!((Entity) curr).isWeak());
                             invalidate();
                         }
                         // if the curr object is an attribute set it to primary
@@ -155,8 +155,7 @@ public class DrawObjects extends View {
                             ((Attribute) curr).setPrimary(!((Attribute) curr).isPrimary());
                             invalidate();
                         }
-                        doublepress = true;
-
+                        invalidate();
                         clickCount = 0;
                         duration = 0;
                     }
@@ -199,12 +198,13 @@ public class DrawObjects extends View {
                 endY = event.getY();
                          /* Get Movement */
                 //  Find connecting relationship
-                if (rCurr != null && curr != null ) {
+                time = System.currentTimeMillis() - startTime;
+                if (rCurr != null && curr != null  && time > 150) {
                     for (ShapeObject i : d.getDrawnObjects()) {
                         // Object clicked
                         if (i.contains(endX + 10, endY + 10) && !(i == curr)) {
                             curr1 = i;
-                            // Check Entities
+                            // Add Attribute to Entity
                             if (curr.getClass() == Entity.class && curr1.getClass() == Attribute.class) {  // if curr is an entity, add attribute curr1 to entity
                                 ((Entity) curr).addAttribute((Attribute) curr1);
                                 d.deleteO(curr1);
@@ -213,7 +213,7 @@ public class DrawObjects extends View {
                                 ((Entity) curr1).addAttribute((Attribute) curr);
                                 d.deleteO(curr);
                                 break;
-                                // Check Attribute
+                                // Add Attribute to Attribute
                             } else if (curr1.getClass() == Attribute.class && curr.getClass() == Attribute.class) { // if attribute is multivalued
                                 //  check for other values already being stored.
                                 if (((Attribute) curr).getValues().isEmpty() && !((Attribute) curr1).getValues().isEmpty()) {
@@ -225,7 +225,7 @@ public class DrawObjects extends View {
                                     d.deleteO(curr1);
                                     break;
                                 }
-                                //Check Relationship
+                                // Add Attribute to Relationship
                             } else if (curr1.getClass() == Attribute.class && curr.getClass() == Relationship.class) { // Add Attributes to a relationship
                                 ((Relationship) curr).addAttribute((Attribute) curr1);
                                 d.deleteO(curr1);
@@ -234,7 +234,9 @@ public class DrawObjects extends View {
                                 ((Relationship) curr1).addAttribute((Attribute) curr);
                                 d.deleteO(curr);
                                 break;
-                            } else if (curr1.getClass() == Entity.class && curr.getClass() == Relationship.class) {
+                            }
+                            // add Entity to existing relationship
+                            else if (curr1.getClass() == Entity.class && curr.getClass() == Relationship.class) {
                                 rCurr.setObj1(curr, c);
                                 ((Relationship) curr).addObj((Entity) curr1, c);
                                 // adds the edit text to the layer so you can edit cardinality
@@ -247,7 +249,7 @@ public class DrawObjects extends View {
                                 d.deleteO(curr);
                                 break;
                             }
-                            // this only gets reached if it is 2 entity objects
+                            // Create a new relationship between two entities
                             rCurr.setObj2(curr1, c);
                             rCurr.setObj1(curr, c);
                             rCurr.update();
@@ -259,8 +261,6 @@ public class DrawObjects extends View {
                                 textLayer.addView(rCurr.getEditId());
                                 textLayer.bringChildToFront(rCurr.getEditId());
                                 Log.d("editText", String.valueOf(textLayer.getChildCount()));
-
-                                //rCurr.moveName();
                                 for (Cardinality e : rCurr.getTextObjs()) {
                                     textLayer.addView(e.getNum());
                                 }

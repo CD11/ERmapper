@@ -229,6 +229,17 @@ public class Relationship extends ShapeObject {
     }
     @Override
     public void removeObj(ShapeObject curr, RelativeLayout textLayer) {
+        for(Attribute a: this.getAttrs().getElements()){
+            if(a.containsObj(curr)){
+                a.removeObj(curr, textLayer);
+                break;
+            }
+            if(a.equals(curr)){
+                this.attrs.remove(a);
+                break;
+            }
+
+        }
         for(Entity e: objs.getElements()) {
             if (e.containsObj(curr)){
                 e.removeObj(curr,textLayer);
@@ -250,6 +261,8 @@ public class Relationship extends ShapeObject {
         ArrayList<ShapeObject> s = new ArrayList<>();
         for(Attribute a: this.attrs.getElements()) {
             s.addAll(a.getallobjects());
+            s.add(a);
+
         }
         if(this.getObjs().isEmpty()){
             s.add(obj1);
@@ -317,6 +330,8 @@ public class Relationship extends ShapeObject {
     }
 
     public EntitySet getObjs() { return objs;}
+
+
     // Is the relationship is between two objects, then add objects to entity set
     public EditText addObj(Entity obj, Context c){
         if(obj == null )
@@ -324,9 +339,11 @@ public class Relationship extends ShapeObject {
         // Create a cardinality for the object
         Cardinality cd = null;
         if(!objs.contains(obj)) { // Check for duplicates
-            objs.add(obj);
+           // if obj is Weak add it to strong entities
+
             cd = new Cardinality(c, obj);
             conns.add(cd);
+            objs.add(obj);
         }
 
         return cd.getNum();
@@ -475,6 +492,37 @@ public class Relationship extends ShapeObject {
             Log.d("R XML Exception", String.valueOf(exception));
             throw exception;
         }
+    }
+
+    public EntitySet getStrong() {
+        EntitySet strong = new EntitySet();
+        for(Entity e: this.getObjs().getElements()){
+            if(!e.isWeak()){
+                strong.add(e);
+            }
+        }
+        return strong;
+    }
+
+
+    // this returns all attributes in the entire relationship
+    public AttributeSet getAllAttr() {
+        AttributeSet attrs = new AttributeSet();
+        for(Entity e : this.getObjs().getElements()){
+            attrs.addAll(e.getAttr());
+        }
+        // add any attrs in the relationship
+        attrs.addAll(this.attrs);
+        return  attrs;
+    }
+
+    public boolean validForeignKey(String name){
+        for(Entity e: this.getStrong().getElements()){
+            if(e.getPrimary().hasName(name)){
+                return true;
+            }
+        }
+        return false;
     }
 
 }
