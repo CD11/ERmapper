@@ -91,7 +91,6 @@ public class DiagramTest {
     @Test
     public void SelectObject(){
         onView(withId(R.id.Select)).perform(click());
-
         // It is ready for you to to Select an object
         assertThat(draw.getState(), is(4));
 
