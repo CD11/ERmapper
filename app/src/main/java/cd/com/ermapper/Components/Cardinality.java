@@ -5,7 +5,6 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 
@@ -35,15 +34,6 @@ public class Cardinality implements Parcelable {
         num.setSingleLine();
         num.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
         num.setTextColor(BLACK);
-        num.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-
-            @Override
-            public void onFocusChange(View view, boolean b) {
-                if(!view.hasFocus()){
-                    object.setName(String.valueOf(num.getText()));
-                }
-            }
-        });
 
 
     }

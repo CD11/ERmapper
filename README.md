@@ -6,8 +6,8 @@ The following are instructions of how to install and set up the software require
   1. JRE: 1.8.0_152-release-9159b01
   2. JVMOpenJDK 64-bit Server VM  by JetBrains s.r.o
   
-2. In Android studio go to File -> new -> import Project.  
-   A dialog will pop up, select the directory where you saved ERMapper.zip and the project will open. 
+2. In Android studio go to File -> open an existing android studio project  
+   A dialog will pop up, select the directory where you saved ERMapper, and select  **ERMapper->ERMapper->APP**. 
 
 **The following are instructions on how to setup the program to run on an emulator in android studio**
   1. In Android studio go to Tools > Android > SDK Manager.
